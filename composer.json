@@ -1,0 +1,14 @@
+{
+    "name": "nasser/expense-manager",
+    "description": "Expense management system",
+    "type": "project",
+    "authors": [
+        {
+            "name": "AmirEFT"
+        }
+    ],
+    "minimum-stability": "stable",
+    "require": {
+		"codeigniter/framework": "3.1.13"
+	}
+}
