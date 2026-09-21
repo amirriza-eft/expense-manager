@@ -23,11 +23,6 @@ class Migration_Create_categories extends CI_Migration
                 'constraint' => 100
             ],
 
-            'type' => [
-                'type' => 'ENUM',
-                'constraint' => ['income', 'expense']
-            ],
-
             'created_at DATETIME DEFAULT CURRENT_TIMESTAMP',
 
             'updated_at DATETIME DEFAULT CURRENT_TIMESTAMP

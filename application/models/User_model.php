@@ -13,8 +13,17 @@ class User_model extends CI_Model
         $this->load->database();
     }
 
-    public function signup($email, $password)
+    public function create($data)
     {
+        return $this->db->insert($this->table, $data);
+    }
 
+    public function find_by_email($email)
+    {
+        return $this->db
+            ->where('email', $email)
+            ->where('deleted_at IS NULL', null, false)
+            ->get($this->table)
+            ->row();
     }
 }
