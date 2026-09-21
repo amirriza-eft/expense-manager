@@ -45,7 +45,7 @@
                 <input type="text"
                        class="form-control"
                        name="full_name"
-                       placeholder="مثال: علی محمدی"
+                       placeholder="مثل: بابک زنجانی"
                        required>
             </div>
         </div>
