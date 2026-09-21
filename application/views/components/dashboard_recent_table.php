@@ -28,7 +28,7 @@
         </div>
         <div class="col-12 col-md-2 d-flex gap-2">
             <button type="submit" class="btn btn-orange-outline w-100">اعمال فیلتر</button>
-            <a href="<?= site_url('home') ?>" class="btn btn-secondary" title="پاکسازی فیلترها"><i class="bi bi-arrow-clockwise"></i></a>
+            <a href="<?= site_url('home') ?>" class="btn btn-secondary px-3" title="پاکسازی فیلترها"><i class="bi bi-arrow-clockwise"></i></a>
         </div>
     </form>
 </div>

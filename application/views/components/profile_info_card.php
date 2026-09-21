@@ -14,14 +14,16 @@
         <div class="d-flex flex-column flex-sm-row align-items-center gap-4 mb-4">
             <div>
                 <img
-                        src=""
+                        src="https://placehold.co/100x100/1e1e24/ff6b00?text=%20"
                         id="avatarPreview"
                         class="rounded-circle border"
+                        alt="Avatar"
                         style="
                 width:100px;
                 height:100px;
                 object-fit:cover;
                 border-color:var(--accent-orange)!important;
+                background-color:var(--bg-surface);
                 ">
             </div>
 

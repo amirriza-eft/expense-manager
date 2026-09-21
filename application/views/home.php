@@ -22,7 +22,7 @@
                 <h2 class="fw-bold text-white mb-1">داشبورد مالی</h2>
                 <p class="text-muted small mb-0">خوش آمدید، <?= html_escape($this->session->userdata('user_name') ?? 'کاربر') ?>. خلاصه وضعیت دخل و خرج این ماه:</p>
             </div>
-            <div class="d-flex gap-2">
+            <div class="d-flex flex-wrap gap-2">
                 <button class="btn btn-orange-outline btn-sm px-3" data-bs-toggle="modal" data-bs-target="#editBudgetModal">
                     <i class="bi bi-piggy-bank me-1"></i> تنظیم بودجه
                 </button>

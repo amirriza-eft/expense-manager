@@ -7,7 +7,7 @@
         <div class="glass-panel p-3 h-100 position-relative">
             <div class="d-flex justify-content-between align-items-center mb-2">
                 <span class="text-muted small fw-medium">بودجه</span>
-                <i class="bi bi-piggy-bank text-warning fs-4"></i>
+                <i class="bi bi-piggy-bank fs-4" style="color: var(--accent-orange);"></i>
             </div>
             <h4 class="fw-bold text-white mb-1"><?= number_format($budget_amount ?? 0) ?> <span class="fs-6 text-muted">ریال</span></h4>
             <div class="small text-muted">بودجه هدف تعیین‌شده</div>
@@ -49,6 +49,8 @@
 <!--            <div class="small --><?php //= ($remaining_amount >= 0) ? 'text-success' : 'text-danger' ?><!--">-->
 <!--                --><?php //= ($remaining_amount >= 0) ? 'تراز مالی مثبت' : 'کسری بودجه' ?>
 <!--            </div>-->
+            <h4 class="fw-bold text-muted mb-1">—</h4>
+            <div class="small text-muted">به‌زودی</div>
         </div>
     </div>
 </div>

@@ -85,7 +85,7 @@
     </form>
 
 
-    <div class="text-center mt-4 pt-3">
+    <div class="text-center mt-4 pt-3 border-top" style="border-color: var(--border-subtle) !important;">
         <span class="text-muted small">
             حساب کاربری ندارید؟
         </span>
