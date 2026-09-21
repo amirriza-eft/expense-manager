@@ -22,7 +22,7 @@
         </div>
     <?php endif; ?>
 
-    <form action="<?= site_url('auth/login_action') ?>" method="POST" id="loginForm" novalidate>
+    <form action="<?= site_url('auth/login') ?>" method="POST" id="loginForm" novalidate>
         <div class="mb-3">
             <label for="email" class="form-label text-light small fw-medium">ایمیل</label>
             <div class="input-group">

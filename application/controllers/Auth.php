@@ -9,14 +9,80 @@ class Auth extends CI_Controller {
         $this->load->library('form_validation');
         $this->load->helpers('helper');
     }
-    public function login() {
-        $data['page_title'] = 'ورود به حساب';
-        $this->load->view('login', $data);
-    }
 
     public function profile() {
         $data['page_title'] = 'مشخصات کاربر';
         $this->load->view('profile', $data);
+    }
+
+
+    public function login() {
+
+        if ($this->input->method() == 'post') {
+
+            $this->form_validation->set_rules(
+                'email',
+                'Email',
+                'required|valid_email',
+            );
+
+            $this->form_validation->set_rules(
+                'password',
+                'Password',
+                'required',
+            );
+
+            if ($this->form_validation->run() === FALSE) {
+
+                $data['page_title'] = 'ورود به حساب';
+
+                $this->load->view('login', $data);
+
+                return;
+            }
+
+            $email = $this->input->post('email', true);
+
+            $password = $this->input->post('password');
+
+            $user = $this->User_model
+                ->find_by_email($email);
+
+
+            if (!$user) {
+                $this->session->set_flashdata(
+                    'error',
+                    'ایمیل یا رمز عبور اشتباه است'
+                );
+
+                redirect('login');
+                return;
+            }
+
+            if (!password_verify($password, $user->password)) {
+
+                $this->session->set_flashdata(
+                    'error',
+                    'ایمیل یا رمز عبور اشتباه است'
+                );
+
+                redirect('login');
+                return;
+            }
+
+            $session_data = [
+                'user_id' => $user->id,
+                'full_name' => $user->full_name,
+                'email' => $user->email,
+                'logged_in' => true
+            ];
+
+            $this->session->set_userdata($session_data);
+            redirect('home');
+        }
+
+        $data['page_title'] = 'ورود به حساب';
+        $this->load->view('login', $data);
     }
 
     public function register()
@@ -91,5 +157,12 @@ class Auth extends CI_Controller {
 
         $data['page_title'] = 'ثبت‌نام کاربر';
         $this->load->view('signup', $data);
+    }
+
+
+    public function logout()
+    {
+        $this->session->sess_destroy();
+        redirect('login');
     }
 }
