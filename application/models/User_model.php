@@ -26,4 +26,20 @@ class User_model extends CI_Model
             ->get($this->table)
             ->row();
     }
+
+    public function find($id)
+    {
+        return $this->db
+            ->where('id',$id)
+            ->where('deleted_at IS NULL',null,false)
+            ->get($this->table)
+            ->row();
+    }
+
+    public function update($id,$data)
+    {
+        return $this->db
+            ->where('id',$id)
+            ->update($this->table,$data);
+    }
 }

@@ -14,29 +14,47 @@ class Auth extends CI_Controller
 
     public function register()
     {
-
         $this->form_validation->set_rules(
             'full_name',
-            'Name',
-            'required|min_length[3]|max_length[100]'
+            'نام و نام خانوادگی',
+            'required|min_length[3]|max_length[100]',
+            [
+                'required' => 'وارد کردن {field} الزامی است.',
+                'min_length' => '{field} باید حداقل ۳ کاراکتر باشد.',
+                'max_length' => '{field} نباید بیشتر از ۱۰۰ کاراکتر باشد.'
+            ]
         );
 
         $this->form_validation->set_rules(
             'email',
-            'Email',
-            'required|valid_email|max_length[100]'
+            'ایمیل',
+            'required|valid_email|max_length[100]',
+            [
+                'required' => 'وارد کردن {field} الزامی است.',
+                'valid_email' => 'فرمت {field} صحیح نیست.',
+                'max_length' => '{field} نباید بیشتر از ۱۰۰ کاراکتر باشد.'
+            ]
         );
 
         $this->form_validation->set_rules(
             'password',
-            'Password',
-            'required|min_length[8]|max_length[100]'
+            'رمز عبور',
+            'required|min_length[8]|max_length[100]',
+            [
+                'required' => 'وارد کردن {field} الزامی است.',
+                'min_length' => '{field} باید حداقل ۸ کاراکتر باشد.',
+                'max_length' => '{field} نباید بیشتر از ۱۰۰ کاراکتر باشد.'
+            ]
         );
 
         $this->form_validation->set_rules(
             'password_confirm',
-            'Confirm Password',
-            'required|matches[password]'
+            'تکرار رمز عبور',
+            'required|matches[password]',
+            [
+                'required' => 'وارد کردن {field} الزامی است.',
+                'matches' => '{field} با رمز عبور یکسان نیست.'
+            ]
         );
 
         if($this->form_validation->run() === FALSE)
@@ -133,9 +151,7 @@ class Auth extends CI_Controller
     private function json($data)
     {
         header('Content-Type: application/json');
-
         echo json_encode($data,JSON_UNESCAPED_UNICODE);
-
         exit;
     }
 
