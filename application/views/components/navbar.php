@@ -217,7 +217,7 @@
                         <img src="<?= $avatar_url ?>" alt="Avatar" class="user-nav-avatar">
                         <span class="text-light small fw-medium d-none d-md-inline"><?= html_escape($user_name) ?></span>
                     </a>
-                    <a href="<?= site_url('auth/logout') ?>" class="btn btn-outline-danger btn-sm px-3 py-1 rounded-2" title="خروج">
+                    <a href="#" id="logoutBtn" class="btn btn-outline-danger btn-sm px-3 py-1 rounded-2" title="خروج">
                         <i class="bi bi-box-arrow-right"></i>
                         <span class="d-none d-sm-inline ms-1">خروج</span>
                     </a>
@@ -238,3 +238,28 @@
 </nav>
 
 <main class="flex-grow-1">
+
+<script>
+
+    document.getElementById('logoutBtn')
+        ?.addEventListener('click', function(e){
+            e.preventDefault();
+
+            fetch("<?= site_url('api/auth/logout') ?>", {
+                method:"POST"
+            })
+                .then(response => response.json())
+
+                .then(data => {
+                    if(data.status)
+                    {
+                        window.location.href =
+                            "<?= site_url('login') ?>";
+                    }
+                })
+
+                .catch(error => {
+                    console.log(error);
+                });
+        });
+</script>
