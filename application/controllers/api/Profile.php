@@ -8,6 +8,7 @@ class Profile extends CI_Controller
     {
         parent::__construct();
         $this->load->model('User_model');
+        $this->load->library('upload');
     }
 
 
@@ -36,19 +37,39 @@ class Profile extends CI_Controller
     {
         $user_id = $this->session->userdata('user_id');
 
-        $data=[
+        $data = [
             'full_name'=>$this->input->post('full_name',true),
             'email'=>$this->input->post('email',true),
             'updated_at'=>date('Y-m-d H:i:s')
         ];
 
+        if(!empty($_FILES['avatar']['name']))
+        {
+
+            $config = [
+                'upload_path'   => FCPATH . '../uploads/avatars/',
+                'allowed_types' => 'jpg|jpeg|png|webp',
+                'max_size'      => 2048,
+                'encrypt_name'  => true
+            ];
+
+            $this->upload->initialize($config);
+
+            if(!$this->upload->do_upload('avatar'))
+            {
+                return $this->json([
+                    'status'=>false,
+                    'message'=>$this->upload->display_errors('', '')
+                ],400);
+            }
+
+            $upload = $this->upload->data();
+
+            $data['avatar'] = $upload['file_name'];
+        }
+
         if($this->User_model->update($user_id,$data))
         {
-            $this->session->set_userdata([
-                'full_name'=>$data['full_name'],
-                'email'=>$data['email']
-            ]);
-
             return $this->json([
                 'status'=>true,
                 'message'=>'اطلاعات با موفقیت ذخیره شد'
