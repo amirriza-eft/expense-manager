@@ -127,11 +127,9 @@
 
 
         <button type="submit"
-                class="btn btn-orange-glow w-100 py-2 fw-bold"
+                class="btn btn-orange-glow w-100"
                 id="regSubmitBtn">
-
             ایجاد حساب کاربری
-
         </button>
 
 

@@ -32,7 +32,9 @@
             --border-subtle: rgba(255, 255, 255, 0.08);
             --border-orange: rgba(255, 107, 0, 0.5);
             --font-family: 'Vazirmatn', -apple-system, BlinkMacSystemFont, sans-serif;
-            --radius-control: 0.65rem;
+            --radius-control: 0.75rem;
+            --control-height: 2.75rem;
+            --btn-font-size: 0.9rem;
         }
 
         body {
@@ -55,6 +57,7 @@
             -webkit-backdrop-filter: blur(14px);
             border: 1px solid var(--border-subtle);
             border-radius: 1.25rem;
+            box-shadow: 0 8px 28px rgba(0, 0, 0, 0.18);
         }
 
         .navbar-custom {
@@ -99,20 +102,36 @@
             box-shadow: 0 0 0 0.2rem rgba(255, 107, 0, 0.25);
         }
 
+        .btn {
+            font-size: var(--btn-font-size);
+            font-weight: 600;
+            line-height: 1.35;
+            min-height: var(--control-height);
+            padding: 0.55rem 1.15rem;
+            border-radius: var(--radius-control);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.35rem;
+            transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease, filter 0.2s ease;
+        }
+
+        .btn-sm {
+            min-height: 2.15rem;
+            padding: 0.35rem 0.8rem;
+            font-size: 0.82rem;
+        }
+
         .btn-orange-glow {
             background: linear-gradient(135deg, var(--accent-orange) 0%, var(--accent-orange-hover) 100%);
             border: none;
             color: #ffffff !important;
-            font-weight: 600;
-            box-shadow: 0 4px 18px var(--accent-glow);
-            transition: transform 0.3s ease, box-shadow 0.3s ease, filter 0.3s ease;
-            border-radius: var(--radius-control);
+            box-shadow: 0 3px 14px var(--accent-glow);
         }
 
         .btn-orange-glow:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 24px rgba(255, 107, 0, 0.5);
-            filter: brightness(1.08);
+            box-shadow: 0 4px 18px rgba(255, 107, 0, 0.45);
+            filter: brightness(1.06);
             color: #ffffff !important;
         }
 
@@ -125,7 +144,6 @@
         .btn-orange-glow:disabled,
         .btn-orange-glow.disabled {
             opacity: 0.65;
-            transform: none;
             box-shadow: none;
             filter: none;
         }
@@ -134,23 +152,18 @@
             border: 1.5px solid var(--accent-orange);
             color: var(--accent-orange) !important;
             background: transparent;
-            font-weight: 600;
-            border-radius: var(--radius-control);
-            transition: transform 0.3s ease, box-shadow 0.3s ease, background 0.3s ease, color 0.3s ease;
         }
 
         .btn-orange-outline:hover {
             background: rgba(255, 107, 0, 0.12);
             color: var(--accent-orange-hover) !important;
-            box-shadow: 0 0 15px rgba(255, 107, 0, 0.2);
-            transform: translateY(-2px);
+            box-shadow: 0 0 12px rgba(255, 107, 0, 0.18);
         }
 
         .btn-secondary {
             background-color: #2a2a35 !important;
             border-color: #3d3d4e !important;
             color: var(--text-main) !important;
-            border-radius: var(--radius-control);
         }
 
         .btn-secondary:hover,
@@ -187,11 +200,16 @@
         .btn-danger {
             background-color: #dc3545;
             border-color: #dc3545;
-            border-radius: var(--radius-control);
+        }
+
+        .btn-group-sm > .btn {
+            min-height: 2rem;
+            padding: 0.3rem 0.55rem;
+            font-size: 0.8rem;
         }
 
         .form-label {
-            margin-bottom: 0.4rem;
+            margin-bottom: 0.45rem;
         }
 
         .form-control, .form-select, .form-check-input {
@@ -199,8 +217,13 @@
             border: 1px solid #3d3d4e !important;
             color: var(--text-main) !important;
             border-radius: var(--radius-control);
-            padding: 0.75rem 1rem;
+            min-height: var(--control-height);
+            padding: 0.55rem 0.95rem;
             font-size: 0.95rem;
+        }
+
+        textarea.form-control {
+            min-height: auto;
         }
 
         .form-control::placeholder {
@@ -219,7 +242,7 @@
 
         .form-control:focus, .form-select:focus {
             border-color: var(--accent-orange) !important;
-            box-shadow: 0 0 0 0.25rem rgba(255, 107, 0, 0.25) !important;
+            box-shadow: 0 0 0 0.2rem rgba(255, 107, 0, 0.22) !important;
             outline: none;
         }
 
@@ -229,26 +252,38 @@
             opacity: 0.85;
         }
 
-        .input-group-text {
-            background-color: var(--bg-input) !important;
-            border: 1px solid #3d3d4e !important;
-            color: var(--text-muted);
+        /* Fully rounded input groups — avoids pointy/mismatched corners in RTL */
+        .input-group {
+            border: 1px solid #3d3d4e;
+            border-radius: var(--radius-control);
+            overflow: hidden;
+            background-color: var(--bg-input);
+            min-height: var(--control-height);
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .input-group:focus-within {
+            border-color: var(--accent-orange);
+            box-shadow: 0 0 0 0.2rem rgba(255, 107, 0, 0.22);
         }
 
         .input-group > .form-control,
         .input-group > .form-select,
-        .input-group > .input-group-text {
+        .input-group > .input-group-text,
+        .input-group > button.input-group-text {
+            border: 0 !important;
             border-radius: 0 !important;
+            box-shadow: none !important;
+            min-height: calc(var(--control-height) - 2px);
+            background-color: transparent !important;
         }
 
-        .input-group > :first-child {
-            border-start-start-radius: var(--radius-control) !important;
-            border-end-start-radius: var(--radius-control) !important;
-        }
-
-        .input-group > :last-child {
-            border-start-end-radius: var(--radius-control) !important;
-            border-end-end-radius: var(--radius-control) !important;
+        .input-group-text {
+            color: var(--text-muted);
+            padding: 0.55rem 0.85rem;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
         }
 
         button.input-group-text {
@@ -258,7 +293,7 @@
 
         button.input-group-text:hover {
             color: var(--accent-orange);
-            background-color: #2c2c36 !important;
+            background-color: rgba(255, 255, 255, 0.04) !important;
         }
 
         .user-nav-avatar {
@@ -363,70 +398,43 @@
 </head>
 <body>
 
-<nav class="navbar navbar-expand-lg navbar-dark navbar-custom sticky-top">
-    <div class="container">
+<nav class="navbar navbar-dark navbar-custom sticky-top">
+    <div class="container d-flex align-items-center justify-content-between">
         <!-- Logo -->
-        <a class="navbar-brand d-flex align-items-center gap-2" href="<?= site_url('home') ?>">
+        <a class="navbar-brand d-flex align-items-center gap-2 mb-0" href="<?= site_url('home') ?>">
             <i class="bi bi-wallet2 brand-icon fs-3"></i>
             <span>حساب<span style="color: var(--accent-orange);">‌یار</span></span>
         </a>
 
-        <!-- Mobile Toggle -->
-        <button class="navbar-toggler border-0 shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#mainNavbar">
-            <i class="bi bi-list fs-2 text-light"></i>
-        </button>
-
-        <div class="collapse navbar-collapse" id="mainNavbar">
-            <?php if ($this->session->userdata('user_id')): ?>
-                <!-- Authenticated Nav Links -->
-                <ul class="navbar-nav mx-auto mb-2 mb-lg-0 pe-0">
-                    <li class="nav-item">
-                        <a class="nav-link <?= (uri_string() == 'home' || uri_string() == '') ? 'active' : '' ?>" href="<?= site_url('home') ?>">
-                            <i class="bi bi-speedometer2 me-1"></i> داشبورد
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#" data-bs-toggle="modal" data-bs-target="#categoryManagerModal">
-                            <i class="bi bi-tags me-1"></i> مدیریت دسته‌بندی‌ها
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link <?= (uri_string() == 'profile') ? 'active' : '' ?>" href="<?= site_url('profile') ?>">
-                            <i class="bi bi-person-gear me-1"></i> پروفایل
-                        </a>
-                    </li>
-                </ul>
-
-                <!-- Authenticated User Menu -->
-                <div class="d-flex align-items-center gap-3 mt-3 mt-lg-0">
-                    <a href="<?= site_url('profile') ?>" class="text-decoration-none d-flex align-items-center gap-2">
-                        <?php
-                        $avatar = $this->session->userdata('user_avatar');
-                        $user_name = $this->session->userdata('user_name') ?? 'کاربر';
-                        $avatar_url = !empty($avatar)
-                            ? base_url('uploads/avatars/' . $avatar)
-                            : 'https://placehold.co/100x100/1e1e24/ff6b00?text=' . urlencode(mb_substr($user_name, 0, 1));
-                        ?>
-                        <img src="<?= $avatar_url ?>" alt="Avatar" class="user-nav-avatar">
-                        <span class="text-light small fw-medium d-none d-md-inline"><?= html_escape($user_name) ?></span>
-                    </a>
-                    <a href="#" id="logoutBtn" class="btn btn-outline-danger btn-sm px-3 py-1 rounded-2" title="خروج">
-                        <i class="bi bi-box-arrow-right"></i>
-                        <span class="d-none d-sm-inline ms-1">خروج</span>
-                    </a>
-                </div>
-            <?php else: ?>
-                <!-- Guest Actions -->
-                <div class="d-flex align-items-center gap-2 ms-auto mt-3 mt-lg-0">
-                    <a href="<?= site_url('login') ?>" class="btn btn-orange-outline px-3 py-2">
-                        <i class="bi bi-box-arrow-in-left ms-1"></i> ورود
-                    </a>
-                    <a href="<?= site_url('signup') ?>" class="btn btn-orange-glow px-3 py-2">
-                        <i class="bi bi-person-plus ms-1"></i> ثبت‌نام
-                    </a>
-                </div>
-            <?php endif; ?>
-        </div>
+        <?php if ($this->session->userdata('user_id')): ?>
+            <?php
+            $avatar = $this->session->userdata('user_avatar');
+            $user_name = $this->session->userdata('user_name') ?? 'کاربر';
+            $avatar_url = !empty($avatar)
+                ? base_url('uploads/avatars/' . $avatar)
+                : 'https://placehold.co/100x100/1e1e24/ff6b00?text=' . urlencode(mb_substr($user_name, 0, 1));
+            ?>
+            <!-- Avatar (left) + logout (right of avatar) -->
+            <div class="d-flex align-items-center gap-3">
+                <a href="#" id="logoutBtn" class="btn btn-outline-danger" title="خروج">
+                    <i class="bi bi-box-arrow-right"></i>
+                    <span class="d-none d-sm-inline">خروج</span>
+                </a>
+                <a href="<?= site_url('profile') ?>" class="text-decoration-none" title="پروفایل">
+                    <img src="<?= $avatar_url ?>" alt="Avatar" class="user-nav-avatar">
+                </a>
+            </div>
+        <?php else: ?>
+            <!-- Guest Actions -->
+            <div class="d-flex align-items-center gap-2">
+                <a href="<?= site_url('login') ?>" class="btn btn-orange-outline">
+                    <i class="bi bi-box-arrow-in-left"></i> ورود
+                </a>
+                <a href="<?= site_url('signup') ?>" class="btn btn-orange-glow">
+                    <i class="bi bi-person-plus"></i> ثبت‌نام
+                </a>
+            </div>
+        <?php endif; ?>
     </div>
 </nav>
 

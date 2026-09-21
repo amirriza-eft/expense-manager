@@ -51,7 +51,7 @@
 
         </div>
 
-        <button class="btn btn-orange-outline px-4">
+        <button class="btn btn-orange-outline">
             تغییر رمز عبور
         </button>
 

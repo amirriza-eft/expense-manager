@@ -75,7 +75,7 @@
 
         </div>
 
-        <button class="btn btn-orange-glow px-4">
+        <button class="btn btn-orange-glow">
             ذخیره اطلاعات
         </button>
 

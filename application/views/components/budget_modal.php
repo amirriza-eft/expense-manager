@@ -16,9 +16,9 @@
                         <input type="number" class="form-control" name="amount" id="budget_amount" value="<?= $budget_amount ?? 0 ?>" required min="0">
                     </div>
                 </div>
-                <div class="modal-footer border-0 pt-0">
-                    <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">انصراف</button>
-                    <button type="submit" class="btn btn-orange-glow btn-sm px-4">ذخیره بودجه</button>
+                <div class="modal-footer border-0 pt-0 gap-2">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">انصراف</button>
+                    <button type="submit" class="btn btn-orange-glow">ذخیره بودجه</button>
                 </div>
             </form>
         </div>
@@ -78,9 +78,9 @@
                     </div>
                 </div>
 
-                <div class="modal-footer border-0 pt-0">
-                    <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">انصراف</button>
-                    <button type="submit" class="btn btn-orange-glow btn-sm px-4">ذخیره تراکنش</button>
+                <div class="modal-footer border-0 pt-0 gap-2">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">انصراف</button>
+                    <button type="submit" class="btn btn-orange-glow">ذخیره تراکنش</button>
                 </div>
             </form>
         </div>
@@ -98,8 +98,8 @@
                 <form action="<?= site_url('home/delete_transaction') ?>" method="POST">
                     <input type="hidden" name="id" id="delete_tx_id">
                     <div class="d-flex justify-content-center gap-2 mt-3">
-                        <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">انصراف</button>
-                        <button type="submit" class="btn btn-danger btn-sm px-3">بله، حذف کن</button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">انصراف</button>
+                        <button type="submit" class="btn btn-danger">بله، حذف کن</button>
                     </div>
                 </form>
             </div>
@@ -119,62 +119,27 @@
                 <!-- Add new category form inside modal -->
                 <form action="<?= site_url('home/save_category') ?>" method="POST" class="row g-2 align-items-end mb-4 p-3 rounded" style="background: rgba(255,255,255,0.03);">
                     <input type="hidden" name="id" id="cat_id" value="">
-                    <div class="col-12 col-md-5">
+                    <div class="col-12 col-md-8">
                         <label class="form-label small text-muted">نام دسته</label>
                         <input type="text" class="form-control" name="name" id="cat_name" placeholder="مثلاً: غذا، ورزش، حقوق" required>
                     </div>
-                    <div class="col-12 col-md-3">
+                    <div class="col-12 col-md-4">
                         <button type="submit" class="btn btn-orange-glow w-100" id="catSubmitBtn">افزودن دسته</button>
                     </div>
                 </form>
 
-                <!-- Category Lists -->
-                <div class="row g-3">
-                    <div class="col-md-6">
-                        <h6 class="text-white fw-bold mb-2 pb-1 border-bottom" style="border-color: var(--border-subtle) !important;">
-                            <i class="bi bi-arrow-up-circle me-1" style="color: var(--expense-red);"></i> دسته‌های هزینه
-                        </h6>
-                        <ul class="list-group list-group-flush p-0">
-                            <?php
-                            $has_exp = false;
-                            if(!empty($categories)): foreach($categories as $cat):
-                                if($cat->type === 'هزینه'): $has_exp = true; ?>
-                                    <li class="list-group-item bg-transparent text-white border-bottom d-flex justify-content-between align-items-center py-2 px-1" style="border-color: var(--border-subtle) !important;">
-                                        <span class="small"><?= html_escape($cat->name) ?></span>
-                                        <div class="btn-group btn-group-sm">
-                                            <button class="btn btn-sm btn-outline-secondary" onclick='setEditCategory(<?= json_encode($cat) ?>)'><i class="bi bi-pencil"></i></button>
-                                            <button class="btn btn-sm btn-outline-danger" onclick="confirmDeleteCat(<?= $cat->id ?>)"><i class="bi bi-trash"></i></button>
-                                        </div>
-                                    </li>
-                                <?php endif; endforeach; endif; ?>
-                            <?php if(!$has_exp): ?>
-                                <li class="list-group-item bg-transparent text-muted small py-2 border-0">دسته‌ای ثبت نشده است.</li>
-                            <?php endif; ?>
-                        </ul>
-                    </div>
-                    <div class="col-md-6">
-                        <h6 class="text-white fw-bold mb-2 pb-1 border-bottom" style="border-color: var(--border-subtle) !important;">
-                            <i class="bi bi-arrow-down-circle me-1" style="color: var(--income-green);"></i> دسته‌های درآمد
-                        </h6>
-                        <ul class="list-group list-group-flush p-0">
-                            <?php
-                            $has_inc = false;
-                            if(!empty($categories)): foreach($categories as $cat):
-                                if($cat->type === 'درآمد'): $has_inc = true; ?>
-                                    <li class="list-group-item bg-transparent text-white border-bottom d-flex justify-content-between align-items-center py-2 px-1" style="border-color: var(--border-subtle) !important;">
-                                        <span class="small"><?= html_escape($cat->name) ?></span>
-                                        <div class="btn-group btn-group-sm">
-                                            <button class="btn btn-sm btn-outline-secondary" onclick='setEditCategory(<?= json_encode($cat) ?>)'><i class="bi bi-pencil"></i></button>
-                                            <button class="btn btn-sm btn-outline-danger" onclick="confirmDeleteCat(<?= $cat->id ?>)"><i class="bi bi-trash"></i></button>
-                                        </div>
-                                    </li>
-                                <?php endif; endforeach; endif; ?>
-                            <?php if(!$has_inc): ?>
-                                <li class="list-group-item bg-transparent text-muted small py-2 border-0">دسته‌ای ثبت نشده است.</li>
-                            <?php endif; ?>
-                        </ul>
-                    </div>
-                </div>
+                <!-- Category List (all together) -->
+                <ul class="list-group list-group-flush p-0">
+                    <?php if(!empty($categories)): foreach($categories as $cat): ?>
+                        <li class="list-group-item bg-transparent text-white border-bottom d-flex justify-content-between align-items-center py-2 px-1" style="border-color: var(--border-subtle) !important;">
+                            <span class="small"><?= html_escape($cat->name) ?></span>
+                            <div class="btn-group btn-group-sm">
+                                <button class="btn btn-sm btn-outline-secondary" onclick='setEditCategory(<?= json_encode($cat) ?>)'><i class="bi bi-pencil"></i></button>
+                                <button class="btn btn-sm btn-outline-danger" onclick="confirmDeleteCat(<?= $cat->id ?>)"><i class="bi bi-trash"></i></button>
+                            </div>
+                        </li>
+                    <?php endforeach; endif; ?>
+                </ul>
             </div>
         </div>
     </div>
@@ -191,8 +156,8 @@
                 <form action="<?= site_url('home/delete_category') ?>" method="POST">
                     <input type="hidden" name="id" id="del_cat_id_input">
                     <div class="d-flex justify-content-center gap-2 mt-3">
-                        <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">انصراف</button>
-                        <button type="submit" class="btn btn-danger btn-sm px-3">حذف</button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">انصراف</button>
+                        <button type="submit" class="btn btn-danger">حذف</button>
                     </div>
                 </form>
             </div>

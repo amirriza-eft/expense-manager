@@ -23,14 +23,8 @@
                 <p class="text-muted small mb-0">خوش آمدید، <?= html_escape($this->session->userdata('user_name') ?? 'کاربر') ?>. خلاصه وضعیت دخل و خرج این ماه:</p>
             </div>
             <div class="d-flex flex-wrap gap-2">
-                <button class="btn btn-orange-outline btn-sm px-3" data-bs-toggle="modal" data-bs-target="#editBudgetModal">
-                    <i class="bi bi-piggy-bank me-1"></i> تنظیم بودجه
-                </button>
-                <button class="btn btn-orange-outline btn-sm px-3" data-bs-toggle="modal" data-bs-target="#categoryManagerModal">
-                    <i class="bi bi-tags me-1"></i> دسته‌بندی‌ها
-                </button>
-                <button class="btn btn-orange-glow btn-sm px-3" data-bs-toggle="modal" data-bs-target="#transactionModal" onclick="openCreateTransactionModal()">
-                    <i class="bi bi-plus-circle me-1"></i> ثبت تراکنش جدید
+                <button class="btn btn-orange-outline" data-bs-toggle="modal" data-bs-target="#editBudgetModal">
+                    <i class="bi bi-piggy-bank"></i> تنظیم بودجه
                 </button>
             </div>
         </div>

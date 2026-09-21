@@ -27,10 +27,19 @@
             </select>
         </div>
         <div class="col-12 col-md-2 d-flex gap-2">
-            <button type="submit" class="btn btn-orange-outline w-100">اعمال فیلتر</button>
-            <a href="<?= site_url('home') ?>" class="btn btn-secondary px-3" title="پاکسازی فیلترها"><i class="bi bi-arrow-clockwise"></i></a>
+            <button type="submit" class="btn btn-orange-outline flex-grow-1">اعمال فیلتر</button>
+            <a href="<?= site_url('home') ?>" class="btn btn-secondary" title="پاکسازی فیلترها"><i class="bi bi-arrow-clockwise"></i></a>
         </div>
     </form>
+</div>
+
+<div class="d-flex flex-wrap gap-2 mb-4">
+    <button class="btn btn-orange-outline" data-bs-toggle="modal" data-bs-target="#categoryManagerModal">
+        <i class="bi bi-tags"></i>مدیریت دسته‌بندی‌ها
+    </button>
+    <button class="btn btn-orange-glow" data-bs-toggle="modal" data-bs-target="#transactionModal" onclick="openCreateTransactionModal()">
+        <i class="bi bi-plus-circle"></i> ثبت تراکنش جدید
+    </button>
 </div>
 
 <!-- Transactions Table Component -->
@@ -74,7 +83,7 @@
                         <td class="text-center">
                             <div class="btn-group btn-group-sm">
                                 <button class="btn btn-outline-secondary" title="ویرایش" onclick='openEditTransactionModal(<?= json_encode($tx) ?>)'>
-                                    <i class="bi bi-pencil text-light"></i>
+                                    <i class="bi bi-pencil"></i>
                                 </button>
                                 <button class="btn btn-outline-danger" title="حذف" onclick="confirmDeleteTransaction(<?= $tx->id ?>)">
                                     <i class="bi bi-trash"></i>
