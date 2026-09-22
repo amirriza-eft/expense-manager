@@ -37,7 +37,7 @@
 
                     <div class="row g-2 mb-3">
                         <div class="col-6">
-                            <label for="tx_amount" class="form-label small text-muted">مبلغ (ریال)</label>
+                            <label for="tx_amount" class="form-label small text-muted">مبلغ (تومان)</label>
                             <input type="number" class="form-control" name="amount" id="tx_amount" required min="1" placeholder="مثال: 5000000">
                         </div>
                         <div class="col-6">
