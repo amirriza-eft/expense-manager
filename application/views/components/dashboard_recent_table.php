@@ -1,4 +1,4 @@
-<?php defined('BASEPATH') OR exit('No direct script access allowed'); ?>
+<?php defined('BASEPATH') or exit('No direct script access allowed'); ?>
 
 <div class="glass-panel p-3 mb-4">
 
@@ -50,7 +50,6 @@
 </div>
 
 
-
 <div class="d-flex flex-wrap gap-2 mb-4">
 
     <button
@@ -74,7 +73,6 @@
     </button>
 
 </div>
-
 
 
 <div class="glass-panel p-4">
@@ -124,10 +122,9 @@
 </div>
 
 
-
 <script>
 
-    document.addEventListener('DOMContentLoaded',()=>{
+    document.addEventListener('DOMContentLoaded', () => {
 
         loadCategories();
         loadTransactions();
@@ -135,32 +132,30 @@
     });
 
 
-    function loadCategories()
-    {
+    function loadCategories() {
         fetch("<?= site_url('api/categories') ?>")
-            .then(res=>res.json())
-            .then(data=>{
+            .then(res => res.json())
+            .then(data => {
 
-                let filter=document.getElementById('filterCategory');
-                let tx=document.getElementById('tx_category');
+                let filter = document.getElementById('filterCategory');
+                let tx = document.getElementById('tx_category');
 
-                filter.innerHTML=
+                filter.innerHTML =
                     '<option value="">همه دسته‌ها</option>';
 
-                tx.innerHTML=
+                tx.innerHTML =
                     '<option value="">بدون دسته</option>';
 
-                if(data.status)
-                {
-                    data.categories.forEach(cat=>{
+                if (data.status) {
+                    data.categories.forEach(cat => {
 
-                        filter.innerHTML+=`
+                        filter.innerHTML += `
                     <option value="${cat.id}">
                         ${cat.title}
                     </option>
                     `;
 
-                        tx.innerHTML+=`
+                        tx.innerHTML += `
                     <option value="${cat.id}">
                         ${cat.title}
                     </option>
@@ -173,10 +168,8 @@
     }
 
 
-
-    function loadTransactions()
-    {
-        let params=new URLSearchParams({
+    function loadTransactions() {
+        let params = new URLSearchParams({
 
             search:
             document.getElementById('search').value,
@@ -189,19 +182,17 @@
 
         });
 
+        fetch("<?= site_url('api/transaction') ?>?" + params)
+            .then(res => res.json())
+            .then(data => {
 
-        fetch("<?= site_url('api/transaction') ?>?"+params)
-            .then(res=>res.json())
-            .then(data=>{
+                let tbody = document.getElementById('transactionList');
 
-                let tbody=document.getElementById('transactionList');
-
-                tbody.innerHTML='';
+                tbody.innerHTML = '';
 
 
-                if(!data.status || !data.transactions.length)
-                {
-                    tbody.innerHTML=`
+                if (!data.status || !data.transactions.length) {
+                    tbody.innerHTML = `
             <tr>
                 <td colspan="7" class="text-center text-muted py-5">
                     تراکنشی وجود ندارد
@@ -213,12 +204,12 @@
 
 
                 document.getElementById('transactionCount').innerText =
-                    "تعداد: "+data.transactions.length;
+                    "تعداد: " + data.transactions.length;
 
 
-                data.transactions.forEach(tx=>{
+                data.transactions.forEach(tx => {
 
-                    tbody.innerHTML+=`
+                    tbody.innerHTML += `
 
             <tr>
 
@@ -229,7 +220,7 @@
 
                 <td>
                     ${
-                        tx.type==="income"
+                        tx.type === "income"
                             ?
                             '<span class="badge badge-income">درآمد</span>'
                             :
@@ -246,7 +237,7 @@
 
 
                 <td class="${
-                        tx.type==="income"
+                        tx.type === "income"
                             ?
                             'text-success'
                             :
@@ -254,7 +245,7 @@
                     } fw-bold">
 
                     ${
-                        tx.type==="income"
+                        tx.type === "income"
                             ? '+'
                             : '-'
                     }

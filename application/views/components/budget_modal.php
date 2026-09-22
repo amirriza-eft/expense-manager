@@ -1,9 +1,10 @@
-<?php defined('BASEPATH') OR exit('No direct script access allowed'); ?>
+<?php defined('BASEPATH') or exit('No direct script access allowed'); ?>
 
 <!-- Modal: Create / Edit Transaction -->
 <div class="modal fade" id="transactionModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content glass-panel text-white" style="background: #1e1e24; border: 1px solid var(--border-subtle);">
+        <div class="modal-content glass-panel text-white"
+             style="background: #1e1e24; border: 1px solid var(--border-subtle);">
             <div class="modal-header border-0 pb-0">
                 <h5 class="modal-title fw-bold" id="txModalTitle">ثبت تراکنش جدید</h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
@@ -16,7 +17,8 @@
                 <div class="modal-body">
                     <div class="mb-3">
                         <label for="tx_title" class="form-label small text-muted">عنوان تراکنش</label>
-                        <input type="text" class="form-control" name="title" id="tx_title" required placeholder="مثلاً: حقوق ماهانه، خرید سوپرمارکت">
+                        <input type="text" class="form-control" name="title" id="tx_title" required
+                               placeholder="مثلاً: حقوق ماهانه، خرید سوپرمارکت">
                     </div>
 
                     <div class="row g-2 mb-3">
@@ -29,26 +31,30 @@
                         </div>
                         <div class="col-6">
                             <label for="tx_category" class="form-label small text-muted">دسته‌بندی</label>
-                            <select name="category_id" id="tx_category" class="form-select">
-                                <option value="">همه دسته‌بندی‌ها</option>
+                            <select id="filterCategory" class="form-select">
+                                <option value="">همه دسته‌ها</option>
                             </select>
                         </div>
+
                     </div>
 
                     <div class="row g-2 mb-3">
                         <div class="col-6">
                             <label for="tx_amount" class="form-label small text-muted">مبلغ (تومان)</label>
-                            <input type="number" class="form-control" name="amount" id="tx_amount" required min="1" placeholder="مثال: 5000000">
+                            <input type="number" class="form-control" name="amount" id="tx_amount" required min="1"
+                                   placeholder="مثال: 5000000">
                         </div>
                         <div class="col-6">
                             <label for="tx_date" class="form-label small text-muted">تاریخ تراکنش</label>
-                            <input type="date" class="form-control" name="transaction_date" id="tx_date" required value="<?= date('Y-m-d') ?>">
+                            <input type="date" class="form-control" name="transaction_date" id="tx_date" required
+                                   value="<?= date('Y-m-d') ?>">
                         </div>
                     </div>
 
                     <div class="mb-2">
                         <label for="tx_description" class="form-label small text-muted">توضیحات (اختیاری)</label>
-                        <textarea class="form-control" name="description" id="tx_description" rows="2" placeholder="توضیحات تکمیلی پیرامون این تراکنش..."></textarea>
+                        <textarea class="form-control" name="description" id="tx_description" rows="2"
+                                  placeholder="توضیحات تکمیلی پیرامون این تراکنش..."></textarea>
                     </div>
                 </div>
 
@@ -64,7 +70,8 @@
 <!-- Modal: Delete Transaction Confirmation -->
 <div class="modal fade" id="deleteTxConfirmModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-sm">
-        <div class="modal-content glass-panel text-white" style="background: #1e1e24; border: 1px solid var(--border-subtle);">
+        <div class="modal-content glass-panel text-white"
+             style="background: #1e1e24; border: 1px solid var(--border-subtle);">
             <div class="modal-body text-center p-4">
                 <i class="bi bi-exclamation-triangle text-danger fs-1 mb-2 d-block"></i>
                 <h6 class="fw-bold mb-2">حذف تراکنش</h6>
@@ -169,7 +176,8 @@
 <!-- Modal: Delete Category Confirmation -->
 <div class="modal fade" id="deleteCatModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-sm">
-        <div class="modal-content glass-panel text-white" style="background: #1e1e24; border: 1px solid var(--border-subtle);">
+        <div class="modal-content glass-panel text-white"
+             style="background: #1e1e24; border: 1px solid var(--border-subtle);">
             <div class="modal-body text-center p-4">
                 <i class="bi bi-trash text-danger fs-1 mb-2 d-block"></i>
                 <h6 class="fw-bold mb-2">حذف دسته‌بندی</h6>
@@ -249,7 +257,7 @@
     }
 
 
-    document.getElementById('txForm').addEventListener('submit', function(e) {
+    document.getElementById('txForm').addEventListener('submit', function (e) {
 
         e.preventDefault();
 
@@ -270,46 +278,45 @@
 
 
         fetch(url, {
-            method:'POST',
-            body:new FormData(form)
+            method: 'POST',
+            body: new FormData(form)
         })
 
-            .then(res=>res.json())
+            .then(res => res.json())
 
-            .then(data=>{
+            .then(data => {
 
                 message.classList.remove('d-none');
 
-                message.textContent=data.message;
+                message.textContent = data.message;
 
-                message.className=data.status
+                message.className = data.status
                     ? 'alert alert-success py-2 px-3 small'
                     : 'alert alert-danger py-2 px-3 small';
 
+                if (data.status) {
 
-                if(data.status){
-
-                    setTimeout(()=>{
+                    setTimeout(() => {
 
                         location.reload();
 
-                    },700);
+                    }, 700);
 
                 }
 
             })
 
-            .catch(()=>{
+            .catch(() => {
 
-                message.className='alert alert-danger py-2 px-3 small';
-                message.textContent='خطا در ارتباط با سرور';
+                message.className = 'alert alert-danger py-2 px-3 small';
+                message.textContent = 'خطا در ارتباط با سرور';
 
             })
 
-            .finally(()=>{
+            .finally(() => {
 
-                button.disabled=false;
-                button.textContent='ذخیره تراکنش';
+                button.disabled = false;
+                button.textContent = 'ذخیره تراکنش';
 
             });
 
@@ -372,35 +379,33 @@
 
 
     // Load categories
-    function loadCategories()
-    {
+    function loadCategories() {
         fetch("<?= site_url('api/categories') ?>")
-            .then(res=>res.json())
-            .then(data=>{
+            .then(res => res.json())
+            .then(data => {
 
-                let filter=document.getElementById('filterCategory');
-                let transaction=document.getElementById('tx_category');
+                let filter = document.getElementById('filterCategory');
+                let transaction = document.getElementById('tx_category');
 
 
-                filter.innerHTML=
+                filter.innerHTML =
                     '<option value="">همه دسته‌ها</option>';
 
 
-                transaction.innerHTML=
+                transaction.innerHTML =
                     '<option value="">بدون دسته</option>';
 
 
-                if(data.status)
-                {
-                    data.categories.forEach(cat=>{
+                if (data.status) {
+                    data.categories.forEach(cat => {
 
-                        filter.innerHTML+=`
+                        filter.innerHTML += `
                 <option value="${cat.id}">
                     ${cat.title}
                 </option>`;
 
 
-                        transaction.innerHTML+=`
+                        transaction.innerHTML += `
                 <option value="${cat.id}">
                     ${cat.title}
                 </option>`;
@@ -465,8 +470,7 @@
     // delete btn //
     let deleteTransactionId = null;
 
-    function confirmDeleteTransaction(id)
-    {
+    function confirmDeleteTransaction(id) {
         deleteTransactionId = id;
 
         new bootstrap.Modal(
@@ -474,24 +478,20 @@
         ).show();
     }
 
-
-
-    function deleteTransaction()
-    {
+    function deleteTransaction() {
         fetch("<?= site_url('api/transaction/delete') ?>", {
-            method:'POST',
-            headers:{
-                'Content-Type':'application/x-www-form-urlencoded'
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded'
             },
-            body:new URLSearchParams({
+            body: new URLSearchParams({
                 id: deleteTransactionId
             })
         })
-            .then(res=>res.json())
-            .then(data=>{
+            .then(res => res.json())
+            .then(data => {
 
-                if(data.status)
-                {
+                if (data.status) {
                     bootstrap.Modal
                         .getInstance(
                             document.getElementById('deleteTxConfirmModal')
@@ -499,14 +499,12 @@
                         .hide();
 
                     loadTransactions();
-                }
-                else
-                {
+                } else {
                     alert(data.message);
                 }
 
             })
-            .catch(err=>{
+            .catch(err => {
                 console.error(err);
                 alert('خطا در حذف تراکنش');
             });
@@ -519,7 +517,6 @@
         categoryTitle.value = category.title;
 
         categorySubmitBtn.textContent = 'به‌روزرسانی دسته';
-
         categoryTitle.focus();
     }
 
