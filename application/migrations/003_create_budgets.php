@@ -12,20 +12,28 @@ class Migration_Create_budgets extends CI_Migration
                 'unsigned' => TRUE,
                 'auto_increment' => TRUE
             ],
+
             'user_id' => [
                 'type' => 'INT',
                 'unsigned' => TRUE
             ],
+
             'amount' => [
-                'type' => 'BIGINT'
+                'type' => 'DECIMAL',
+                'constraint' => '12,2',
+                'default' => 0
             ],
+
             'created_at DATETIME DEFAULT CURRENT_TIMESTAMP',
+
             'updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
                 ON UPDATE CURRENT_TIMESTAMP',
+
             'deleted_at DATETIME NULL'
         ]);
 
         $this->dbforge->add_key('id', TRUE);
+        $this->dbforge->add_key('user_id', FALSE, TRUE);
 
         $this->dbforge->add_field(
             'CONSTRAINT fk_budget_user

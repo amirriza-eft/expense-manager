@@ -89,18 +89,21 @@ class Auth extends CI_Controller
         ];
 
 
-        if($this->User_model->create($data))
-        {
+        $user_id = $this->User_model->create($data);
+
+        if ($user_id) {
+            $this->User_model->create_budget($user_id);
+
             return $this->json([
-                'status'=>true,
-                'message'=>'ثبت نام موفق'
+                'status' => true,
+                'message' => 'ثبت نام موفق'
             ]);
         }
 
         return $this->json([
-            'status'=>false,
-            'message'=>'خطا در ایجاد حساب'
-        ],500);
+            'status' => false,
+            'message' => 'خطا در ایجاد حساب'
+        ], 500);
     }
     public function login()
     {

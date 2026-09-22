@@ -20,7 +20,8 @@ class Migration_Create_transactions extends CI_Migration
 
             'category_id' => [
                 'type' => 'INT',
-                'unsigned' => TRUE
+                'unsigned' => TRUE,
+                'null' => TRUE
             ],
 
             'title' => [
@@ -29,7 +30,8 @@ class Migration_Create_transactions extends CI_Migration
             ],
 
             'amount' => [
-                'type' => 'BIGINT'
+                'type' => 'DECIMAL',
+                'constraint' => '12,2'
             ],
 
             'type' => [
@@ -47,8 +49,10 @@ class Migration_Create_transactions extends CI_Migration
             ],
 
             'created_at DATETIME DEFAULT CURRENT_TIMESTAMP',
+
             'updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
                 ON UPDATE CURRENT_TIMESTAMP',
+
             'deleted_at DATETIME NULL'
         ]);
 
@@ -65,7 +69,7 @@ class Migration_Create_transactions extends CI_Migration
             'CONSTRAINT fk_transaction_category
             FOREIGN KEY (category_id)
             REFERENCES categories(id)
-            ON DELETE CASCADE'
+            ON DELETE SET NULL'
         );
 
         $this->dbforge->create_table('transactions');

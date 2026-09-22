@@ -1,30 +1,5 @@
 <?php defined('BASEPATH') OR exit('No direct script access allowed'); ?>
 
-<!-- Modal: Update Budget -->
-<div class="modal fade" id="editBudgetModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content glass-panel text-white" style="background: #1e1e24; border: 1px solid var(--border-subtle);">
-            <div class="modal-header border-0 pb-0">
-                <h5 class="modal-title fw-bold">تنظیم بودجه کل</h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-            </div>
-            <form action="<?= site_url('home/set_budget') ?>" method="POST">
-                <div class="modal-body">
-                    <p class="text-muted small">سقف بودجه مدنظر خود را بر حسب ریال ایران وارد کنید:</p>
-                    <div class="mb-3">
-                        <label for="budget_amount" class="form-label small text-muted">مبلغ بودجه (ریال)</label>
-                        <input type="number" class="form-control" name="amount" id="budget_amount" value="<?= $budget_amount ?? 0 ?>" required min="0">
-                    </div>
-                </div>
-                <div class="modal-footer border-0 pt-0 gap-2">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">انصراف</button>
-                    <button type="submit" class="btn btn-orange-glow">ذخیره بودجه</button>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
-
 <!-- Modal: Create / Edit Transaction -->
 <div class="modal fade" id="transactionModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
@@ -33,7 +8,9 @@
                 <h5 class="modal-title fw-bold" id="txModalTitle">ثبت تراکنش جدید</h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
             </div>
-            <form action="<?= site_url('home/save_transaction') ?>" method="POST" id="txForm">
+            <form id="txForm">
+                <div id="txMessage" class="alert d-none py-2 px-3 small"></div>
+
                 <input type="hidden" name="id" id="tx_id" value="">
 
                 <div class="modal-body">
@@ -45,18 +22,15 @@
                     <div class="row g-2 mb-3">
                         <div class="col-6">
                             <label for="tx_type" class="form-label small text-muted">نوع</label>
-                            <select name="type" id="tx_type" class="form-select" required onchange="filterCategoryDropdownByType()">
-                                <option value="هزینه">هزینه</option>
-                                <option value="درآمد">درآمد</option>
+                            <select name="type" id="tx_type" class="form-select" required>
+                                <option value="expense">هزینه</option>
+                                <option value="income">درآمد</option>
                             </select>
                         </div>
                         <div class="col-6">
                             <label for="tx_category" class="form-label small text-muted">دسته‌بندی</label>
-                            <select name="category_id" id="tx_category" class="form-select" required>
-                                <option value="">انتخاب دسته...</option>
-                                <?php if(!empty($categories)): foreach($categories as $cat): ?>
-                                    <option value="<?= $cat->id ?>" data-type="<?= $cat->type ?>"><?= html_escape($cat->name) ?></option>
-                                <?php endforeach; endif; ?>
+                            <select name="category_id" id="tx_category" class="form-select">
+                                <option value="">همه دسته‌بندی‌ها</option>
                             </select>
                         </div>
                     </div>
@@ -221,4 +195,65 @@
         document.getElementById('del_cat_id_input').value = id;
         new bootstrap.Modal(document.getElementById('deleteCatModal')).show();
     }
+
+
+        document.getElementById('txForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+
+        const form = this;
+        const message = document.getElementById('txMessage');
+        const button = form.querySelector('button[type="submit"]');
+
+        message.classList.add('d-none');
+
+        button.disabled = true;
+        button.textContent = 'در حال ذخیره...';
+
+        fetch("<?= site_url('api/transactions') ?>", {
+        method: 'POST',
+        body: new FormData(form)
+    })
+        .then(response => response.json())
+        .then(data => {
+        message.textContent = data.message;
+        message.className = data.status
+        ? 'alert alert-success py-2 px-3 small'
+        : 'alert alert-danger py-2 px-3 small';
+
+        if (data.status) {
+        form.reset();
+
+        setTimeout(() => {
+        location.reload();
+    }, 700);
+    }
+    })
+        .catch(() => {
+        message.textContent = 'خطا در ارتباط با سرور';
+        message.className = 'alert alert-danger py-2 px-3 small';
+    })
+        .finally(() => {
+        button.disabled = false;
+        button.textContent = 'ذخیره تراکنش';
+    });
+    });
+
+
+    //== categories ==//
+    fetch('/api/categories')
+        .then(response => response.json())
+        .then(data => {
+            const categorySelect = document.getElementById('tx_category');
+
+            data.categories.forEach(category => {
+                const option = document.createElement('option');
+
+                option.value = category.id;
+                option.textContent = category.name;
+                option.dataset.type = category.type;
+
+                categorySelect.appendChild(option);
+            });
+        });
+
 </script>

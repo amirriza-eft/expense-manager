@@ -1,0 +1,61 @@
+<?php
+
+defined('BASEPATH') OR exit('No direct script access allowed');
+
+class Transaction extends CI_Controller
+{
+    public function __construct()
+    {
+        parent::__construct();
+
+        $this->load->model('Transaction_model');
+        $this->load->library('session');
+    }
+
+    public function create()
+    {
+        $user_id = $this->session->userdata('user_id');
+
+        if (!$user_id) {
+            return $this->json([
+                'status' => false,
+                'message' => 'ابتدا وارد حساب خود شوید'
+            ], 401);
+        }
+
+        $category_id = $this->input->post('category_id', true);
+
+        $data = [
+            'user_id' => $user_id,
+            'category_id' => $category_id ?: null,
+            'title' => $this->input->post('title', true),
+            'amount' => $this->input->post('amount', true),
+            'type' => $this->input->post('type', true),
+            'transaction_date' => $this->input->post('transaction_date', true),
+            'description' => $this->input->post('description', true)
+        ];
+
+        if ($this->Transaction_model->create($data)) {
+            return $this->json([
+                'status' => true,
+                'message' => 'تراکنش با موفقیت ثبت شد'
+            ]);
+        }
+
+        return $this->json([
+            'status' => false,
+            'message' => 'خطا در ثبت تراکنش'
+        ], 500);
+    }
+
+    private function json($data, $status = 200)
+    {
+        http_response_code($status);
+
+        header('Content-Type: application/json');
+
+        echo json_encode($data, JSON_UNESCAPED_UNICODE);
+
+        exit;
+    }
+}

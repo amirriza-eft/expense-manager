@@ -15,7 +15,16 @@ class User_model extends CI_Model
 
     public function create($data)
     {
-        return $this->db->insert($this->table, $data);
+        $this->db->insert($this->table, $data);
+        return $this->db->insert_id();
+    }
+
+    public function create_budget($user_id)
+    {
+        return $this->db->insert('budgets', [
+            'user_id' => $user_id,
+            'amount' => 0
+        ]);
     }
 
     public function find_by_email($email)
