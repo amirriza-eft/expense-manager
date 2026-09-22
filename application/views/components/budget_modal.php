@@ -84,36 +84,72 @@
 <!-- Modal: Category Manager -->
 <div class="modal fade" id="categoryManagerModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-lg">
-        <div class="modal-content glass-panel text-white" style="background: #1e1e24; border: 1px solid var(--border-subtle);">
+        <div
+                class="modal-content glass-panel text-white"
+                style="background: #1e1e24; border: 1px solid var(--border-subtle);"
+        >
+
             <div class="modal-header border-0">
-                <h5 class="modal-title fw-bold">مدیریت دسته‌بندی‌های شما</h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                <h5 class="modal-title fw-bold">
+                    مدیریت دسته‌بندی‌های شما
+                </h5>
+
+                <button
+                        type="button"
+                        class="btn-close btn-close-white"
+                        data-bs-dismiss="modal"
+                ></button>
             </div>
+
             <div class="modal-body">
-                <!-- Add new category form inside modal -->
-                <form action="<?= site_url('home/save_category') ?>" method="POST" class="row g-2 align-items-end mb-4 p-3 rounded" style="background: rgba(255,255,255,0.03);">
-                    <input type="hidden" name="id" id="cat_id" value="">
+
+                <!-- Add / Edit category -->
+                <form
+                        id="categoryForm"
+                        class="row g-2 align-items-end mb-4 p-3 rounded"
+                        style="background: rgba(255,255,255,0.03);"
+                >
+
+                    <input
+                            type="hidden"
+                            id="cat_id"
+                            value=""
+                    >
+
                     <div class="col-12 col-md-8">
-                        <label class="form-label small text-muted">نام دسته</label>
-                        <input type="text" class="form-control" name="name" id="cat_name" placeholder="مثلاً: غذا، ورزش، حقوق" required>
+                        <label class="form-label small text-muted">
+                            نام دسته
+                        </label>
+
+                        <input
+                                type="text"
+                                class="form-control"
+                                id="cat_title"
+                                placeholder="مثلاً: غذا، ورزش، حقوق"
+                                required
+                        >
                     </div>
+
                     <div class="col-12 col-md-4">
-                        <button type="submit" class="btn btn-orange-glow w-100" id="catSubmitBtn">افزودن دسته</button>
+                        <button
+                                type="submit"
+                                class="btn btn-orange-glow w-100"
+                                id="catSubmitBtn"
+                        >
+                            افزودن دسته
+                        </button>
                     </div>
+
                 </form>
 
-                <!-- Category List (all together) -->
-                <ul class="list-group list-group-flush p-0">
-                    <?php if(!empty($categories)): foreach($categories as $cat): ?>
-                        <li class="list-group-item bg-transparent text-white border-bottom d-flex justify-content-between align-items-center py-2 px-1" style="border-color: var(--border-subtle) !important;">
-                            <span class="small"><?= html_escape($cat->name) ?></span>
-                            <div class="btn-group btn-group-sm">
-                                <button class="btn btn-sm btn-outline-secondary" onclick='setEditCategory(<?= json_encode($cat) ?>)'><i class="bi bi-pencil"></i></button>
-                                <button class="btn btn-sm btn-outline-danger" onclick="confirmDeleteCat(<?= $cat->id ?>)"><i class="bi bi-trash"></i></button>
-                            </div>
-                        </li>
-                    <?php endforeach; endif; ?>
+                <!-- Category list -->
+                <ul
+                        id="categoryList"
+                        class="list-group list-group-flush p-0"
+                >
+                    <!-- JavaScript will add categories here -->
                 </ul>
+
             </div>
         </div>
     </div>
@@ -240,20 +276,202 @@
 
 
     //== categories ==//
-    fetch('/api/categories')
-        .then(response => response.json())
-        .then(data => {
-            const categorySelect = document.getElementById('tx_category');
+    // ==================== Categories ====================
 
-            data.categories.forEach(category => {
-                const option = document.createElement('option');
+    const categoryForm = document.getElementById('categoryForm');
+    const categoryList = document.getElementById('categoryList');
+    const categoryId = document.getElementById('cat_id');
+    const categoryTitle = document.getElementById('cat_title');
+    const categorySubmitBtn = document.getElementById('catSubmitBtn');
 
-                option.value = category.id;
-                option.textContent = category.name;
-                option.dataset.type = category.type;
 
-                categorySelect.appendChild(option);
+    // Create / update category
+    categoryForm.addEventListener('submit', function (event) {
+
+        event.preventDefault();
+
+        const id = categoryId.value;
+        const title = categoryTitle.value.trim();
+
+        if (!title) {
+            return;
+        }
+
+        const url = id
+            ? `/api/categories/update/${id}`
+            : '/api/categories/create';
+
+        fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded'
+            },
+            body: new URLSearchParams({
+                title: title
+            })
+        })
+            .then(response => response.json())
+            .then(data => {
+
+                console.log(data);
+
+                if (!data.status) {
+                    alert(data.message);
+                    return;
+                }
+
+                resetCategoryForm();
+                loadCategories();
+            })
+            .catch(error => {
+                console.error(error);
+                alert('خطا در ارتباط با سرور');
             });
+    });
+
+
+    // Load categories
+    function loadCategories() {
+
+        fetch('/api/categories')
+            .then(response => response.json())
+            .then(data => {
+
+                console.log(data);
+
+                if (!data.status) {
+                    return;
+                }
+
+                renderCategories(data.categories);
+                loadCategoriesIntoTransactionDropdown(data.categories);
+            })
+            .catch(error => {
+                console.error('Category loading error:', error);
+            });
+    }
+
+
+    // Render category list
+    function renderCategories(categories) {
+
+        categoryList.innerHTML = '';
+
+        categories.forEach(category => {
+
+            const li = document.createElement('li');
+
+            li.className =
+                'list-group-item bg-transparent text-white border-bottom d-flex justify-content-between align-items-center py-2 px-1';
+
+            li.innerHTML = `
+            <span class="small"></span>
+
+            <div class="btn-group btn-group-sm">
+
+                <button
+                    type="button"
+                    class="btn btn-sm btn-outline-secondary edit-category-btn">
+                    <i class="bi bi-pencil"></i>
+                </button>
+
+                <button
+                    type="button"
+                    class="btn btn-sm btn-outline-danger delete-category-btn">
+                    <i class="bi bi-trash"></i>
+                </button>
+
+            </div>
+        `;
+
+            li.querySelector('span').textContent = category.title;
+
+            li.querySelector('.edit-category-btn')
+                .addEventListener('click', () => {
+                    editCategory(category);
+                });
+
+            li.querySelector('.delete-category-btn')
+                .addEventListener('click', () => {
+                    deleteCategory(category.id);
+                });
+
+            categoryList.appendChild(li);
         });
+    }
+
+
+    // Edit category
+    function editCategory(category) {
+
+        categoryId.value = category.id;
+        categoryTitle.value = category.title;
+
+        categorySubmitBtn.textContent = 'به‌روزرسانی دسته';
+
+        categoryTitle.focus();
+    }
+
+
+    // Delete category
+    function deleteCategory(id) {
+
+        if (!confirm('آیا از حذف این دسته‌بندی اطمینان دارید؟')) {
+            return;
+        }
+
+        fetch(`/api/categories/delete/${id}`, {
+            method: 'POST'
+        })
+            .then(response => response.json())
+            .then(data => {
+
+                if (!data.status) {
+                    alert(data.message);
+                    return;
+                }
+
+                loadCategories();
+            })
+            .catch(error => {
+                console.error(error);
+                alert('خطا در ارتباط با سرور');
+            });
+    }
+
+
+    // Reset form
+    function resetCategoryForm() {
+
+        categoryId.value = '';
+        categoryTitle.value = '';
+
+        categorySubmitBtn.textContent = 'افزودن دسته';
+    }
+
+
+    // Put categories into transaction dropdown
+    function loadCategoriesIntoTransactionDropdown(categories) {
+
+        const categorySelect = document.getElementById('tx_category');
+
+        categorySelect.innerHTML = `
+        <option value="">همه دسته‌بندی‌ها</option>
+    `;
+
+        categories.forEach(category => {
+
+            const option = document.createElement('option');
+
+            option.value = category.id;
+            option.textContent = category.title;
+
+            categorySelect.appendChild(option);
+        });
+    }
+
+
+    // Initial load
+    loadCategories();
 
 </script>

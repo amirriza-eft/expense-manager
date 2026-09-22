@@ -12,6 +12,25 @@ class Category extends CI_Controller
         $this->load->library('session');
     }
 
+    public function index()
+    {
+        $user_id = $this->session->userdata('user_id');
+
+        if (!$user_id) {
+            return $this->json([
+                'status' => false,
+                'message' => 'ابتدا وارد حساب خود شوید'
+            ], 401);
+        }
+
+        $categories = $this->Category_model->get_all($user_id);
+
+        return $this->json([
+            'status' => true,
+            'categories' => $categories
+        ]);
+    }
+
     public function create()
     {
         $user_id = $this->session->userdata('user_id');
