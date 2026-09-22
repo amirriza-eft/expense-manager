@@ -61,6 +61,45 @@ class Category extends CI_Controller
         ], 500);
     }
 
+    public function update($id)
+    {
+        $user_id = $this->session->userdata('user_id');
+
+        if (!$user_id) {
+            return $this->json([
+                'status' => false,
+                'message' => 'ابتدا وارد حساب خود شوید'
+            ], 401);
+        }
+
+        $title = $this->input->post('title', true);
+
+        if (!$title) {
+            return $this->json([
+                'status' => false,
+                'message' => 'نام دسته الزامی است'
+            ], 400);
+        }
+
+        $data = [
+            'title' => $title
+        ];
+
+        if ($this->Category_model->update($id, $data)) {
+
+            return $this->json([
+                'status' => true,
+                'message' => 'دسته‌بندی با موفقیت بروزرسانی شد'
+            ]);
+
+        }
+
+        return $this->json([
+            'status' => false,
+            'message' => 'خطا در بروزرسانی دسته‌بندی'
+        ], 500);
+    }
+    
     private function json($data, $status = 200)
     {
         http_response_code($status);
