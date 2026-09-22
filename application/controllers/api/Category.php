@@ -99,7 +99,32 @@ class Category extends CI_Controller
             'message' => 'خطا در بروزرسانی دسته‌بندی'
         ], 500);
     }
-    
+
+
+    public function delete($id)
+    {
+        $user_id = $this->session->userdata('user_id');
+
+        if (!$user_id) {
+            return $this->json([
+                'status' => false,
+                'message' => 'ابتدا وارد حساب خود شوید'
+            ], 401);
+        }
+
+        if ($this->Category_model->delete($id, $user_id)) {
+            return $this->json([
+                'status' => true,
+                'message' => 'دسته حذف شد'
+            ]);
+        }
+
+        return $this->json([
+            'status' => false,
+            'message' => 'خطا در حذف'
+        ], 500);
+    }
+
     private function json($data, $status = 200)
     {
         http_response_code($status);

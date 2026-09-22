@@ -72,3 +72,4 @@ $route['api/transactions/update/(:num)'] = 'api/transaction/update/$1';
 $route['api/categories'] = 'api/Category/index';
 $route['api/categories/create'] = 'api/Category/create';
 $route['api/categories/update/(:num)'] = 'api/Category/update/$1';
+$route['api/categories/delete/(:num)'] = 'api/Category/delete/$1';
