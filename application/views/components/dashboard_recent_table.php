@@ -141,21 +141,30 @@
             .then(res=>res.json())
             .then(data=>{
 
-                let select=document.getElementById('filterCategory');
+                let filter=document.getElementById('filterCategory');
+                let tx=document.getElementById('tx_category');
 
-                select.innerHTML=
+                filter.innerHTML=
                     '<option value="">همه دسته‌ها</option>';
 
+                tx.innerHTML=
+                    '<option value="">بدون دسته</option>';
 
                 if(data.status)
                 {
                     data.categories.forEach(cat=>{
 
-                        select.innerHTML+=`
+                        filter.innerHTML+=`
                     <option value="${cat.id}">
                         ${cat.title}
                     </option>
-                `;
+                    `;
+
+                        tx.innerHTML+=`
+                    <option value="${cat.id}">
+                        ${cat.title}
+                    </option>
+                    `;
 
                     });
                 }

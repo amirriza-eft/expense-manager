@@ -331,23 +331,42 @@
 
 
     // Load categories
-    function loadCategories() {
+    function loadCategories()
+    {
+        fetch("<?= site_url('api/categories') ?>")
+            .then(res=>res.json())
+            .then(data=>{
 
-        fetch('/api/categories')
-            .then(response => response.json())
-            .then(data => {
+                let filter=document.getElementById('filterCategory');
+                let transaction=document.getElementById('tx_category');
 
-                console.log(data);
 
-                if (!data.status) {
-                    return;
+                filter.innerHTML=
+                    '<option value="">همه دسته‌ها</option>';
+
+
+                transaction.innerHTML=
+                    '<option value="">بدون دسته</option>';
+
+
+                if(data.status)
+                {
+                    data.categories.forEach(cat=>{
+
+                        filter.innerHTML+=`
+                <option value="${cat.id}">
+                    ${cat.title}
+                </option>`;
+
+
+                        transaction.innerHTML+=`
+                <option value="${cat.id}">
+                    ${cat.title}
+                </option>`;
+
+                    });
                 }
 
-                renderCategories(data.categories);
-                loadCategoriesIntoTransactionDropdown(data.categories);
-            })
-            .catch(error => {
-                console.error('Category loading error:', error);
             });
     }
 

@@ -16,18 +16,20 @@ class Category extends CI_Controller
     {
         $user_id = $this->session->userdata('user_id');
 
-        if (!$user_id) {
+        if(!$user_id)
+        {
             return $this->json([
-                'status' => false,
-                'message' => 'ابتدا وارد حساب خود شوید'
-            ], 401);
+                'status'=>false,
+                'message'=>'Unauthorized'
+            ],401);
         }
 
-        $categories = $this->Category_model->get_all($user_id);
+        $categories = $this->Category_model
+            ->get_user_categories($user_id);
 
         return $this->json([
-            'status' => true,
-            'categories' => $categories
+            'status'=>true,
+            'categories'=>$categories
         ]);
     }
 

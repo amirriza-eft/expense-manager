@@ -69,6 +69,76 @@ class Transaction extends CI_Controller
         ], 500);
     }
 
+    public function update()
+    {
+        $user_id=$this->session->userdata('user_id');
+
+        if(!$user_id)
+        {
+            return $this->json([
+                'status'=>false,
+                'message'=>'ابتدا وارد شوید'
+            ],401);
+        }
+
+        $id=$this->input->post('id',true);
+
+        $data=[
+            'category_id'=>$this->input->post('category_id',true) ?: null,
+            'title'=>$this->input->post('title',true),
+            'amount'=>$this->input->post('amount',true),
+            'type'=>$this->input->post('type',true),
+            'transaction_date'=>$this->input->post('transaction_date',true),
+            'description'=>$this->input->post('description',true)
+        ];
+
+        if($this->Transaction_model->update($id,$user_id,$data))
+        {
+            return $this->json([
+                'status'=>true,
+                'message'=>'تراکنش بروزرسانی شد'
+            ]);
+        }
+
+        return $this->json([
+            'status'=>false,
+            'message'=>'خطا در بروزرسانی'
+        ],500);
+    }
+
+
+    public function delete()
+    {
+        $user_id=$this->session->userdata('user_id');
+
+        if(!$user_id)
+        {
+            return $this->json([
+                'status'=>false,
+                'message'=>'ابتدا وارد شوید'
+            ],401);
+        }
+
+
+        $id=$this->input->post('id',true);
+
+
+        if($this->Transaction_model->delete($id,$user_id))
+        {
+            return $this->json([
+                'status'=>true,
+                'message'=>'تراکنش حذف شد'
+            ]);
+        }
+
+
+        return $this->json([
+            'status'=>false,
+            'message'=>'خطا در حذف'
+        ],500);
+    }
+
+
     private function json($data, $status = 200)
     {
         http_response_code($status);
