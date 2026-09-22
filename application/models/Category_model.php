@@ -39,6 +39,17 @@ class Category_model extends CI_Model
     {
         return $this->db
             ->where('id', $id)
-            ->delete($this->table);
+            ->update($this->table, [
+                'deleted_at' => date('Y-m-d H:i:s')
+            ]);
+    }
+
+    public function restore($id)
+    {
+        return $this->db
+            ->where('id', $id)
+            ->update($this->table, [
+                'deleted_at' => null
+            ]);
     }
 }
