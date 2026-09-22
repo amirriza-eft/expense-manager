@@ -12,6 +12,27 @@ class Transaction extends CI_Controller
         $this->load->library('session');
     }
 
+    public function index()
+    {
+        $user_id = $this->session->userdata('user_id');
+
+        if(!$user_id)
+        {
+            return $this->json([
+                'status'=>false,
+                'message'=>'ابتدا وارد شوید'
+            ],401);
+        }
+
+        $transactions = $this->Transaction_model
+            ->get_user_transactions($user_id);
+
+        return $this->json([
+            'status'=>true,
+            'transactions'=>$transactions
+        ]);
+    }
+
     public function create()
     {
         $user_id = $this->session->userdata('user_id');

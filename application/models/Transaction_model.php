@@ -36,21 +36,18 @@ class Transaction_model extends CI_Model
         return $this->db->trans_status();
     }
 
-    public function getUserTransactions($user_id)
+    public function get_user_transactions($user_id)
     {
         return $this->db
-            ->select('
-                transaction.*,
-                categories.title as category_name
-            ')
-            ->from($this->table)
+            ->select('transactions.*, categories.title as category_name')
+            ->from('transactions')
             ->join(
                 'categories',
-                'categories.id = transaction.category_id',
+                'categories.id = transactions.category_id',
                 'left'
             )
-            ->where('transaction.user_id',$user_id)
-            ->order_by('transaction.id','DESC')
+            ->where('transactions.user_id',$user_id)
+            ->order_by('transactions.id','DESC')
             ->get()
             ->result();
     }
