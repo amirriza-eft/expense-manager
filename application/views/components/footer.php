@@ -10,9 +10,8 @@
                 </span>
             </div>
             <div class="col-md-6 text-center text-md-end">
-                <a href="https://github.com/amirreza-eftekharzade" target="_blank" rel="noopener noreferrer" class="text-muted text-decoration-none small hover-orange d-inline-flex align-items-center gap-1">
+                <a href="https://github.com/amirriza-eft" target="_blank" rel="noopener noreferrer" class="text-muted text-decoration-none small hover-orange d-inline-flex align-items-center gap-1">
                     <i class="bi bi-github fs-5 text-light"></i>
-                    <span>مشاهده سورس در گیت‌هاب</span>
                 </a>
             </div>
         </div>

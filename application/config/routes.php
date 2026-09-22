@@ -65,3 +65,5 @@ $route['api/profile/update'] = 'api/Profile/update';
 $route['api/profile/password'] = 'api/Profile/change_password';
 
 $route['api/transactions'] = 'api/Transaction/create';
+
+$route['api/categories/create'] = 'api/Category/create';
