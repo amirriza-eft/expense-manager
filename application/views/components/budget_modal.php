@@ -29,10 +29,17 @@
                                 <option value="income">درآمد</option>
                             </select>
                         </div>
+
                         <div class="col-6">
-                            <label for="tx_category" class="form-label small text-muted">دسته‌بندی</label>
-                            <select id="filterCategory" class="form-select">
-                                <option value="">همه دسته‌ها</option>
+                            <label for="tx_category" class="form-label small text-muted">
+                                دسته‌بندی
+                            </label>
+                            <select
+                                    name="category_id"
+                                    id="filterCategory"
+                                    class="form-select">
+
+                                <option value="">بدون دسته</option>
                             </select>
                         </div>
 
@@ -189,7 +196,7 @@
                         <button
                                 type="button"
                                 class="btn btn-danger"
-                                onclick="deleteCategoryConfirm()">
+                                onclick="confirmDeleteCat()">
                             حذف
                         </button>
                     </div>
@@ -376,45 +383,6 @@
                 alert('خطا در ارتباط با سرور');
             });
     });
-
-
-    // Load categories
-    function loadCategories() {
-        fetch("<?= site_url('api/categories') ?>")
-            .then(res => res.json())
-            .then(data => {
-
-                let filter = document.getElementById('filterCategory');
-                let transaction = document.getElementById('tx_category');
-
-
-                filter.innerHTML =
-                    '<option value="">همه دسته‌ها</option>';
-
-
-                transaction.innerHTML =
-                    '<option value="">بدون دسته</option>';
-
-
-                if (data.status) {
-                    data.categories.forEach(cat => {
-
-                        filter.innerHTML += `
-                <option value="${cat.id}">
-                    ${cat.title}
-                </option>`;
-
-
-                        transaction.innerHTML += `
-                <option value="${cat.id}">
-                    ${cat.title}
-                </option>`;
-
-                    });
-                }
-
-            });
-    }
 
 
     // Render category list

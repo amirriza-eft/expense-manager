@@ -30,8 +30,13 @@
 
 
         <div class="col-6 col-md-3">
-            <select id="filterCategory" class="form-select">
-                <option value="">همه دسته‌ها</option>
+            <select
+                    name="category_id"
+                    id="tx_category"
+                    class="form-select">
+
+                <option value="">بدون دسته</option>
+
             </select>
         </div>
 
@@ -133,38 +138,77 @@
 
 
     function loadCategories() {
+
         fetch("<?= site_url('api/categories') ?>")
             .then(res => res.json())
             .then(data => {
 
-                let filter = document.getElementById('filterCategory');
-                let tx = document.getElementById('tx_category');
-
-                filter.innerHTML =
-                    '<option value="">همه دسته‌ها</option>';
-
-                tx.innerHTML =
-                    '<option value="">بدون دسته</option>';
-
                 if (data.status) {
+
+                    renderCategories(data.categories);
+
                     data.categories.forEach(cat => {
 
-                        filter.innerHTML += `
-                    <option value="${cat.id}">
-                        ${cat.title}
-                    </option>
-                    `;
+                        if (filter) {
+                            filter.innerHTML += `
+                                <option value="${cat.id}">
+                                    ${cat.title}
+                                </option>`;
+                        }
 
-                        tx.innerHTML += `
-                    <option value="${cat.id}">
-                        ${cat.title}
-                    </option>
-                    `;
+
+                        if (transaction) {
+                            transaction.innerHTML += `
+                                <option value="${cat.id}">
+                                    ${cat.title}
+                                </option>`;
+                        }
 
                     });
+
+                }
+
+                const filter = document.getElementById('filterCategory');
+                const transaction = document.getElementById('tx_category');
+
+                if (filter) {
+                    filter.innerHTML = '<option value="">همه دسته‌ها</option>';
+                }
+
+                if (transaction) {
+                    transaction.innerHTML = '<option value="">بدون دسته</option>';
+                }
+
+
+                if (data.status) {
+
+                    data.categories.forEach(cat => {
+
+                        if (filter) {
+
+                            filter.innerHTML += `
+                    <option value="${cat.id}">
+                    ${cat.title}
+                    </option>`;
+
+                        }
+
+
+                        if (transaction) {
+
+                            transaction.innerHTML += `
+                    <option value="${cat.id}">
+                    ${cat.title}
+                    </option>`;
+
+                        }
+
+                    });
+
                 }
 
             });
+
     }
 
 
