@@ -181,7 +181,7 @@
                         <button
                                 type="button"
                                 class="btn btn-danger"
-                                onclick="deleteTransaction()">
+                                onclick="deleteCategoryConfirm()">
                             حذف
                         </button>
                     </div>
@@ -258,7 +258,7 @@
 
         let url = id
             ? "<?= site_url('api/transaction/update/') ?>" + id
-            : "<?= site_url('api/transaction') ?>";
+            : "<?= site_url('api/transaction/create') ?>";
 
 
         const message = document.getElementById('txMessage');
