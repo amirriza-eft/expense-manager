@@ -69,17 +69,28 @@
                 <i class="bi bi-exclamation-triangle text-danger fs-1 mb-2 d-block"></i>
                 <h6 class="fw-bold mb-2">حذف تراکنش</h6>
                 <p class="text-muted small">آیا از حذف این تراکنش از سوابق مالی اطمینان دارید؟</p>
-                <form action="<?= site_url('home/delete_transaction') ?>" method="POST">
+                <form id="deleteTransactionForm">
                     <input type="hidden" name="id" id="delete_tx_id">
                     <div class="d-flex justify-content-center gap-2 mt-3">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">انصراف</button>
-                        <button type="submit" class="btn btn-danger">بله، حذف کن</button>
+                        <button
+                                type="button"
+                                class="btn btn-secondary"
+                                data-bs-dismiss="modal">
+                            انصراف
+                        </button>
+                        <button
+                                type="button"
+                                class="btn btn-danger"
+                                onclick="deleteTransaction()">
+                            بله، حذف کن
+                        </button>
                     </div>
                 </form>
             </div>
         </div>
     </div>
 </div>
+
 
 <!-- Modal: Category Manager -->
 <div class="modal fade" id="categoryManagerModal" tabindex="-1" aria-hidden="true">
@@ -167,7 +178,12 @@
                     <input type="hidden" name="id" id="del_cat_id_input">
                     <div class="d-flex justify-content-center gap-2 mt-3">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">انصراف</button>
-                        <button type="submit" class="btn btn-danger">حذف</button>
+                        <button
+                                type="button"
+                                class="btn btn-danger"
+                                onclick="deleteTransaction()">
+                            حذف
+                        </button>
                     </div>
                 </form>
             </div>
@@ -233,45 +249,70 @@
     }
 
 
-        document.getElementById('txForm').addEventListener('submit', function(e) {
+    document.getElementById('txForm').addEventListener('submit', function(e) {
+
         e.preventDefault();
 
         const form = this;
+        const id = document.getElementById('tx_id').value;
+
+        let url = id
+            ? "<?= site_url('api/transaction/update/') ?>" + id
+            : "<?= site_url('api/transaction') ?>";
+
+
         const message = document.getElementById('txMessage');
         const button = form.querySelector('button[type="submit"]');
 
-        message.classList.add('d-none');
 
         button.disabled = true;
         button.textContent = 'در حال ذخیره...';
 
-        fetch("<?= site_url('api/transactions') ?>", {
-        method: 'POST',
-        body: new FormData(form)
-    })
-        .then(response => response.json())
-        .then(data => {
-        message.textContent = data.message;
-        message.className = data.status
-        ? 'alert alert-success py-2 px-3 small'
-        : 'alert alert-danger py-2 px-3 small';
 
-        if (data.status) {
-        form.reset();
+        fetch(url, {
+            method:'POST',
+            body:new FormData(form)
+        })
 
-        setTimeout(() => {
-        location.reload();
-    }, 700);
-    }
-    })
-        .catch(() => {
-        message.textContent = 'خطا در ارتباط با سرور';
-        message.className = 'alert alert-danger py-2 px-3 small';
-    })
-        .finally(() => {
-        button.disabled = false;
-        button.textContent = 'ذخیره تراکنش';
-    });
+            .then(res=>res.json())
+
+            .then(data=>{
+
+                message.classList.remove('d-none');
+
+                message.textContent=data.message;
+
+                message.className=data.status
+                    ? 'alert alert-success py-2 px-3 small'
+                    : 'alert alert-danger py-2 px-3 small';
+
+
+                if(data.status){
+
+                    setTimeout(()=>{
+
+                        location.reload();
+
+                    },700);
+
+                }
+
+            })
+
+            .catch(()=>{
+
+                message.className='alert alert-danger py-2 px-3 small';
+                message.textContent='خطا در ارتباط با سرور';
+
+            })
+
+            .finally(()=>{
+
+                button.disabled=false;
+                button.textContent='ذخیره تراکنش';
+
+            });
+
     });
 
 
@@ -419,6 +460,57 @@
         });
     }
 
+
+    ///=/////////////////==///
+    // delete btn //
+    let deleteTransactionId = null;
+
+    function confirmDeleteTransaction(id)
+    {
+        deleteTransactionId = id;
+
+        new bootstrap.Modal(
+            document.getElementById('deleteTxConfirmModal')
+        ).show();
+    }
+
+
+
+    function deleteTransaction()
+    {
+        fetch("<?= site_url('api/transaction/delete') ?>", {
+            method:'POST',
+            headers:{
+                'Content-Type':'application/x-www-form-urlencoded'
+            },
+            body:new URLSearchParams({
+                id: deleteTransactionId
+            })
+        })
+            .then(res=>res.json())
+            .then(data=>{
+
+                if(data.status)
+                {
+                    bootstrap.Modal
+                        .getInstance(
+                            document.getElementById('deleteTxConfirmModal')
+                        )
+                        .hide();
+
+                    loadTransactions();
+                }
+                else
+                {
+                    alert(data.message);
+                }
+
+            })
+            .catch(err=>{
+                console.error(err);
+                alert('خطا در حذف تراکنش');
+            });
+    }
 
     // Edit category
     function editCategory(category) {

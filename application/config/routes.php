@@ -66,6 +66,8 @@ $route['api/profile/password'] = 'api/Profile/change_password';
 
 $route['api/transactions'] = 'api/transaction/index';
 $route['api/transactions'] = 'api/Transaction/create';
+$route['api/transactions/delete/(:num)'] = 'api/transaction/delete/$1';
+$route['api/transactions/update/(:num)'] = 'api/transaction/update/$1';
 
 $route['api/categories'] = 'api/Category/index';
 $route['api/categories/create'] = 'api/Category/create';
