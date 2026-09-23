@@ -66,14 +66,13 @@ class Auth extends CI_Controller
 
         $email = $this->input->post('email', true);
 
-        $exists = $this->User_model
-            ->find_by_email($email);
+        $exists = $this->User_model->find_any_by_email($email);
 
         if ($exists) {
             return $this->json([
                 'status' => false,
                 'message' => 'این ایمیل قبلا ثبت شده است'
-            ], 400);
+            ]);
         }
 
         $data = [
@@ -150,7 +149,39 @@ class Auth extends CI_Controller
 
     public function delete_account()
     {
-        
+        $user_id = $this->session->userdata("user_id");
+
+        if (!$user_id) {
+            return $this->json([
+                'status' => false,
+                'message' => 'ابتدا وارد شوید'
+            ], 401);
+        }
+
+        $password = $this->input->post("password", true);
+
+        $user = $this->User_model->find($user_id);
+
+        if (!$user || !password_verify($password, $user->password)) {
+            return $this->json([
+                'status' => false,
+                'message' => 'رمز عبور اشتباه است'
+            ]);
+        }
+
+        if ($this->User_model->soft_delete($user_id)) {
+            $this->session->sess_destroy();
+
+            return $this->json([
+                'status' => true,
+                'message' => 'حساب شما حذف شد. تا ۳۰ روز امکان بازیابی وجود دارد'
+            ]);
+        }
+
+        return $this->json([
+            'status' => false,
+            'message' => 'خطا در حذف حساب'
+        ]);
     }
 
     private function json($data)

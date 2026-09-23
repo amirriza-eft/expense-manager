@@ -36,6 +36,14 @@ class User_model extends CI_Model
             ->row();
     }
 
+    public function find_any_by_email($email)
+    {
+        return $this->db
+            ->where('email', $email)
+            ->get($this->table)
+            ->row();
+    }
+
     public function find($id)
     {
         return $this->db
