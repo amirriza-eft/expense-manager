@@ -2,7 +2,9 @@
 
 defined('BASEPATH') or exit('No direct script access allowed');
 
-class Auth extends CI_Controller
+require_once(APPPATH . 'controllers/api/Base_API_Controller.php');
+
+class Auth extends Base_API_Controller
 {
     public function __construct()
     {
@@ -182,13 +184,6 @@ class Auth extends CI_Controller
             'status' => false,
             'message' => 'خطا در حذف حساب'
         ]);
-    }
-
-    private function json($data)
-    {
-        header('Content-Type: application/json');
-        echo json_encode($data, JSON_UNESCAPED_UNICODE);
-        exit;
     }
 
 }

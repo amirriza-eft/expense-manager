@@ -2,7 +2,9 @@
 
 defined('BASEPATH') or exit('No direct script access allowed');
 
-class Category extends CI_Controller
+require_once(APPPATH . 'controllers/api/Base_API_Controller.php');
+
+class Category extends Base_API_Controller
 {
     public function __construct()
     {
@@ -124,12 +126,5 @@ class Category extends CI_Controller
             'message' => 'خطا در حذف'
         ], 500);
     }
-
-    private function json($data, $status = 200)
-    {
-        http_response_code($status);
-        header('Content-Type: application/json');
-        echo json_encode($data, JSON_UNESCAPED_UNICODE);
-        exit;
-    }
+    
 }
