@@ -99,8 +99,7 @@ class Transaction_model extends CI_Model
 
         return $this->db->trans_status();
     }
-
-
+    
     public function delete($id, $user_id)
     {
         $transaction = $this->db
@@ -128,7 +127,6 @@ class Transaction_model extends CI_Model
             ]);
     }
 
-
     private function change_budget($user_id, $amount, $type, $add = true)
     {
         $value = (float)$amount;
@@ -152,7 +150,6 @@ class Transaction_model extends CI_Model
             ->update('budgets');
     }
 
-
     public function get_monthly_income($user_id)
     {
         return $this->db
@@ -166,7 +163,6 @@ class Transaction_model extends CI_Model
             ->row()
             ->amount ?? 0;
     }
-
 
     public function get_monthly_expense($user_id)
     {
