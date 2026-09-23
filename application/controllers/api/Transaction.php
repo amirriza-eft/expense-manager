@@ -25,12 +25,28 @@ class Transaction extends Base_API_Controller
             ], 401);
         }
 
+
+        $page = (int)$this->input->get('page') ?: 1;
+        $limit = 8;
+        $offset = ($page - 1) * $limit;
+
+
         $transactions = $this->Transaction_model
-            ->get_user_transactions($user_id);
+            ->get_user_transactions($user_id, $limit, $offset);
+
+
+        $total = $this->Transaction_model
+            ->count_user_transactions($user_id);
+
 
         return $this->json([
             'status' => true,
-            'transactions' => $transactions
+            'transactions' => $transactions,
+            'pagination' => [
+                'current_page' => $page,
+                'total_pages' => ceil($total / $limit),
+                'total' => $total
+            ]
         ]);
     }
 
@@ -131,5 +147,5 @@ class Transaction extends Base_API_Controller
             'message' => 'خطا در حذف'
         ], 500);
     }
-    
+
 }

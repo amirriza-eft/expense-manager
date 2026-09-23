@@ -411,6 +411,47 @@
         ::-webkit-scrollbar-thumb:hover {
             background: var(--accent-orange);
         }
+
+        .pagination {
+            gap: 8px;
+        }
+
+
+        .pagination button {
+            min-width: 38px;
+            height: 38px;
+
+            border-radius: 12px;
+
+            background: rgba(255, 255, 255, .05);
+
+            border: 1px solid rgba(255, 255, 255, .1);
+
+            color: #fff;
+
+            transition: .2s ease;
+        }
+
+
+        .pagination button:hover {
+            background: rgba(255, 107, 0, .15);
+
+            border-color: #ff6b00;
+
+            color: #ff6b00;
+        }
+
+
+        .pagination button.active {
+            background: #ff6b00;
+
+            border-color: #ff6b00;
+
+            color: #fff;
+
+            box-shadow: 0 0 15px rgba(255, 107, 0, .35);
+        }
+
     </style>
 </head>
 <body>

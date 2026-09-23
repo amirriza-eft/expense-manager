@@ -122,7 +122,7 @@
 
     <div class="table-responsive">
 
-        <table class="table table-dark align-middle">
+        <table class="table table-dark table-borderless align-middle">
 
             <thead>
 
@@ -150,6 +150,18 @@
 
     </div>
 
+    <div id="mobileTransactionList"></div>
+
+    <div class="d-flex justify-content-center mt-4">
+
+        <nav>
+            <ul id="pagination"
+                class="pagination pagination-dark">
+            </ul>
+        </nav>
+
+    </div>
+
 </div>
 
 
@@ -160,6 +172,8 @@
 <script src="https://cdn.jsdelivr.net/npm/persian-datepicker@1.2.0/dist/js/persian-datepicker.min.js"></script>
 
 <script>
+    let currentPage = 1;
+
 
     $(document).ready(function () {
 
@@ -247,8 +261,13 @@
     }
 
 
-    function loadTransactions() {
+    function loadTransactions(page = 1) {
+
+        currentPage = page;
+
         let params = new URLSearchParams({
+
+            page: page,
 
             search:
             document.getElementById('search').value,
@@ -285,6 +304,7 @@
                 document.getElementById('transactionCount').innerText =
                     "تعداد: " + data.transactions.length;
 
+                renderPagination(data.pagination);
 
                 data.transactions.forEach(tx => {
 
@@ -373,4 +393,86 @@
             });
     }
 
+
+    function renderPagination(p) {
+        let html = '';
+
+        for (let i = 1; i <= p.total_pages; i++) {
+            html += `
+            <button
+                class="${i == p.current_page ? 'active' : ''}"
+                onclick="loadTransactions(${i})">
+                ${i}
+            </button>
+        `;
+        }
+
+        document.getElementById('pagination').innerHTML = html;
+    }
+
+
+    const mobile = document.getElementById('mobileTransactionList');
+
+    mobile.innerHTML = data.transactions.map(tx => {
+
+        const income = tx.type === 'income';
+
+        return `
+    <div class="transaction-card glass-panel p-3 mb-3">
+
+        <div class="d-flex justify-content-between align-items-center">
+            <h6 class="text-white fw-bold mb-0">
+                ${tx.title}
+            </h6>
+
+            <span class="badge ${income ? 'badge-income' : 'badge-expense'}">
+                ${income ? 'درآمد' : 'هزینه'}
+            </span>
+        </div>
+
+
+        <div class="mt-3">
+
+            <div class="d-flex justify-content-between">
+                <span class="text-muted">مبلغ</span>
+
+                <strong class="${income ? 'text-success' : 'text-danger'}">
+                    ${income ? '+' : '-'}
+                    ${Number(tx.amount).toLocaleString()}
+                </strong>
+            </div>
+
+
+            <div class="d-flex justify-content-between mt-2">
+                <span class="text-muted">دسته</span>
+                <span class="text-white">
+                    ${tx.category_name ?? 'بدون دسته'}
+                </span>
+            </div>
+
+
+            <div class="d-flex justify-content-between mt-2">
+                <span class="text-muted">تاریخ</span>
+                <span class="text-white">
+                    ${tx.transaction_date}
+                </span>
+            </div>
+
+        </div>
+
+
+        <div class="d-flex gap-2 mt-3">
+            <button class="btn btn-sm btn-outline-secondary flex-fill">
+                ویرایش
+            </button>
+
+            <button class="btn btn-sm btn-outline-danger flex-fill">
+                حذف
+            </button>
+        </div>
+
+    </div>
+    `;
+
+    }).join('');
 </script>

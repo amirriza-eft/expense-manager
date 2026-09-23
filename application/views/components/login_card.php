@@ -1,8 +1,8 @@
-<?php defined('BASEPATH') OR exit('No direct script access allowed'); ?>
+<?php defined('BASEPATH') or exit('No direct script access allowed'); ?>
 
 <div class="glass-panel p-4 p-sm-5 shadow-lg border" style="border-color: var(--border-subtle) !important;">
 
-    <div class="text-center mb-4">
+    <div class="text-center mb-5">
         <a href="<?= site_url('home') ?>" class="d-inline-block mb-3">
             <i class="bi bi-wallet2 brand-icon" style="font-size:2.75rem;"></i>
         </a>
@@ -119,19 +119,19 @@
             if (passwordInput.type === "password") {
 
                 passwordInput.type = "text";
-                icon.classList.replace('bi-eye','bi-eye-slash');
+                icon.classList.replace('bi-eye', 'bi-eye-slash');
 
             } else {
 
                 passwordInput.type = "password";
-                icon.classList.replace('bi-eye-slash','bi-eye');
+                icon.classList.replace('bi-eye-slash', 'bi-eye');
 
             }
 
         });
 
 
-        loginForm.addEventListener('submit', function(e){
+        loginForm.addEventListener('submit', function (e) {
 
             e.preventDefault();
 
@@ -153,14 +153,14 @@
 
                 .then(data => {
 
-                    if(data.status){
+                    if (data.status) {
 
                         successBox.innerHTML = data.message;
                         successBox.classList.remove('d-none');
 
                         setTimeout(() => {
                             window.location.href = "<?= site_url('home') ?>";
-                        },800);
+                        }, 800);
 
                     } else {
 

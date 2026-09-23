@@ -36,7 +36,7 @@ class Transaction_model extends CI_Model
         return $this->db->trans_status();
     }
 
-    public function get_user_transactions($user_id)
+    public function get_user_transactions($user_id, $limit, $offset)
     {
         return $this->db
             ->select('transactions.*, categories.title as category_name')
@@ -49,8 +49,17 @@ class Transaction_model extends CI_Model
             ->where('transactions.user_id', $user_id)
             ->where('transactions.deleted_at IS NULL', null, false)
             ->order_by('transactions.id', 'DESC')
+            ->limit($limit, $offset)
             ->get()
             ->result();
+    }
+
+    public function count_user_transactions($user_id)
+    {
+        return $this->db
+            ->where('user_id', $user_id)
+            ->where('deleted_at IS NULL', null, false)
+            ->count_all_results('transactions');
     }
 
     public function update($id, $user_id, $data)
