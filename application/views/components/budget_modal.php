@@ -34,11 +34,12 @@
                             <label for="tx_category" class="form-label small text-muted">
                                 دسته‌بندی
                             </label>
+
                             <select
                                     name="category_id"
-                                    id="filterCategory"
-                                    class="form-select">
-
+                                    id="tx_category"
+                                    class="form-select"
+                            >
                                 <option value="">بدون دسته</option>
                             </select>
                         </div>

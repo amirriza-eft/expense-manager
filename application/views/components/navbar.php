@@ -1,4 +1,4 @@
-<?php defined('BASEPATH') OR exit('No direct script access allowed'); ?>
+<?php defined('BASEPATH') or exit('No direct script access allowed'); ?>
 <!DOCTYPE html>
 <html lang="fa" dir="rtl">
 <head>
@@ -10,11 +10,16 @@
     <!-- Google Fonts: Vazirmatn -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;700;900&display=swap"
+          rel="stylesheet">
 
     <!-- Bootstrap 5 RTL CSS & Icons CDN -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.rtl.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link
+            rel="stylesheet"
+            href="https://cdn.jsdelivr.net/npm/persian-datepicker@1.2.0/dist/css/persian-datepicker.min.css"
+    >
 
     <style>
         :root {
@@ -390,10 +395,22 @@
             color: var(--accent-orange) !important;
         }
 
-        ::-webkit-scrollbar { width: 8px; }
-        ::-webkit-scrollbar-track { background: var(--bg-body); }
-        ::-webkit-scrollbar-thumb { background: #2b2b36; border-radius: 4px; }
-        ::-webkit-scrollbar-thumb:hover { background: var(--accent-orange); }
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--bg-body);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #2b2b36;
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--accent-orange);
+        }
     </style>
 </head>
 <body>
@@ -411,8 +428,8 @@
             $avatar = $this->session->userdata('user_avatar');
             $user_name = $this->session->userdata('user_name') ?? 'کاربر';
             $avatar_url = !empty($avatar)
-                ? base_url('uploads/avatars/' . $avatar)
-                : 'https://placehold.co/100x100/1e1e24/ff6b00?text=' . urlencode(mb_substr($user_name, 0, 1));
+                    ? base_url('uploads/avatars/' . $avatar)
+                    : 'https://placehold.co/100x100/1e1e24/ff6b00?text=' . urlencode(mb_substr($user_name, 0, 1));
             ?>
             <!-- Avatar (left) + logout (right of avatar) -->
             <div class="d-flex align-items-center gap-3">
@@ -440,27 +457,26 @@
 
 <main class="flex-grow-1">
 
-<script>
+    <script>
 
-    document.getElementById('logoutBtn')
-        ?.addEventListener('click', function(e){
-            e.preventDefault();
+        document.getElementById('logoutBtn')
+            ?.addEventListener('click', function (e) {
+                e.preventDefault();
 
-            fetch("<?= site_url('api/auth/logout') ?>", {
-                method:"POST"
-            })
-                .then(response => response.json())
-
-                .then(data => {
-                    if(data.status)
-                    {
-                        window.location.href =
-                            "<?= site_url('login') ?>";
-                    }
+                fetch("<?= site_url('api/auth/logout') ?>", {
+                    method: "POST"
                 })
+                    .then(response => response.json())
 
-                .catch(error => {
-                    console.log(error);
-                });
-        });
-</script>
+                    .then(data => {
+                        if (data.status) {
+                            window.location.href =
+                                "<?= site_url('login') ?>";
+                        }
+                    })
+
+                    .catch(error => {
+                        console.log(error);
+                    });
+            });
+    </script>

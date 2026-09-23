@@ -4,7 +4,8 @@
 
     <div class="row g-2 align-items-center">
 
-        <div class="col-12 col-md-4">
+        <!-- Search -->
+        <div class="col-12 col-md-3">
             <div class="input-group">
                 <span class="input-group-text">
                     <i class="bi bi-search"></i>
@@ -20,7 +21,8 @@
         </div>
 
 
-        <div class="col-6 col-md-3">
+        <!-- Type -->
+        <div class="col-6 col-md-2">
             <select id="filterType" class="form-select">
                 <option value="">همه نوع‌ها</option>
                 <option value="income">درآمد</option>
@@ -29,19 +31,43 @@
         </div>
 
 
-        <div class="col-6 col-md-3">
+        <!-- Category -->
+        <div class="col-6 col-md-2">
             <select
-                    name="category_id"
-                    id="tx_category"
-                    class="form-select">
-
-                <option value="">بدون دسته</option>
-
+                    id="filterCategory"
+                    class="form-select"
+            >
+                <option value="">همه دسته‌ها</option>
             </select>
         </div>
 
 
-        <div class="col-12 col-md-2">
+        <!-- From date -->
+        <div class="col-6 col-md-2">
+            <input
+                    type="text"
+                    id="filterFromDate"
+                    class="form-control"
+                    placeholder="از تاریخ"
+                    autocomplete="off"
+            >
+        </div>
+
+
+        <!-- To date -->
+        <div class="col-6 col-md-2">
+            <input
+                    type="text"
+                    id="filterToDate"
+                    class="form-control"
+                    placeholder="تا تاریخ"
+                    autocomplete="off"
+            >
+        </div>
+
+
+        <!-- Apply -->
+        <div class="col-12 col-md-1">
             <button
                     class="btn btn-orange-outline w-100"
                     onclick="loadTransactions()"
@@ -127,7 +153,30 @@
 </div>
 
 
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/persian-date@1.1.0/dist/persian-date.min.js"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/persian-datepicker@1.2.0/dist/js/persian-datepicker.min.js"></script>
+
 <script>
+
+    $(document).ready(function () {
+
+        $('#filterFromDate').pDatepicker({
+            format: 'YYYY/MM/DD',
+            autoClose: true,
+            initialValue: false
+        });
+
+        $('#filterToDate').pDatepicker({
+            format: 'YYYY/MM/DD',
+            autoClose: true,
+            initialValue: false
+        });
+
+    });
+
 
     document.addEventListener('DOMContentLoaded', () => {
 
@@ -143,72 +192,58 @@
             .then(res => res.json())
             .then(data => {
 
-                if (data.status) {
-
-                    renderCategories(data.categories);
-
-                    data.categories.forEach(cat => {
-
-                        if (filter) {
-                            filter.innerHTML += `
-                                <option value="${cat.id}">
-                                    ${cat.title}
-                                </option>`;
-                        }
-
-
-                        if (transaction) {
-                            transaction.innerHTML += `
-                                <option value="${cat.id}">
-                                    ${cat.title}
-                                </option>`;
-                        }
-
-                    });
-
+                if (!data.status) {
+                    return;
                 }
 
                 const filter = document.getElementById('filterCategory');
                 const transaction = document.getElementById('tx_category');
 
+                // Transaction list filter
                 if (filter) {
-                    filter.innerHTML = '<option value="">همه دسته‌ها</option>';
-                }
 
-                if (transaction) {
-                    transaction.innerHTML = '<option value="">بدون دسته</option>';
-                }
+                    filter.innerHTML = `
+                    <option value="">همه دسته‌ها</option>
+                `;
 
+                    data.categories.forEach(category => {
 
-                if (data.status) {
-
-                    data.categories.forEach(cat => {
-
-                        if (filter) {
-
-                            filter.innerHTML += `
-                    <option value="${cat.id}">
-                    ${cat.title}
-                    </option>`;
-
-                        }
-
-
-                        if (transaction) {
-
-                            transaction.innerHTML += `
-                    <option value="${cat.id}">
-                    ${cat.title}
-                    </option>`;
-
-                        }
+                        filter.innerHTML += `
+                        <option value="${category.id}">
+                            ${category.title}
+                        </option>
+                    `;
 
                     });
-
                 }
 
-            });
 
+                // Create / edit transaction category
+                if (transaction) {
+
+                    transaction.innerHTML = `
+                    <option value="">بدون دسته</option>
+                `;
+
+                    data.categories.forEach(category => {
+
+                        transaction.innerHTML += `
+                        <option value="${category.id}">
+                            ${category.title}
+                        </option>
+                    `;
+
+                    });
+                }
+
+
+                // Category manager list
+                renderCategories(data.categories);
+
+            })
+            .catch(error => {
+                console.error(error);
+            });
     }
 
 
