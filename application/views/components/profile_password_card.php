@@ -207,7 +207,7 @@
 
 
         fetch(
-            "<?= site_url('api/profile/delete') ?>",
+            "<?= site_url('api/user/delete') ?>",
             {
                 method: "POST",
 
