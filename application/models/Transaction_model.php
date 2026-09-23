@@ -151,4 +151,34 @@ class Transaction_model extends CI_Model
             ->where('user_id', $user_id)
             ->update('budgets');
     }
+
+
+    public function get_monthly_income($user_id)
+    {
+        return $this->db
+            ->select_sum('amount')
+            ->where('user_id', $user_id)
+            ->where('type', 'income')
+            ->where('deleted_at IS NULL', null, false)
+            ->where('MONTH(transaction_date)', date('m'))
+            ->where('YEAR(transaction_date)', date('Y'))
+            ->get($this->table)
+            ->row()
+            ->amount ?? 0;
+    }
+
+
+    public function get_monthly_expense($user_id)
+    {
+        return $this->db
+            ->select_sum('amount')
+            ->where('user_id', $user_id)
+            ->where('type', 'expense')
+            ->where('deleted_at IS NULL', null, false)
+            ->where('MONTH(transaction_date)', date('m'))
+            ->where('YEAR(transaction_date)', date('Y'))
+            ->get($this->table)
+            ->row()
+            ->amount ?? 0;
+    }
 }
