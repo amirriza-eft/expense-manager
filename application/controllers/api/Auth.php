@@ -1,6 +1,6 @@
 <?php
 
-defined('BASEPATH') OR exit('No direct script access allowed');
+defined('BASEPATH') or exit('No direct script access allowed');
 
 class Auth extends CI_Controller
 {
@@ -57,35 +57,33 @@ class Auth extends CI_Controller
             ]
         );
 
-        if($this->form_validation->run() === FALSE)
-        {
+        if ($this->form_validation->run() === FALSE) {
             return $this->json([
-                'status'=>false,
-                'message'=>validation_errors()
-            ],400);
+                'status' => false,
+                'message' => validation_errors()
+            ], 400);
         }
 
-        $email = $this->input->post('email',true);
+        $email = $this->input->post('email', true);
 
         $exists = $this->User_model
             ->find_by_email($email);
 
-        if($exists)
-        {
+        if ($exists) {
             return $this->json([
-                'status'=>false,
-                'message'=>'این ایمیل قبلا ثبت شده است'
-            ],400);
+                'status' => false,
+                'message' => 'این ایمیل قبلا ثبت شده است'
+            ], 400);
         }
 
         $data = [
-            'full_name'=>$this->input->post('full_name',true),
-            'email'=>$email,
-            'password'=>password_hash(
+            'full_name' => $this->input->post('full_name', true),
+            'email' => $email,
+            'password' => password_hash(
                 $this->input->post('password'),
                 PASSWORD_DEFAULT
             ),
-            'created_at'=>date('Y-m-d H:i:s')
+            'created_at' => date('Y-m-d H:i:s')
         ];
 
 
@@ -105,6 +103,7 @@ class Auth extends CI_Controller
             'message' => 'خطا در ایجاد حساب'
         ], 500);
     }
+
     public function login()
     {
         $email = $this->input->post('email', true);
@@ -112,32 +111,30 @@ class Auth extends CI_Controller
 
         $user = $this->User_model->find_by_email($email);
 
-        if(!$user)
-        {
+        if (!$user) {
             return $this->json([
-                'status'=>false,
-                'message'=>'ایمیل یا رمز عبور اشتباه است'
+                'status' => false,
+                'message' => 'ایمیل یا رمز عبور اشتباه است'
             ]);
         }
 
-        if(!password_verify($password,$user->password))
-        {
+        if (!password_verify($password, $user->password)) {
             return $this->json([
-                'status'=>false,
-                'message'=>'ایمیل یا رمز عبور اشتباه است'
+                'status' => false,
+                'message' => 'ایمیل یا رمز عبور اشتباه است'
             ]);
         }
 
         $this->session->set_userdata([
-            'user_id'=>$user->id,
-            'full_name'=>$user->full_name,
-            'email'=>$user->email,
-            'logged_in'=>true
+            'user_id' => $user->id,
+            'full_name' => $user->full_name,
+            'email' => $user->email,
+            'logged_in' => true
         ]);
 
         return $this->json([
-            'status'=>true,
-            'message'=>'ورود موفق'
+            'status' => true,
+            'message' => 'ورود موفق'
         ]);
     }
 
@@ -151,10 +148,15 @@ class Auth extends CI_Controller
         ]);
     }
 
+    public function delete_account()
+    {
+        
+    }
+
     private function json($data)
     {
         header('Content-Type: application/json');
-        echo json_encode($data,JSON_UNESCAPED_UNICODE);
+        echo json_encode($data, JSON_UNESCAPED_UNICODE);
         exit;
     }
 

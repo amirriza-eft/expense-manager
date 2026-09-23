@@ -1,6 +1,6 @@
 <?php
 
-defined('BASEPATH') OR exit('No direct script access allowed');
+defined('BASEPATH') or exit('No direct script access allowed');
 
 class User_model extends CI_Model
 {
@@ -39,16 +39,25 @@ class User_model extends CI_Model
     public function find($id)
     {
         return $this->db
-            ->where('id',$id)
-            ->where('deleted_at IS NULL',null,false)
+            ->where('id', $id)
+            ->where('deleted_at IS NULL', null, false)
             ->get($this->table)
             ->row();
     }
 
-    public function update($id,$data)
+    public function update($id, $data)
     {
         return $this->db
-            ->where('id',$id)
-            ->update($this->table,$data);
+            ->where('id', $id)
+            ->update($this->table, $data);
+    }
+
+    public function soft_delete($id)
+    {
+        return $this->db
+            ->where('id', $id)
+            ->update($this->table, [
+                'deleted_at' => date('Y-m-d H:i:s')
+            ]);
     }
 }

@@ -210,53 +210,37 @@
 <script>
     // Transaction Modal Handling
     function openCreateTransactionModal() {
+
         document.getElementById('txModalTitle').innerText = 'ثبت تراکنش جدید';
         document.getElementById('txForm').reset();
         document.getElementById('tx_id').value = '';
-        document.getElementById('tx_date').value = new Date().toISOString().split('T')[0];
-        filterCategoryDropdownByType();
+        document.getElementById('tx_date').value =
+            new Date().toISOString().split('T')[0];
+
     }
 
     function openEditTransactionModal(tx) {
+
         document.getElementById('txModalTitle').innerText = 'ویرایش تراکنش';
         document.getElementById('tx_id').value = tx.id;
         document.getElementById('tx_title').value = tx.title;
         document.getElementById('tx_type').value = tx.type;
-        filterCategoryDropdownByType();
-        document.getElementById('tx_category').value = tx.category_id;
-        document.getElementById('tx_amount').value = tx.amount;
-        document.getElementById('tx_date').value = tx.transaction_date;
-        document.getElementById('tx_description').value = tx.description || '';
-
-        new bootstrap.Modal(document.getElementById('transactionModal')).show();
-    }
-
-    function filterCategoryDropdownByType() {
-        const selectedType = document.getElementById('tx_type').value;
-        const catSelect = document.getElementById('tx_category');
-        const options = catSelect.querySelectorAll('option');
-
-        options.forEach(opt => {
-            if (!opt.value) return; // Keep "انتخاب دسته..."
-            if (opt.getAttribute('data-type') === selectedType) {
-                opt.style.display = '';
-            } else {
-                opt.style.display = 'none';
-            }
-        });
+        document.getElementById('tx_category').value =
+            tx.category_id ?? '';
+        document.getElementById('tx_amount').value =
+            tx.amount;
+        document.getElementById('tx_date').value =
+            tx.transaction_date;
+        document.getElementById('tx_description').value =
+            tx.description || '';
+        new bootstrap.Modal(
+            document.getElementById('transactionModal')
+        ).show();
     }
 
     function confirmDeleteTransaction(id) {
         document.getElementById('delete_tx_id').value = id;
         new bootstrap.Modal(document.getElementById('deleteTxConfirmModal')).show();
-    }
-
-    // Category Modal Handling
-    function setEditCategory(cat) {
-        document.getElementById('cat_id').value = cat.id;
-        document.getElementById('cat_name').value = cat.name;
-        document.getElementById('cat_type').value = cat.type;
-        document.getElementById('catSubmitBtn').innerText = 'به‌روزرسانی دسته';
     }
 
     function confirmDeleteCat(id) {
@@ -448,6 +432,7 @@
     }
 
     function deleteTransaction() {
+
         fetch("<?= site_url('api/transaction/delete') ?>", {
             method: 'POST',
             headers: {
@@ -457,10 +442,25 @@
                 id: deleteTransactionId
             })
         })
-            .then(res => res.json())
+            .then(async res => {
+
+                const text = await res.text();
+
+                console.log("SERVER RESPONSE:", text);
+
+                try {
+                    return JSON.parse(text);
+                } catch (e) {
+                    throw new Error("Server did not return JSON");
+                }
+
+            })
             .then(data => {
 
+                console.log("JSON DATA:", data);
+
                 if (data.status) {
+
                     bootstrap.Modal
                         .getInstance(
                             document.getElementById('deleteTxConfirmModal')
@@ -468,15 +468,20 @@
                         .hide();
 
                     loadTransactions();
+
                 } else {
+
                     alert(data.message);
+
                 }
 
             })
             .catch(err => {
-                console.error(err);
-                alert('خطا در حذف تراکنش');
+
+                console.error("DELETE ERROR:", err);
+
             });
+
     }
 
     // Edit category

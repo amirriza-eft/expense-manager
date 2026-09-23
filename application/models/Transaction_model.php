@@ -1,6 +1,6 @@
 <?php
 
-defined('BASEPATH') OR exit('No direct script access allowed');
+defined('BASEPATH') or exit('No direct script access allowed');
 
 class Transaction_model extends CI_Model
 {
@@ -21,12 +21,12 @@ class Transaction_model extends CI_Model
 
         if ($data['type'] === 'income') {
             $this->db
-                ->set('amount', 'amount + ' . (float) $data['amount'], false)
+                ->set('amount', 'amount + ' . (float)$data['amount'], false)
                 ->where('user_id', $data['user_id'])
                 ->update('budgets');
         } else {
             $this->db
-                ->set('amount', 'amount - ' . (float) $data['amount'], false)
+                ->set('amount', 'amount - ' . (float)$data['amount'], false)
                 ->where('user_id', $data['user_id'])
                 ->update('budgets');
         }
@@ -46,24 +46,24 @@ class Transaction_model extends CI_Model
                 'categories.id = transactions.category_id',
                 'left'
             )
-            ->where('transactions.user_id',$user_id)
-            ->order_by('transactions.id','DESC')
+            ->where('transactions.user_id', $user_id)
+            ->where('transactions.deleted_at IS NULL', null, false)
+            ->order_by('transactions.id', 'DESC')
             ->get()
             ->result();
     }
 
-    public function update($id,$user_id,$data)
+    public function update($id, $user_id, $data)
     {
         $this->db->trans_start();
 
-        $old=$this->db
-            ->where('id',$id)
-            ->where('user_id',$user_id)
+        $old = $this->db
+            ->where('id', $id)
+            ->where('user_id', $user_id)
             ->get($this->table)
             ->row();
 
-        if(!$old)
-        {
+        if (!$old) {
             return false;
         }
 
@@ -82,9 +82,9 @@ class Transaction_model extends CI_Model
         );
 
         $this->db
-            ->where('id',$id)
-            ->where('user_id',$user_id)
-            ->update($this->table,$data);
+            ->where('id', $id)
+            ->where('user_id', $user_id)
+            ->update($this->table, $data);
 
         $this->db->trans_complete();
 
@@ -92,19 +92,15 @@ class Transaction_model extends CI_Model
     }
 
 
-
-    public function delete($id,$user_id)
+    public function delete($id, $user_id)
     {
-        $this->db->trans_start();
-
-        $transaction=$this->db
-            ->where('id',$id)
-            ->where('user_id',$user_id)
+        $transaction = $this->db
+            ->where('id', $id)
+            ->where('user_id', $user_id)
             ->get($this->table)
             ->row();
 
-        if(!$transaction)
-        {
+        if (!$transaction) {
             return false;
         }
 
@@ -115,41 +111,35 @@ class Transaction_model extends CI_Model
             false
         );
 
-        $this->db
-            ->where('id',$id)
-            ->where('user_id',$user_id)
-            ->delete($this->table);
-
-        $this->db->trans_complete();
-
-        return $this->db->trans_status();
+        return $this->db
+            ->where('id', $id)
+            ->where('user_id', $user_id)
+            ->update($this->table, [
+                'deleted_at' => date('Y-m-d H:i:s')
+            ]);
     }
 
 
-
-    private function change_budget($user_id,$amount,$type,$add=true)
+    private function change_budget($user_id, $amount, $type, $add = true)
     {
-        $value=(float)$amount;
+        $value = (float)$amount;
 
-        if($type==='income')
-        {
+        if ($type === 'income') {
             $add
                 ?
-                $this->db->set('amount','amount + '.$value,false)
+                $this->db->set('amount', 'amount + ' . $value, false)
                 :
-                $this->db->set('amount','amount - '.$value,false);
-        }
-        else
-        {
+                $this->db->set('amount', 'amount - ' . $value, false);
+        } else {
             $add
                 ?
-                $this->db->set('amount','amount - '.$value,false)
+                $this->db->set('amount', 'amount - ' . $value, false)
                 :
-                $this->db->set('amount','amount + '.$value,false);
+                $this->db->set('amount', 'amount + ' . $value, false);
         }
 
         return $this->db
-            ->where('user_id',$user_id)
+            ->where('user_id', $user_id)
             ->update('budgets');
     }
 }
