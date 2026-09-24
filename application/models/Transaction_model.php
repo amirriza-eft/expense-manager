@@ -17,7 +17,9 @@ class Transaction_model extends CI_Model
     {
         $this->db->trans_start();
 
-        $this->db->insert($this->table, $data);
+        if (!$this->db->insert($this->table, $data)) {
+            return false;
+        }
 
         $this->change_budget(
             $data['user_id'],
