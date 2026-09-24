@@ -17,25 +17,34 @@ class Transaction_model extends CI_Model
     {
         $this->db->trans_start();
 
-        if (!$this->db->insert($this->table, $data)) {
-            return false;
-        }
+        $result = $this->db->insert($this->table, $data);
 
-        $this->change_budget(
-            $data['user_id'],
-            $data['amount'],
-            $data['type'],
-            true
-        );
+        if ($result) {
+
+            $this->change_budget(
+                $data['user_id'],
+                $data['amount'],
+                $data['type'],
+                true
+            );
+
+        }
 
         $this->db->trans_complete();
 
         return $this->db->trans_status();
     }
 
-    public function get_user_transactions($user_id, $limit, $offset)
+    public function get_user_transactions(
+        $user_id,
+        $limit,
+        $offset,
+        $search = null,
+        $type = null,
+        $category_id = null
+    )
     {
-        return $this->db
+        $this->db
             ->select('transactions.*, categories.title as category_name')
             ->from('transactions')
             ->join(
@@ -44,7 +53,37 @@ class Transaction_model extends CI_Model
                 'left'
             )
             ->where('transactions.user_id', $user_id)
-            ->where('transactions.deleted_at IS NULL', null, false)
+            ->where('transactions.deleted_at IS NULL', null, false);
+
+        if (!empty($search)) {
+
+            $this->db->group_start()
+                ->like('transactions.title', $search)
+                ->or_like('transactions.description', $search)
+                ->or_like('categories.title', $search)
+                ->group_end();
+
+        }
+
+        if (!empty($type)) {
+
+            $this->db->where(
+                'transactions.type',
+                $type
+            );
+
+        }
+
+        if (!empty($category_id)) {
+
+            $this->db->where(
+                'transactions.category_id',
+                $category_id
+            );
+
+        }
+
+        return $this->db
             ->order_by('transactions.id', 'DESC')
             ->limit($limit, $offset)
             ->get()

@@ -32,7 +32,14 @@ class Transaction extends Base_API_Controller
 
 
         $transactions = $this->Transaction_model
-            ->get_user_transactions($user_id, $limit, $offset);
+            ->get_user_transactions(
+                $user_id,
+                $limit,
+                $offset,
+                $this->input->get('search'),
+                $this->input->get('type'),
+                $this->input->get('category_id')
+            );
 
 
         $total = $this->Transaction_model
