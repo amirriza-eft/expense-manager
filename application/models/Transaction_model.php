@@ -19,17 +19,12 @@ class Transaction_model extends CI_Model
 
         $this->db->insert($this->table, $data);
 
-        if ($data['type'] === 'income') {
-            $this->db
-                ->set('amount', 'amount + ' . (float)$data['amount'], false)
-                ->where('user_id', $data['user_id'])
-                ->update('budgets');
-        } else {
-            $this->db
-                ->set('amount', 'amount - ' . (float)$data['amount'], false)
-                ->where('user_id', $data['user_id'])
-                ->update('budgets');
-        }
+        $this->change_budget(
+            $data['user_id'],
+            $data['amount'],
+            $data['type'],
+            true
+        );
 
         $this->db->trans_complete();
 
@@ -99,7 +94,7 @@ class Transaction_model extends CI_Model
 
         return $this->db->trans_status();
     }
-    
+
     public function delete($id, $user_id)
     {
         $transaction = $this->db
@@ -129,7 +124,7 @@ class Transaction_model extends CI_Model
 
     private function change_budget($user_id, $amount, $type, $add = true)
     {
-        $value = (float)$amount;
+        $value = $amount;
 
         if ($type === 'income') {
             $add
