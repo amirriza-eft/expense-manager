@@ -41,7 +41,8 @@ class Transaction_model extends CI_Model
         $offset,
         $search = null,
         $type = null,
-        $category_id = null
+        $category_id = null,
+        $sort = 'newest'
     )
     {
         $this->db
@@ -83,8 +84,23 @@ class Transaction_model extends CI_Model
 
         }
 
+
+        if ($sort === 'oldest') {
+
+            $this->db->order_by(
+                'transactions.transaction_date',
+                'ASC'
+            );
+        } else {
+
+            $this->db->order_by(
+                'transactions.transaction_date',
+                'DESC'
+            );
+
+        }
+
         return $this->db
-            ->order_by('transactions.id', 'DESC')
             ->limit($limit, $offset)
             ->get()
             ->result();
@@ -178,6 +194,8 @@ class Transaction_model extends CI_Model
 
     public function delete($id, $user_id)
     {
+        $this->db->trans_start();
+
         $transaction = $this->db
             ->where('id', $id)
             ->where('user_id', $user_id)
@@ -195,12 +213,16 @@ class Transaction_model extends CI_Model
             false
         );
 
-        return $this->db
+        $this->db
             ->where('id', $id)
             ->where('user_id', $user_id)
             ->update($this->table, [
                 'deleted_at' => date('Y-m-d H:i:s')
             ]);
+
+        $this->db->trans_complete();
+
+        return $this->db->trans_status();
     }
 
     private function change_budget($user_id, $amount, $type, $add = true)

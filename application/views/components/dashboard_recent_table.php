@@ -81,28 +81,47 @@
 </div>
 
 
-<div class="d-flex flex-wrap gap-2 mb-4">
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-4">
+    <div class="d-flex flex-wrap gap-2">
+        <button
+                class="btn btn-orange-outline"
+                data-bs-toggle="modal"
+                data-bs-target="#categoryManagerModal"
+        >
+            <i class="bi bi-tags"></i>
+            مدیریت دسته‌ها
+        </button>
 
-    <button
-            class="btn btn-orange-outline"
-            data-bs-toggle="modal"
-            data-bs-target="#categoryManagerModal"
-    >
-        <i class="bi bi-tags"></i>
-        مدیریت دسته‌ها
-    </button>
+        <button
+                class="btn btn-orange-glow"
+                data-bs-toggle="modal"
+                data-bs-target="#transactionModal"
+                onclick="openCreateTransactionModal()"
+        >
+            <i class="bi bi-plus-circle"></i>
+            ثبت تراکنش
+        </button>
+    </div>
 
+    <div class="d-flex align-items-center gap-2">
+        <label for="sort" class="mb-0">
+            مرتب‌سازی:
+        </label>
 
-    <button
-            class="btn btn-orange-glow"
-            data-bs-toggle="modal"
-            data-bs-target="#transactionModal"
-            onclick="openCreateTransactionModal()"
-    >
-        <i class="bi bi-plus-circle"></i>
-        ثبت تراکنش
-    </button>
+        <select
+                id="sort"
+                class="form-select"
+                style="width: 150px;"
+        >
+            <option value="newest">
+                جدیدترین
+            </option>
 
+            <option value="oldest">
+                قدیمی‌ترین
+            </option>
+        </select>
+    </div>
 </div>
 
 
@@ -197,6 +216,14 @@
         loadCategories();
         loadTransactions();
 
+        document
+            .getElementById('sort')
+            .addEventListener('change', function () {
+
+                loadTransactions(1);
+
+            });
+
     });
 
 
@@ -276,12 +303,18 @@
             document.getElementById('filterType').value,
 
             category_id:
-            document.getElementById('filterCategory').value
+            document.getElementById('filterCategory').value,
+
+            sort:
+                document.getElementById('sort')?.value || 'newest'
 
         });
 
+
         fetch("<?= site_url('api/transaction') ?>?" + params)
+
             .then(res => res.json())
+
             .then(data => {
 
                 let tbody = document.getElementById('transactionList');
@@ -290,12 +323,18 @@
 
 
                 if (!data.status || !data.transactions.length) {
+
                     tbody.innerHTML = `
-            <tr>
-                <td colspan="7" class="text-center text-muted py-5">
-                    تراکنشی وجود ندارد
-                </td>
-            </tr>`;
+                        <tr>
+                            <td colspan="7" class="text-center text-muted py-5">
+                                تراکنشی وجود ندارد
+                            </td>
+                        </tr>`;
+
+                    document.getElementById('pagination').innerHTML = '';
+
+                    document.getElementById('transactionCount').innerText =
+                        "تعداد: 0";
 
                     return;
                 }
@@ -304,38 +343,40 @@
                 document.getElementById('transactionCount').innerText =
                     "تعداد: " + data.transactions.length;
 
+
                 renderPagination(data.pagination);
+
 
                 data.transactions.forEach(tx => {
 
                     tbody.innerHTML += `
 
-            <tr>
+                <tr>
 
-                <td class="text-white fw-bold">
-                    ${tx.title}
-                </td>
+                    <td class="text-white fw-bold">
+                        ${tx.title}
+                    </td>
 
 
-                <td>
-                    ${
+                    <td>
+                        ${
                         tx.type === "income"
                             ?
                             '<span class="badge badge-income">درآمد</span>'
                             :
                             '<span class="badge badge-expense">هزینه</span>'
                     }
-                </td>
+                    </td>
 
 
-                <td>
-                    <span class="badge bg-secondary">
-                        ${tx.category_name ?? 'بدون دسته'}
-                    </span>
-                </td>
+                    <td>
+                        <span class="badge bg-secondary">
+                            ${tx.category_name ?? 'بدون دسته'}
+                        </span>
+                    </td>
 
 
-                <td class="${
+                    <td class="${
                         tx.type === "income"
                             ?
                             'text-success'
@@ -343,50 +384,46 @@
                             'text-danger'
                     } fw-bold">
 
-                    ${
-                        tx.type === "income"
-                            ? '+'
-                            : '-'
-                    }
+                        ${tx.type === "income" ? '+' : '-'}
 
-                    ${Number(tx.amount).toLocaleString()}
+                        ${Number(tx.amount).toLocaleString()}
 
-                </td>
+                    </td>
 
 
-                <td class="text-muted small">
-                    ${tx.transaction_date}
-                </td>
+                    <td class="text-muted small">
+                        ${tx.transaction_date}
+                    </td>
 
 
-                <td class="text-muted small">
-                    ${tx.description ?? '-'}
-                </td>
+                    <td class="text-muted small">
+                        ${tx.description ?? '-'}
+                    </td>
 
 
-                <td>
+                    <td>
 
-                    <button
-                    class="btn btn-sm btn-outline-secondary"
-                    onclick='openEditTransactionModal(${JSON.stringify(tx)})'
-                    >
-                    <i class="bi bi-pencil"></i>
-                    </button>
-
-
-                    <button
-                    class="btn btn-sm btn-outline-danger"
-                    onclick="confirmDeleteTransaction(${tx.id})"
-                    >
-                    <i class="bi bi-trash"></i>
-                    </button>
-
-                </td>
+                        <button
+                        class="btn btn-sm btn-outline-secondary"
+                        onclick='openEditTransactionModal(${JSON.stringify(tx)})'
+                        >
+                            <i class="bi bi-pencil"></i>
+                        </button>
 
 
-            </tr>
+                        <button
+                        class="btn btn-sm btn-outline-danger"
+                        onclick="confirmDeleteTransaction(${tx.id})"
+                        >
+                            <i class="bi bi-trash"></i>
+                        </button>
 
-            `;
+                    </td>
+
+                </tr>
+
+                `;
+
 
                 });
 
@@ -410,69 +447,4 @@
         document.getElementById('pagination').innerHTML = html;
     }
 
-
-    const mobile = document.getElementById('mobileTransactionList');
-
-    mobile.innerHTML = data.transactions.map(tx => {
-
-        const income = tx.type === 'income';
-
-        return `
-    <div class="transaction-card glass-panel p-3 mb-3">
-
-        <div class="d-flex justify-content-between align-items-center">
-            <h6 class="text-white fw-bold mb-0">
-                ${tx.title}
-            </h6>
-
-            <span class="badge ${income ? 'badge-income' : 'badge-expense'}">
-                ${income ? 'درآمد' : 'هزینه'}
-            </span>
-        </div>
-
-
-        <div class="mt-3">
-
-            <div class="d-flex justify-content-between">
-                <span class="text-muted">مبلغ</span>
-
-                <strong class="${income ? 'text-success' : 'text-danger'}">
-                    ${income ? '+' : '-'}
-                    ${Number(tx.amount).toLocaleString()}
-                </strong>
-            </div>
-
-
-            <div class="d-flex justify-content-between mt-2">
-                <span class="text-muted">دسته</span>
-                <span class="text-white">
-                    ${tx.category_name ?? 'بدون دسته'}
-                </span>
-            </div>
-
-
-            <div class="d-flex justify-content-between mt-2">
-                <span class="text-muted">تاریخ</span>
-                <span class="text-white">
-                    ${tx.transaction_date}
-                </span>
-            </div>
-
-        </div>
-
-
-        <div class="d-flex gap-2 mt-3">
-            <button class="btn btn-sm btn-outline-secondary flex-fill">
-                ویرایش
-            </button>
-
-            <button class="btn btn-sm btn-outline-danger flex-fill">
-                حذف
-            </button>
-        </div>
-
-    </div>
-    `;
-
-    }).join('');
 </script>

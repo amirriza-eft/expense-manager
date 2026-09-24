@@ -25,11 +25,9 @@ class Transaction extends Base_API_Controller
             ], 401);
         }
 
-
         $page = (int)$this->input->get('page') ?: 1;
         $limit = 8;
         $offset = ($page - 1) * $limit;
-
 
         $transactions = $this->Transaction_model
             ->get_user_transactions(
@@ -38,9 +36,9 @@ class Transaction extends Base_API_Controller
                 $offset,
                 $this->input->get('search'),
                 $this->input->get('type'),
-                $this->input->get('category_id')
+                $this->input->get('category_id'),
+                $this->input->get('sort')
             );
-
 
         $total = $this->Transaction_model
             ->count_user_transactions(
@@ -49,7 +47,6 @@ class Transaction extends Base_API_Controller
                 $this->input->get('type'),
                 $this->input->get('category_id')
             );
-
 
         return $this->json([
             'status' => true,
