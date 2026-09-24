@@ -42,6 +42,8 @@ class Transaction_model extends CI_Model
         $search = null,
         $type = null,
         $category_id = null,
+        $from_date = null,
+        $to_date = null,
         $sort = 'newest'
     )
     {
@@ -84,6 +86,24 @@ class Transaction_model extends CI_Model
 
         }
 
+        if (!empty($from_date)) {
+
+            $this->db->where(
+                'transactions.transaction_date >=',
+                $from_date
+            );
+
+        }
+
+
+        if (!empty($to_date)) {
+
+            $this->db->where(
+                'transactions.transaction_date <=',
+                $to_date
+            );
+
+        }
 
         if ($sort === 'oldest') {
 
@@ -109,7 +129,9 @@ class Transaction_model extends CI_Model
         $user_id,
         $search = null,
         $type = null,
-        $category_id = null
+        $category_id = null,
+        $from_date = null,
+        $to_date = null
     )
     {
         $this->db
@@ -146,6 +168,25 @@ class Transaction_model extends CI_Model
             $this->db->where(
                 'transactions.category_id',
                 $category_id
+            );
+
+        }
+
+        if (!empty($from_date)) {
+
+            $this->db->where(
+                'transactions.transaction_date >=',
+                $from_date
+            );
+
+        }
+
+
+        if (!empty($to_date)) {
+
+            $this->db->where(
+                'transactions.transaction_date <=',
+                $to_date . ' 23:59:59'
             );
 
         }

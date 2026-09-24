@@ -287,6 +287,37 @@
             });
     }
 
+    function convertPersianToGregorian(date) {
+
+        if (!date) {
+            return '';
+        }
+
+        const persianDigits = '۰۱۲۳۴۵۶۷۸۹';
+        const englishDigits = '0123456789';
+
+        date = date.replace(/[۰-۹]/g, function (char) {
+            return englishDigits[persianDigits.indexOf(char)];
+        });
+
+        let parts = date.split('/');
+
+        let pDate = new persianDate([
+            Number(parts[0]),
+            Number(parts[1]),
+            Number(parts[2])
+        ]);
+
+        let result = pDate
+            .toCalendar('gregorian')
+            .format('YYYY-MM-DD');
+
+        result = result.replace(/[۰-۹]/g, function (char) {
+            return englishDigits[persianDigits.indexOf(char)];
+        });
+
+        return result;
+    }
 
     function loadTransactions(page = 1) {
 
@@ -305,11 +336,35 @@
             category_id:
             document.getElementById('filterCategory').value,
 
+            from_date:
+                convertPersianToGregorian(
+                    document.getElementById('filterFromDate').value
+                ),
+
+            to_date:
+                convertPersianToGregorian(
+                    document.getElementById('filterToDate').value
+                ),
+
             sort:
                 document.getElementById('sort')?.value || 'newest'
 
         });
 
+
+        console.log(
+            "FROM:",
+            convertPersianToGregorian(
+                document.getElementById('filterFromDate').value
+            )
+        );
+
+        console.log(
+            "TO:",
+            convertPersianToGregorian(
+                document.getElementById('filterToDate').value
+            )
+        );
 
         fetch("<?= site_url('api/transaction') ?>?" + params)
 

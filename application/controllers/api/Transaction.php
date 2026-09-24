@@ -37,6 +37,8 @@ class Transaction extends Base_API_Controller
                 $this->input->get('search'),
                 $this->input->get('type'),
                 $this->input->get('category_id'),
+                $this->input->get('from_date'),
+                $this->input->get('to_date'),
                 $this->input->get('sort')
             );
 
@@ -45,7 +47,9 @@ class Transaction extends Base_API_Controller
                 $user_id,
                 $this->input->get('search'),
                 $this->input->get('type'),
-                $this->input->get('category_id')
+                $this->input->get('category_id'),
+                $this->input->get('from_date'),
+                $this->input->get('to_date')
             );
 
         return $this->json([
