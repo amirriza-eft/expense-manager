@@ -87,16 +87,15 @@ class Transaction_model extends CI_Model
 
         if ($sort === 'oldest') {
 
-            $this->db->order_by(
-                'transactions.transaction_date',
-                'ASC'
-            );
+            $this->db
+                ->order_by('transactions.transaction_date', 'ASC')
+                ->order_by('transactions.id', 'ASC');
+
         } else {
 
-            $this->db->order_by(
-                'transactions.transaction_date',
-                'DESC'
-            );
+            $this->db
+                ->order_by('transactions.transaction_date', 'DESC')
+                ->order_by('transactions.id', 'DESC');
 
         }
 
