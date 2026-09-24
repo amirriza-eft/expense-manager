@@ -90,12 +90,52 @@ class Transaction_model extends CI_Model
             ->result();
     }
 
-    public function count_user_transactions($user_id)
+    public function count_user_transactions(
+        $user_id,
+        $search = null,
+        $type = null,
+        $category_id = null
+    )
     {
-        return $this->db
-            ->where('user_id', $user_id)
-            ->where('deleted_at IS NULL', null, false)
-            ->count_all_results('transactions');
+        $this->db
+            ->from('transactions')
+            ->join(
+                'categories',
+                'categories.id = transactions.category_id',
+                'left'
+            )
+            ->where('transactions.user_id', $user_id)
+            ->where('transactions.deleted_at IS NULL', null, false);
+
+        if (!empty($search)) {
+
+            $this->db->group_start()
+                ->like('transactions.title', $search)
+                ->or_like('transactions.description', $search)
+                ->or_like('categories.title', $search)
+                ->group_end();
+
+        }
+
+        if (!empty($type)) {
+
+            $this->db->where(
+                'transactions.type',
+                $type
+            );
+
+        }
+
+        if (!empty($category_id)) {
+
+            $this->db->where(
+                'transactions.category_id',
+                $category_id
+            );
+
+        }
+
+        return $this->db->count_all_results();
     }
 
     public function update($id, $user_id, $data)

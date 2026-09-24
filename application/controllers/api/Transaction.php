@@ -43,7 +43,12 @@ class Transaction extends Base_API_Controller
 
 
         $total = $this->Transaction_model
-            ->count_user_transactions($user_id);
+            ->count_user_transactions(
+                $user_id,
+                $this->input->get('search'),
+                $this->input->get('type'),
+                $this->input->get('category_id')
+            );
 
 
         return $this->json([
