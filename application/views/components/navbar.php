@@ -16,7 +16,6 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/persian-datepicker@1.2.0/dist/css/persian-datepicker.min.css">
 
     <link rel="stylesheet" href="<?= base_url('assets/css/app.css') ?>">
-    <link rel="stylesheet" href="<?= base_url('assets/css/navbar/style.css') ?>">
 
     <script>
         window.APP_AVATAR_BASE = "<?= base_url('uploads/avatars/') ?>";
