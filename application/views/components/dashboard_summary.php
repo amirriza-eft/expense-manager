@@ -1,6 +1,6 @@
 <?php defined('BASEPATH') or exit('No direct script access allowed'); ?>
 
-<div class="row g-3 mb-5">
+<div class="row g-3 mb-5 justify-content-center">
 
     <?php $this->load->view('components/statistics_card', [
         'label' => 'مانده',
