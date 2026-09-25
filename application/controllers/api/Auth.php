@@ -129,6 +129,8 @@ class Auth extends Base_API_Controller
         $this->session->set_userdata([
             'user_id' => $user->id,
             'full_name' => $user->full_name,
+            'user_name' => $user->full_name,
+            'user_avatar' => $user->avatar ?? null,
             'email' => $user->email,
             'logged_in' => true
         ]);

@@ -67,9 +67,31 @@ class Profile extends Base_API_Controller
         }
 
         if ($this->User_model->update($user_id, $data)) {
+            $session_data = [
+                'full_name' => $data['full_name'],
+                'user_name' => $data['full_name'],
+                'email' => $data['email'],
+            ];
+
+            if (!empty($data['avatar'])) {
+                $session_data['user_avatar'] = $data['avatar'];
+            }
+
+            $this->session->set_userdata($session_data);
+
+            // Force navbar/profile to re-read avatar after update
+            $this->session->unset_userdata('avatar_synced');
+
+            $user = $this->User_model->find($user_id);
+
             return $this->json([
                 'status' => true,
-                'message' => 'اطلاعات با موفقیت ذخیره شد'
+                'message' => 'اطلاعات با موفقیت ذخیره شد',
+                'user' => [
+                    'full_name' => $user->full_name,
+                    'email' => $user->email,
+                    'avatar' => $user->avatar,
+                ]
             ]);
         }
 

@@ -467,23 +467,26 @@
         <?php if ($this->session->userdata('user_id')): ?>
             <?php
             $avatar = $this->session->userdata('user_avatar');
-            $user_name = $this->session->userdata('user_name') ?? 'کاربر';
-            $avatar_url = !empty($avatar)
-                    ? base_url('uploads/avatars/' . $avatar)
-                    : 'https://placehold.co/100x100/1e1e24/ff6b00?text=' . urlencode(mb_substr($user_name, 0, 1));
+            $user_name = $this->session->userdata('user_name')
+                ?: ($this->session->userdata('full_name') ?: 'کاربر');
             ?>
-            <!-- Avatar (left) + logout (right of avatar) -->
             <div class="d-flex align-items-center gap-3">
                 <a href="#" id="logoutBtn" class="btn btn-outline-danger" title="خروج">
                     <i class="bi bi-box-arrow-right"></i>
                     <span class="d-none d-sm-inline">خروج</span>
                 </a>
                 <a href="<?= site_url('profile') ?>" class="text-decoration-none" title="پروفایل">
-                    <img src="<?= $avatar_url ?>" alt="Avatar" class="user-nav-avatar">
+                    <?php $this->load->view('components/profile_avatar', [
+                        'avatar_filename' => $avatar,
+                        'user_name' => $user_name,
+                        'size' => 38,
+                        'css_class' => 'user-nav-avatar',
+                        'element_id' => 'navbarAvatar',
+                        'alt' => 'آواتار کاربر',
+                    ]); ?>
                 </a>
             </div>
         <?php else: ?>
-            <!-- Guest Actions -->
             <div class="d-flex align-items-center gap-2">
                 <a href="<?= site_url('login') ?>" class="btn btn-orange-outline">
                     <i class="bi bi-box-arrow-in-left"></i> ورود
@@ -499,25 +502,18 @@
 <main class="flex-grow-1">
 
     <script>
+        document.getElementById('logoutBtn')?.addEventListener('click', function (e) {
+            e.preventDefault();
 
-        document.getElementById('logoutBtn')
-            ?.addEventListener('click', function (e) {
-                e.preventDefault();
-
-                fetch("<?= site_url('api/auth/logout') ?>", {
-                    method: "POST"
+            fetch("<?= site_url('api/auth/logout') ?>", { method: 'POST' })
+                .then(function (response) { return response.json(); })
+                .then(function (data) {
+                    if (data.status) {
+                        window.location.href = "<?= site_url('login') ?>";
+                    }
                 })
-                    .then(response => response.json())
-
-                    .then(data => {
-                        if (data.status) {
-                            window.location.href =
-                                "<?= site_url('login') ?>";
-                        }
-                    })
-
-                    .catch(error => {
-                        console.log(error);
-                    });
-            });
+                .catch(function (error) {
+                    console.error(error);
+                });
+        });
     </script>

@@ -11,6 +11,7 @@ class Base_Controller extends CI_Controller
         $this->load->model('User_model');
 
         $this->authCheck();
+        $this->syncSessionProfile();
     }
 
     protected function authCheck()
@@ -19,5 +20,33 @@ class Base_Controller extends CI_Controller
             redirect('login');
             exit;
         }
+    }
+
+    /**
+     * Keep display fields (name/avatar) in session for navbar and profile UI.
+     */
+    protected function syncSessionProfile()
+    {
+        if ($this->session->userdata('avatar_synced')) {
+            return;
+        }
+
+        $user_id = $this->session->userdata('user_id');
+        if (!$user_id) {
+            return;
+        }
+
+        $user = $this->User_model->find($user_id);
+        if (!$user) {
+            return;
+        }
+
+        $this->session->set_userdata([
+            'full_name' => $user->full_name,
+            'user_name' => $user->full_name,
+            'user_avatar' => $user->avatar ?? null,
+            'email' => $user->email,
+            'avatar_synced' => true,
+        ]);
     }
 }

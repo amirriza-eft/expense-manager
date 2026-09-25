@@ -19,8 +19,12 @@
     </div>
 </footer>
 
-<!-- App utilities (display formatting) -->
+<!-- App utilities (display formatting + avatar helpers) -->
+<script>
+    window.APP_AVATAR_BASE = "<?= base_url('uploads/avatars/') ?>";
+</script>
 <script src="<?= base_url('assets/js/format.js') ?>"></script>
+<script src="<?= base_url('assets/js/avatar.js') ?>"></script>
 
 <!-- Bootstrap 5 Bundle JS CDN -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
