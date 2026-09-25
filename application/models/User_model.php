@@ -68,4 +68,24 @@ class User_model extends CI_Model
                 'deleted_at' => date('Y-m-d H:i:s')
             ]);
     }
+
+    public function find_deleted_by_email($email)
+    {
+        return $this->db
+            ->where('email', $email)
+            ->where('deleted_at IS NOT NULL', null, false)
+            ->get($this->table)
+            ->row();
+    }
+
+    public function restore($id)
+    {
+        return $this->db
+            ->where('id', $id)
+            ->where('deleted_at IS NOT NULL', null, false)
+            ->update($this->table, [
+                'deleted_at' => null,
+                'updated_at' => date('Y-m-d H:i:s')
+            ]);
+    }
 }

@@ -112,33 +112,77 @@ class Auth extends Base_API_Controller
 
         $user = $this->User_model->find_by_email($email);
 
-        if (!$user) {
+        if ($user) {
+            if (!password_verify($password, $user->password)) {
+                return $this->json([
+                    'status' => false,
+                    'message' => 'ایمیل یا رمز عبور اشتباه است'
+                ]);
+            }
+
+            $this->session->set_userdata([
+                'user_id' => $user->id,
+                'full_name' => $user->full_name,
+                'user_name' => $user->full_name,
+                'user_avatar' => $user->avatar ?? null,
+                'email' => $user->email,
+                'logged_in' => true
+            ]);
+
             return $this->json([
-                'status' => false,
-                'message' => 'ایمیل یا رمز عبور اشتباه است'
+                'status' => true,
+                'message' => 'ورود موفق'
             ]);
         }
 
-        if (!password_verify($password, $user->password)) {
+        $deleted = $this->User_model->find_deleted_by_email($email);
+
+        if ($deleted && password_verify($password, $deleted->password)) {
             return $this->json([
                 'status' => false,
-                'message' => 'ایمیل یا رمز عبور اشتباه است'
+                'code' => 'account_deleted',
+                'message' => 'این حساب حذف شده است. برای بازیابی حساب کلیک کنید.'
             ]);
         }
-
-        $this->session->set_userdata([
-            'user_id' => $user->id,
-            'full_name' => $user->full_name,
-            'user_name' => $user->full_name,
-            'user_avatar' => $user->avatar ?? null,
-            'email' => $user->email,
-            'logged_in' => true
-        ]);
 
         return $this->json([
-            'status' => true,
-            'message' => 'ورود موفق'
+            'status' => false,
+            'message' => 'ایمیل یا رمز عبور اشتباه است'
         ]);
+    }
+
+    public function restore()
+    {
+        $email = $this->input->post('email', true);
+        $password = $this->input->post('password');
+
+        if (!$email || !$password) {
+            return $this->json([
+                'status' => false,
+                'message' => 'ایمیل و رمز عبور الزامی است'
+            ], 400);
+        }
+
+        $user = $this->User_model->find_deleted_by_email($email);
+
+        if (!$user || !password_verify($password, $user->password)) {
+            return $this->json([
+                'status' => false,
+                'message' => 'ایمیل یا رمز عبور اشتباه است'
+            ]);
+        }
+
+        if ($this->User_model->restore($user->id)) {
+            return $this->json([
+                'status' => true,
+                'message' => 'حساب شما بازیابی شد. اکنون می‌توانید وارد شوید'
+            ]);
+        }
+
+        return $this->json([
+            'status' => false,
+            'message' => 'خطا در بازیابی حساب'
+        ], 500);
     }
 
     public function logout()

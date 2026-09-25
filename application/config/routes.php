@@ -59,6 +59,8 @@ $route['profile'] = 'Auth/profile';
 
 $route['api/auth/login'] = 'api/Auth/login';
 $route['api/auth/logout'] = 'api/Auth/logout';
+$route['api/auth/restore'] = 'api/Auth/restore';
+$route['api/auth/register'] = 'api/Auth/register';
 
 $route['api/profile'] = 'api/Profile/get';
 $route['api/profile/update'] = 'api/Profile/update';
