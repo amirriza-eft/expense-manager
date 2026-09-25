@@ -12,6 +12,9 @@ class Transaction extends Base_API_Controller
 
         $this->load->model('Transaction_model');
         $this->load->library('session');
+
+        require_once APPPATH . 'policies/Transaction_policy.php';
+        $this->transaction_policy = new Transaction_policy();
     }
 
     public function index()
@@ -67,7 +70,7 @@ class Transaction extends Base_API_Controller
     {
         $user_id = $this->session->userdata('user_id');
 
-        if (!$user_id) {
+        if (!$this->transaction_policy->can_create($user_id)) {
             return $this->json([
                 'status' => false,
                 'message' => 'ابتدا وارد حساب خود شوید'
@@ -111,6 +114,14 @@ class Transaction extends Base_API_Controller
         }
 
         $id = $this->input->post('id', true);
+        $tx = $this->db->get_where('transactions', ['id' => $id])->row();
+
+        if (!$this->transaction_policy->can_update($user_id, $tx)) {
+            return $this->json([
+                'status' => false,
+                'message' => 'اجازه ویرایش این تراکنش را ندارید'
+            ], 403);
+        }
 
         $data = [
             'category_id' => $this->input->post('category_id', true) ?: null,
@@ -147,6 +158,14 @@ class Transaction extends Base_API_Controller
         }
 
         $id = $this->input->post('id', true);
+        $tx = $this->db->get_where('transactions', ['id' => $id])->row();
+
+        if (!$this->transaction_policy->can_delete($user_id, $tx)) {
+            return $this->json([
+                'status' => false,
+                'message' => 'اجازه حذف این تراکنش را ندارید'
+            ], 403);
+        }
 
         if ($this->Transaction_model->delete($id, $user_id)) {
             return $this->json([

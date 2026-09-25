@@ -5,7 +5,8 @@
     <?php $this->load->view('components/statistics_card', [
         'label' => 'مانده',
         'icon' => 'bi-cash-stack brand-icon',
-        'amount' => $budget_amount ?? 0,
+        'amount' => 0,
+        'amount_id' => 'dashboardBudgetAmount',
         'prefix' => '',
         'amount_class' => 'text-white',
         'subtitle' => 'موجودی لحظه',
@@ -15,7 +16,8 @@
         'label' => 'درآمد ماه جاری',
         'icon' => 'bi-arrow-down-left-circle',
         'icon_style' => 'color: var(--income-green);',
-        'amount' => $monthly_income ?? 0,
+        'amount' => 0,
+        'amount_id' => 'dashboardMonthlyIncome',
         'prefix' => '+',
         'amount_class' => '',
         'amount_style' => 'color: var(--income-green);',
@@ -26,7 +28,8 @@
         'label' => 'هزینه ماه جاری',
         'icon' => 'bi-arrow-up-right-circle',
         'icon_style' => 'color: var(--expense-red);',
-        'amount' => $monthly_expense ?? 0,
+        'amount' => 0,
+        'amount_id' => 'dashboardMonthlyExpense',
         'prefix' => '-',
         'amount_class' => '',
         'amount_style' => 'color: var(--expense-red);',
@@ -34,3 +37,50 @@
     ]); ?>
 
 </div>
+
+<script>
+    var DASHBOARD_API = "<?= site_url('api/dashboard') ?>";
+
+    function setDashboardAmount(el, prefix, amount) {
+        if (!el) {
+            return;
+        }
+
+        el.innerHTML =
+            (prefix || '') + formatNumber(amount) +
+            ' <span class="fs-6 text-muted">تومان</span>';
+    }
+
+    function loadDashboardSummary() {
+        fetch(DASHBOARD_API)
+            .then(function (res) { return res.json(); })
+            .then(function (data) {
+                if (!data.status) {
+                    return;
+                }
+
+                setDashboardAmount(
+                    document.getElementById('dashboardBudgetAmount'),
+                    '',
+                    data.budget_amount
+                );
+                setDashboardAmount(
+                    document.getElementById('dashboardMonthlyIncome'),
+                    '+',
+                    data.monthly_income
+                );
+                setDashboardAmount(
+                    document.getElementById('dashboardMonthlyExpense'),
+                    '-',
+                    data.monthly_expense
+                );
+            })
+            .catch(function (error) {
+                console.error(error);
+            });
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+        loadDashboardSummary();
+    });
+</script>

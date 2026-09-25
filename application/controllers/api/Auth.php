@@ -12,10 +12,22 @@ class Auth extends Base_API_Controller
 
         $this->load->model('User_model');
         $this->load->library('session');
+
+        require_once APPPATH . 'policies/Registration_policy.php';
+        $this->registration_policy = new Registration_policy();
     }
 
     public function register()
     {
+        $user_id = $this->session->userdata('user_id');
+
+        if (!$this->registration_policy->can_register($user_id)) {
+            return $this->json([
+                'status' => false,
+                'message' => 'شما قبلا وارد شده‌اید'
+            ], 403);
+        }
+
         $this->form_validation->set_rules(
             'full_name',
             'نام و نام خانوادگی',

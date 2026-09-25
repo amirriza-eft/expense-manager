@@ -204,6 +204,9 @@
                 if (typeof loadDeletedTransactions === 'function') {
                     loadDeletedTransactions();
                 }
+                if (typeof loadDashboardSummary === 'function') {
+                    loadDashboardSummary();
+                }
             })
             .catch(function (error) {
                 console.error(error);

@@ -12,6 +12,9 @@ class Category extends Base_API_Controller
 
         $this->load->model('Category_model');
         $this->load->library('session');
+
+        require_once APPPATH . 'policies/Category_policy.php';
+        $this->category_policy = new Category_policy();
     }
 
     public function index()
@@ -58,7 +61,7 @@ class Category extends Base_API_Controller
     {
         $user_id = $this->session->userdata('user_id');
 
-        if (!$user_id) {
+        if (!$this->category_policy->can_create($user_id)) {
             return $this->json([
                 'status' => false,
                 'message' => 'ابتدا وارد حساب خود شوید'
@@ -94,6 +97,15 @@ class Category extends Base_API_Controller
             ], 401);
         }
 
+        $cat = $this->db->get_where('categories', ['id' => $id])->row();
+
+        if (!$this->category_policy->can_update($user_id, $cat)) {
+            return $this->json([
+                'status' => false,
+                'message' => 'اجازه ویرایش این دسته را ندارید'
+            ], 403);
+        }
+
         $title = $this->input->post('title', true);
 
         if (!$title) {
@@ -125,6 +137,15 @@ class Category extends Base_API_Controller
                 'status' => false,
                 'message' => 'ابتدا وارد حساب خود شوید'
             ], 401);
+        }
+
+        $cat = $this->db->get_where('categories', ['id' => $id])->row();
+
+        if (!$this->category_policy->can_delete($user_id, $cat)) {
+            return $this->json([
+                'status' => false,
+                'message' => 'اجازه حذف این دسته را ندارید'
+            ], 403);
         }
 
         if ($this->Category_model->delete($id, $user_id)) {

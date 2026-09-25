@@ -178,6 +178,9 @@
 
                 loadTransactions(currentPage || 1);
                 loadDeletedTransactions();
+                if (typeof loadDashboardSummary === 'function') {
+                    loadDashboardSummary();
+                }
             })
             .catch(function (error) {
                 console.error(error);

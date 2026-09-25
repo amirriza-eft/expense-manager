@@ -5,6 +5,7 @@ $label = $label ?? '';
 $icon = $icon ?? 'bi-circle';
 $icon_style = $icon_style ?? '';
 $amount = $amount ?? 0;
+$amount_id = $amount_id ?? '';
 $prefix = $prefix ?? '';
 $amount_class = $amount_class ?? 'text-white';
 $amount_style = $amount_style ?? '';
@@ -19,6 +20,7 @@ $subtitle = $subtitle ?? '';
                <?php if ($icon_style !== ''): ?>style="<?= html_escape($icon_style) ?>"<?php endif; ?>></i>
         </div>
         <h4 class="fw-bold mb-1 <?= html_escape($amount_class) ?>"
+            <?php if ($amount_id !== ''): ?>id="<?= html_escape($amount_id) ?>"<?php endif; ?>
             <?php if ($amount_style !== ''): ?>style="<?= html_escape($amount_style) ?>"<?php endif; ?>>
             <?= html_escape($prefix) ?><?= format_number($amount) ?>
             <span class="fs-6 text-muted">تومان</span>
