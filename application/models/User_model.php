@@ -80,12 +80,11 @@ class User_model extends CI_Model
 
     public function restore($id)
     {
-        return $this->db
-            ->where('id', $id)
-            ->where('deleted_at IS NOT NULL', null, false)
-            ->update($this->table, [
-                'deleted_at' => null,
-                'updated_at' => date('Y-m-d H:i:s')
-            ]);
+        $this->db->set('deleted_at', null);
+        $this->db->set('updated_at', date('Y-m-d H:i:s'));
+        $this->db->where('id', $id);
+        $this->db->where('deleted_at IS NOT NULL', null, false);
+
+        return $this->db->update($this->table);
     }
 }
