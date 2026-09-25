@@ -183,12 +183,7 @@
     }
 }
 
-/* Soft-deleted transactions */
-.deleted-transactions-section {
-    border-style: dashed;
-    opacity: 0.98;
-}
-
+/* Soft-deleted transactions (modal cards) */
 .transaction-card--deleted {
     border-style: dashed;
     border-color: rgba(239, 68, 68, 0.28);

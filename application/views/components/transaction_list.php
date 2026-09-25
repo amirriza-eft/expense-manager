@@ -13,4 +13,19 @@
             <div id="pagination" class="pagination pagination-dark"></div>
         </nav>
     </div>
+
+    <div class="d-flex justify-content-center mt-4 pt-3 border-top"
+         style="border-color: var(--border-subtle) !important;">
+        <button
+            type="button"
+            class="btn btn-orange-outline"
+            id="openDeletedTransactionsBtn"
+            data-bs-toggle="modal"
+            data-bs-target="#deletedTransactionsModal"
+        >
+            <i class="bi bi-trash"></i>
+            تراکنش‌های حذف‌شده
+            <span id="deletedTransactionCountBadge" class="badge bg-secondary ms-1">۰</span>
+        </button>
+    </div>
 </div>

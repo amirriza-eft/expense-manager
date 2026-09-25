@@ -5,7 +5,7 @@
 <?php $this->load->view('components/transaction_filters'); ?>
 <?php $this->load->view('components/transaction_toolbar'); ?>
 <?php $this->load->view('components/transaction_list'); ?>
-<?php $this->load->view('components/deleted_transactions_section'); ?>
+<?php $this->load->view('components/deleted_transactions_modal'); ?>
 
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/persian-datepicker@1.2.0/dist/js/persian-datepicker.min.js"></script>
@@ -125,6 +125,7 @@
     function loadDeletedTransactions() {
         var list = document.getElementById('deletedTransactionList');
         var countEl = document.getElementById('deletedTransactionCount');
+        var badgeEl = document.getElementById('deletedTransactionCountBadge');
 
         if (!list) {
             return;
@@ -138,7 +139,15 @@
                 }
 
                 var transactions = data.transactions || [];
-                countEl.textContent = 'تعداد: ' + formatNumber(transactions.length);
+                var countLabel = 'تعداد: ' + formatNumber(transactions.length);
+
+                if (countEl) {
+                    countEl.textContent = countLabel;
+                }
+                if (badgeEl) {
+                    badgeEl.textContent = formatNumber(transactions.length);
+                }
+
                 renderTransactionList(list, transactions, {
                     deleted: true,
                     emptyText: 'تراکنش حذف‌شده‌ای وجود ندارد'
@@ -223,6 +232,13 @@
         loadCategories();
         loadTransactions(1);
         loadDeletedTransactions();
+
+        var deletedModal = document.getElementById('deletedTransactionsModal');
+        if (deletedModal) {
+            deletedModal.addEventListener('show.bs.modal', function () {
+                loadDeletedTransactions();
+            });
+        }
 
         document.getElementById('sort').addEventListener('change', function () {
             loadTransactions(1);
