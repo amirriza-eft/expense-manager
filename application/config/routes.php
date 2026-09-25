@@ -74,8 +74,10 @@ $route['api/transaction/deleted'] = 'api/Transaction/deleted';
 $route['api/transaction/restore'] = 'api/Transaction/restore';
 
 $route['api/categories'] = 'api/Category/index';
+$route['api/categories/deleted'] = 'api/Category/deleted';
 $route['api/categories/create'] = 'api/Category/create';
 $route['api/categories/update/(:num)'] = 'api/Category/update/$1';
 $route['api/categories/delete/(:num)'] = 'api/Category/delete/$1';
+$route['api/categories/restore/(:num)'] = 'api/Category/restore/$1';
 
 $route['api/user/delete'] = 'api/auth/delete_account';

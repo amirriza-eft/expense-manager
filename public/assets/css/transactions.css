@@ -212,3 +212,8 @@
     padding: 0.35em 0.7em;
     border-radius: 0.4rem;
 }
+
+.deleted-category-item {
+    opacity: 0.92;
+    border-style: dashed !important;
+}

@@ -34,6 +34,26 @@ class Category extends Base_API_Controller
         ]);
     }
 
+    public function deleted()
+    {
+        $user_id = $this->session->userdata('user_id');
+
+        if (!$user_id) {
+            return $this->json([
+                'status' => false,
+                'message' => 'ابتدا وارد حساب خود شوید'
+            ], 401);
+        }
+
+        $categories = $this->Category_model
+            ->get_user_deleted_categories($user_id);
+
+        return $this->json([
+            'status' => true,
+            'categories' => $categories
+        ]);
+    }
+
     public function create()
     {
         $user_id = $this->session->userdata('user_id');
@@ -83,17 +103,11 @@ class Category extends Base_API_Controller
             ], 400);
         }
 
-        $data = [
-            'title' => $title
-        ];
-
-        if ($this->Category_model->update($id, $data)) {
-
+        if ($this->Category_model->update($id, $user_id, ['title' => $title])) {
             return $this->json([
                 'status' => true,
                 'message' => 'دسته‌بندی با موفقیت بروزرسانی شد'
             ]);
-
         }
 
         return $this->json([
@@ -101,7 +115,6 @@ class Category extends Base_API_Controller
             'message' => 'خطا در بروزرسانی دسته‌بندی'
         ], 500);
     }
-
 
     public function delete($id)
     {
@@ -126,5 +139,28 @@ class Category extends Base_API_Controller
             'message' => 'خطا در حذف'
         ], 500);
     }
-    
+
+    public function restore($id)
+    {
+        $user_id = $this->session->userdata('user_id');
+
+        if (!$user_id) {
+            return $this->json([
+                'status' => false,
+                'message' => 'ابتدا وارد حساب خود شوید'
+            ], 401);
+        }
+
+        if ($this->Category_model->restore($id, $user_id)) {
+            return $this->json([
+                'status' => true,
+                'message' => 'دسته بازیابی شد'
+            ]);
+        }
+
+        return $this->json([
+            'status' => false,
+            'message' => 'خطا در بازیابی دسته'
+        ], 500);
+    }
 }

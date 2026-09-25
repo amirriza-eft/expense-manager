@@ -90,10 +90,7 @@
         <div class="modal-content glass-panel text-white"
              style="background: #1e1e24; border: 1px solid var(--border-subtle);">
             <div class="modal-header border-0">
-                <div>
-                    <h5 class="modal-title fw-bold mb-1">مدیریت دسته‌بندی‌های شما</h5>
-                    <div id="categoryCount" class="text-muted small">تعداد: ۰</div>
-                </div>
+                <h5 class="modal-title fw-bold">مدیریت دسته‌بندی‌های شما</h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body">
@@ -111,7 +108,23 @@
                         </button>
                     </div>
                 </form>
-                <ul id="categoryList" class="list-group list-group-flush p-0"></ul>
+
+                <div class="mb-2 d-flex justify-content-between align-items-center">
+                    <h6 class="fw-bold text-white mb-0">دسته‌های فعال</h6>
+                    <span id="categoryCount" class="text-muted small">تعداد: ۰</span>
+                </div>
+                <ul id="categoryList" class="list-group list-group-flush p-0 mb-4"></ul>
+
+                <div class="pt-3 border-top" style="border-color: var(--border-subtle) !important;">
+                    <div class="mb-2 d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="fw-bold text-white mb-0">دسته‌های حذف‌شده</h6>
+                            <small class="text-muted">دسته‌های حذف‌شده را می‌توانید بازیابی کنید</small>
+                        </div>
+                        <span id="deletedCategoryCount" class="text-muted small">تعداد: ۰</span>
+                    </div>
+                    <ul id="deletedCategoryList" class="list-group list-group-flush p-0"></ul>
+                </div>
             </div>
         </div>
     </div>
@@ -122,9 +135,11 @@
 
     var categoryForm = document.getElementById('categoryForm');
     var categoryList = document.getElementById('categoryList');
+    var deletedCategoryList = document.getElementById('deletedCategoryList');
     var categoryId = document.getElementById('cat_id');
     var categoryTitle = document.getElementById('cat_title');
     var categorySubmitBtn = document.getElementById('catSubmitBtn');
+    var CATEGORIES_DELETED_API = "<?= site_url('api/categories/deleted') ?>";
 
     function openCreateTransactionModal() {
         document.getElementById('txModalTitle').innerText = 'ثبت تراکنش جدید';
@@ -224,6 +239,26 @@
                 if (typeof loadCategories === 'function') {
                     loadCategories();
                 }
+                loadDeletedCategories();
+            })
+            .catch(function (error) {
+                console.error(error);
+                alert('خطا در ارتباط با سرور');
+            });
+    }
+
+    function restoreCategory(id) {
+        fetch('/api/categories/restore/' + id, { method: 'POST' })
+            .then(function (response) { return response.json(); })
+            .then(function (data) {
+                if (!data.status) {
+                    alert(data.message);
+                    return;
+                }
+                if (typeof loadCategories === 'function') {
+                    loadCategories();
+                }
+                loadDeletedCategories();
             })
             .catch(function (error) {
                 console.error(error);
@@ -274,6 +309,71 @@
             li.appendChild(actions);
             categoryList.appendChild(li);
         });
+    }
+
+    function renderDeletedCategories(categories) {
+        if (!deletedCategoryList) {
+            return;
+        }
+
+        deletedCategoryList.innerHTML = '';
+
+        var countEl = document.getElementById('deletedCategoryCount');
+        if (countEl) {
+            countEl.textContent = 'تعداد: ' + formatNumber((categories && categories.length) || 0);
+        }
+
+        if (!categories || !categories.length) {
+            deletedCategoryList.innerHTML =
+                '<li class="list-group-item bg-transparent text-muted text-center py-4">دسته حذف‌شده‌ای وجود ندارد</li>';
+            return;
+        }
+
+        categories.forEach(function (category) {
+            var li = document.createElement('li');
+            li.className = 'list-group-item bg-transparent text-white d-flex justify-content-between align-items-center py-2 px-1 deleted-category-item';
+
+            var titleWrap = document.createElement('div');
+            titleWrap.className = 'd-flex align-items-center gap-2 min-w-0';
+
+            var title = document.createElement('span');
+            title.className = 'small text-truncate';
+            title.textContent = category.title;
+
+            var badge = document.createElement('span');
+            badge.className = 'badge badge-deleted';
+            badge.textContent = 'حذف‌شده';
+
+            titleWrap.appendChild(title);
+            titleWrap.appendChild(badge);
+
+            var restoreBtn = document.createElement('button');
+            restoreBtn.type = 'button';
+            restoreBtn.className = 'btn btn-sm btn-orange-outline';
+            restoreBtn.title = 'بازیابی';
+            restoreBtn.innerHTML = '<i class="bi bi-arrow-counterclockwise"></i> بازیابی';
+            restoreBtn.addEventListener('click', function () {
+                restoreCategory(category.id);
+            });
+
+            li.appendChild(titleWrap);
+            li.appendChild(restoreBtn);
+            deletedCategoryList.appendChild(li);
+        });
+    }
+
+    function loadDeletedCategories() {
+        fetch(CATEGORIES_DELETED_API)
+            .then(function (response) { return response.json(); })
+            .then(function (data) {
+                if (!data.status) {
+                    return;
+                }
+                renderDeletedCategories(data.categories || []);
+            })
+            .catch(function (error) {
+                console.error(error);
+            });
     }
 
     document.getElementById('confirmDeleteTxBtn').addEventListener('click', deleteTransaction);
@@ -358,6 +458,7 @@
                 if (typeof loadCategories === 'function') {
                     loadCategories();
                 }
+                loadDeletedCategories();
             })
             .catch(function (error) {
                 console.error(error);

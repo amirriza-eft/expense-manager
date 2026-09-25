@@ -56,6 +56,9 @@
                 if (typeof renderCategories === 'function') {
                     renderCategories(data.categories);
                 }
+                if (typeof loadDeletedCategories === 'function') {
+                    loadDeletedCategories();
+                }
             })
             .catch(function (error) {
                 console.error(error);
