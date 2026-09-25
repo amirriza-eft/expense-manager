@@ -6,7 +6,7 @@
         <div class="row align-items-center justify-content-between g-3">
             <div class="col-md-6 text-center text-md-start">
                 <span class="text-muted small">
-                    Created by <strong class="text-light">Amirreza Eft</strong> &copy; <?= format_number(date('Y')) ?>
+                    Created by <strong class="text-light">Amirreza Eft</strong> &copy; <?= (date('Y')) ?>
                 </span>
             </div>
             <div class="col-md-6 text-center text-md-end">
