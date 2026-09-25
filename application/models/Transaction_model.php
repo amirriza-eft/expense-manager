@@ -239,6 +239,7 @@ class Transaction_model extends CI_Model
         $transaction = $this->db
             ->where('id', $id)
             ->where('user_id', $user_id)
+            ->where('deleted_at IS NULL', null, false)
             ->get($this->table)
             ->row();
 
@@ -259,6 +260,57 @@ class Transaction_model extends CI_Model
             ->update($this->table, [
                 'deleted_at' => date('Y-m-d H:i:s')
             ]);
+
+        $this->db->trans_complete();
+
+        return $this->db->trans_status();
+    }
+
+    public function get_user_deleted_transactions($user_id)
+    {
+        return $this->db
+            ->select('transactions.*, categories.title as category_name')
+            ->from('transactions')
+            ->join(
+                'categories',
+                'categories.id = transactions.category_id',
+                'left'
+            )
+            ->where('transactions.user_id', $user_id)
+            ->where('transactions.deleted_at IS NOT NULL', null, false)
+            ->order_by('transactions.deleted_at', 'DESC')
+            ->order_by('transactions.id', 'DESC')
+            ->get()
+            ->result();
+    }
+
+    public function restore($id, $user_id)
+    {
+        $this->db->trans_start();
+
+        $transaction = $this->db
+            ->where('id', $id)
+            ->where('user_id', $user_id)
+            ->where('deleted_at IS NOT NULL', null, false)
+            ->get($this->table)
+            ->row();
+
+        if (!$transaction) {
+            $this->db->trans_complete();
+            return false;
+        }
+
+        $this->db->set('deleted_at', null);
+        $this->db->where('id', $id);
+        $this->db->where('user_id', $user_id);
+        $this->db->update($this->table);
+
+        $this->change_budget(
+            $user_id,
+            $transaction->amount,
+            $transaction->type,
+            true
+        );
 
         $this->db->trans_complete();
 

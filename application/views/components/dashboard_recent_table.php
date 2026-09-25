@@ -5,6 +5,7 @@
 <?php $this->load->view('components/transaction_filters'); ?>
 <?php $this->load->view('components/transaction_toolbar'); ?>
 <?php $this->load->view('components/transaction_list'); ?>
+<?php $this->load->view('components/deleted_transactions_section'); ?>
 
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/persian-datepicker@1.2.0/dist/js/persian-datepicker.min.js"></script>
@@ -13,6 +14,8 @@
 <script>
     var currentPage = 1;
     var TRANSACTION_API = "<?= site_url('api/transaction') ?>";
+    var TRANSACTION_DELETED_API = "<?= site_url('api/transaction/deleted') ?>";
+    var TRANSACTION_RESTORE_API = "<?= site_url('api/transaction/restore') ?>";
     var CATEGORIES_API = "<?= site_url('api/categories') ?>";
 
     function fillCategorySelect(select, categories, emptyLabel) {
@@ -116,6 +119,60 @@
             });
     }
 
+    function loadDeletedTransactions() {
+        var list = document.getElementById('deletedTransactionList');
+        var countEl = document.getElementById('deletedTransactionCount');
+
+        if (!list) {
+            return;
+        }
+
+        fetch(TRANSACTION_DELETED_API)
+            .then(function (res) { return res.json(); })
+            .then(function (data) {
+                if (!data.status) {
+                    return;
+                }
+
+                var transactions = data.transactions || [];
+                countEl.textContent = 'تعداد: ' + formatNumber(transactions.length);
+                renderTransactionList(list, transactions, {
+                    deleted: true,
+                    emptyText: 'تراکنش حذف‌شده‌ای وجود ندارد'
+                });
+                bindTransactionListActions(list);
+            })
+            .catch(function (error) {
+                console.error(error);
+            });
+    }
+
+    function restoreTransaction(id) {
+        if (!id) {
+            return;
+        }
+
+        fetch(TRANSACTION_RESTORE_API, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: new URLSearchParams({ id: id })
+        })
+            .then(function (res) { return res.json(); })
+            .then(function (data) {
+                if (!data.status) {
+                    alert(data.message || 'خطا در بازیابی');
+                    return;
+                }
+
+                loadTransactions(currentPage || 1);
+                loadDeletedTransactions();
+            })
+            .catch(function (error) {
+                console.error(error);
+                alert('خطا در ارتباط با سرور');
+            });
+    }
+
     function initPersianDatePickers() {
         var pickerOptions = {
             format: 'YYYY/MM/DD',
@@ -162,6 +219,7 @@
     document.addEventListener('DOMContentLoaded', function () {
         loadCategories();
         loadTransactions(1);
+        loadDeletedTransactions();
 
         document.getElementById('sort').addEventListener('change', function () {
             loadTransactions(1);

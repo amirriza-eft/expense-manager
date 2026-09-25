@@ -161,4 +161,50 @@ class Transaction extends Base_API_Controller
         ], 500);
     }
 
+    public function deleted()
+    {
+        $user_id = $this->session->userdata('user_id');
+
+        if (!$user_id) {
+            return $this->json([
+                'status' => false,
+                'message' => 'ابتدا وارد شوید'
+            ], 401);
+        }
+
+        $transactions = $this->Transaction_model
+            ->get_user_deleted_transactions($user_id);
+
+        return $this->json([
+            'status' => true,
+            'transactions' => $transactions
+        ]);
+    }
+
+    public function restore()
+    {
+        $user_id = $this->session->userdata('user_id');
+
+        if (!$user_id) {
+            return $this->json([
+                'status' => false,
+                'message' => 'ابتدا وارد شوید'
+            ], 401);
+        }
+
+        $id = $this->input->post('id', true);
+
+        if ($this->Transaction_model->restore($id, $user_id)) {
+            return $this->json([
+                'status' => true,
+                'message' => 'تراکنش بازیابی شد'
+            ]);
+        }
+
+        return $this->json([
+            'status' => false,
+            'message' => 'خطا در بازیابی تراکنش'
+        ], 500);
+    }
+
 }

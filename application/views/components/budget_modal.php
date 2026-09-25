@@ -186,6 +186,9 @@
                 if (typeof loadTransactions === 'function') {
                     loadTransactions(currentPage || 1);
                 }
+                if (typeof loadDeletedTransactions === 'function') {
+                    loadDeletedTransactions();
+                }
             })
             .catch(function (error) {
                 console.error(error);
