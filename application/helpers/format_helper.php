@@ -14,7 +14,18 @@ function format_number($value, $decimals = 0)
     $number = is_numeric($value) ? (float) $value : 0.0;
     $formatted = number_format($number, $decimals);
 
-    return strtr($formatted, [
+    return to_persian_digits($formatted);
+}
+
+/**
+ * Replace English digits with Persian digits in a string.
+ *
+ * @param mixed $value
+ * @return string
+ */
+function to_persian_digits($value)
+{
+    return strtr((string) $value, [
         '0' => '۰',
         '1' => '۱',
         '2' => '۲',

@@ -48,8 +48,8 @@
                         '<span class="badge bg-secondary">' + escapeHtml(category) + '</span>' +
                         '<span class="transaction-card__date">' +
                             '<i class="bi bi-calendar3 ms-1"></i>' +
-                            escapeHtml(typeof toPersianDigits === 'function'
-                                ? toPersianDigits(tx.transaction_date || '')
+                            escapeHtml(typeof formatPersianDate === 'function'
+                                ? formatPersianDate(tx.transaction_date)
                                 : (tx.transaction_date || '')) +
                         '</span>' +
                     '</div>' +

@@ -40,12 +40,13 @@
                         <div class="col-6">
                             <label for="tx_amount" class="form-label small text-muted">مبلغ (تومان)</label>
                             <input type="number" class="form-control" name="amount" id="tx_amount" required min="1"
-                                   placeholder="مثال: 5000000">
+                                   placeholder="مثال: ۵۰۰۰۰۰۰" inputmode="numeric">
                         </div>
                         <div class="col-6">
-                            <label for="tx_date" class="form-label small text-muted">تاریخ تراکنش</label>
-                            <input type="date" class="form-control" name="transaction_date" id="tx_date" required
-                                   value="<?= date('Y-m-d') ?>">
+                            <label for="tx_date_display" class="form-label small text-muted">تاریخ تراکنش</label>
+                            <input type="text" class="form-control" id="tx_date_display"
+                                   placeholder="تاریخ شمسی" autocomplete="off" required>
+                            <input type="hidden" name="transaction_date" id="tx_date" value="">
                         </div>
                     </div>
 
@@ -126,8 +127,13 @@
         document.getElementById('txModalTitle').innerText = 'ثبت تراکنش جدید';
         document.getElementById('txForm').reset();
         document.getElementById('tx_id').value = '';
-        document.getElementById('tx_date').value = new Date().toISOString().split('T')[0];
         document.getElementById('txMessage').classList.add('d-none');
+
+        if (typeof setTransactionDateDisplay === 'function') {
+            setTransactionDateDisplay(new Date().toISOString().split('T')[0]);
+        } else {
+            document.getElementById('tx_date').value = new Date().toISOString().split('T')[0];
+        }
     }
 
     function openEditTransactionModal(tx) {
@@ -137,9 +143,15 @@
         document.getElementById('tx_type').value = tx.type;
         document.getElementById('tx_category').value = tx.category_id ?? '';
         document.getElementById('tx_amount').value = tx.amount;
-        document.getElementById('tx_date').value = tx.transaction_date;
         document.getElementById('tx_description').value = tx.description || '';
         document.getElementById('txMessage').classList.add('d-none');
+
+        if (typeof setTransactionDateDisplay === 'function') {
+            setTransactionDateDisplay(tx.transaction_date);
+        } else {
+            document.getElementById('tx_date').value = tx.transaction_date;
+        }
+
         new bootstrap.Modal(document.getElementById('transactionModal')).show();
     }
 
@@ -253,6 +265,21 @@
         e.preventDefault();
 
         var form = this;
+        var displayDate = document.getElementById('tx_date_display');
+        var hiddenDate = document.getElementById('tx_date');
+
+        if (displayDate && displayDate.value) {
+            hiddenDate.value = convertPersianToGregorian(displayDate.value);
+        }
+
+        if (!hiddenDate.value) {
+            var messageEarly = document.getElementById('txMessage');
+            messageEarly.classList.remove('d-none');
+            messageEarly.className = 'alert alert-danger py-2 px-3 small';
+            messageEarly.textContent = 'لطفاً تاریخ تراکنش را انتخاب کنید';
+            return;
+        }
+
         var id = document.getElementById('tx_id').value;
         var url = id
             ? "<?= site_url('api/transaction/update/') ?>" + id

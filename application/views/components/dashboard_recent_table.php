@@ -7,7 +7,6 @@
 <?php $this->load->view('components/transaction_list'); ?>
 
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/persian-date@1.1.0/dist/persian-date.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/persian-datepicker@1.2.0/dist/js/persian-datepicker.min.js"></script>
 <script src="<?= base_url('assets/js/transactions.js') ?>"></script>
 
@@ -15,32 +14,6 @@
     var currentPage = 1;
     var TRANSACTION_API = "<?= site_url('api/transaction') ?>";
     var CATEGORIES_API = "<?= site_url('api/categories') ?>";
-
-    function convertPersianToGregorian(date) {
-        if (!date) {
-            return '';
-        }
-
-        var persianDigits = '۰۱۲۳۴۵۶۷۸۹';
-        var englishDigits = '0123456789';
-
-        date = date.replace(/[۰-۹]/g, function (char) {
-            return englishDigits[persianDigits.indexOf(char)];
-        });
-
-        var parts = date.split('/');
-        var pDate = new persianDate([
-            Number(parts[0]),
-            Number(parts[1]),
-            Number(parts[2])
-        ]);
-
-        var result = pDate.toCalendar('gregorian').format('YYYY-MM-DD');
-
-        return result.replace(/[۰-۹]/g, function (char) {
-            return englishDigits[persianDigits.indexOf(char)];
-        });
-    }
 
     function fillCategorySelect(select, categories, emptyLabel) {
         if (!select) {
@@ -143,18 +116,47 @@
             });
     }
 
-    $(document).ready(function () {
-        $('#filterFromDate').pDatepicker({
+    function initPersianDatePickers() {
+        var pickerOptions = {
             format: 'YYYY/MM/DD',
             autoClose: true,
-            initialValue: false
-        });
+            initialValue: false,
+            calendar: {
+                persian: {
+                    locale: 'fa'
+                }
+            }
+        };
 
-        $('#filterToDate').pDatepicker({
-            format: 'YYYY/MM/DD',
-            autoClose: true,
-            initialValue: false
-        });
+        $('#filterFromDate').pDatepicker(pickerOptions);
+        $('#filterToDate').pDatepicker(pickerOptions);
+
+        if ($('#tx_date_display').length) {
+            $('#tx_date_display').pDatepicker($.extend({}, pickerOptions, {
+                initialValue: true,
+                onSelect: function () {
+                    // Keep hidden Gregorian field in sync for the API
+                    var shamsi = document.getElementById('tx_date_display').value;
+                    document.getElementById('tx_date').value = convertPersianToGregorian(shamsi);
+                }
+            }));
+        }
+    }
+
+    function setTransactionDateDisplay(gregorianDate) {
+        var display = document.getElementById('tx_date_display');
+        var hidden = document.getElementById('tx_date');
+        if (!display || !hidden) {
+            return;
+        }
+
+        var g = gregorianDate || new Date().toISOString().split('T')[0];
+        hidden.value = g;
+        display.value = formatPersianDate(g);
+    }
+
+    $(document).ready(function () {
+        initPersianDatePickers();
     });
 
     document.addEventListener('DOMContentLoaded', function () {

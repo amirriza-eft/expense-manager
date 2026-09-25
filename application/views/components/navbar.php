@@ -21,6 +21,7 @@
     <script>
         window.APP_AVATAR_BASE = "<?= base_url('uploads/avatars/') ?>";
     </script>
+    <script src="https://cdn.jsdelivr.net/npm/persian-date@1.1.0/dist/persian-date.min.js"></script>
     <script src="<?= base_url('assets/js/format.js') ?>"></script>
     <script src="<?= base_url('assets/js/avatar.js') ?>"></script>
 </head>
