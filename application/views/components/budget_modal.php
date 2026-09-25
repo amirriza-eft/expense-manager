@@ -90,7 +90,10 @@
         <div class="modal-content glass-panel text-white"
              style="background: #1e1e24; border: 1px solid var(--border-subtle);">
             <div class="modal-header border-0">
-                <h5 class="modal-title fw-bold">مدیریت دسته‌بندی‌های شما</h5>
+                <div>
+                    <h5 class="modal-title fw-bold mb-1">مدیریت دسته‌بندی‌های شما</h5>
+                    <div id="categoryCount" class="text-muted small">تعداد: ۰</div>
+                </div>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body">
@@ -228,6 +231,17 @@
     function renderCategories(categories) {
         categoryList.innerHTML = '';
 
+        var countEl = document.getElementById('categoryCount');
+        if (countEl) {
+            countEl.textContent = 'تعداد: ' + formatNumber((categories && categories.length) || 0);
+        }
+
+        if (!categories || !categories.length) {
+            categoryList.innerHTML =
+                '<li class="list-group-item bg-transparent text-muted text-center py-4">دسته‌ای وجود ندارد</li>';
+            return;
+        }
+
         categories.forEach(function (category) {
             var li = document.createElement('li');
             li.className = 'list-group-item bg-transparent text-white d-flex justify-content-between align-items-center py-2 px-1';
@@ -239,10 +253,10 @@
             var actions = document.createElement('div');
             actions.className = 'btn-group btn-group-sm';
             actions.innerHTML =
-                '<button type="button" class="btn btn-sm btn-outline-secondary edit-category-btn">' +
+                '<button type="button" class="btn btn-sm btn-outline-secondary edit-category-btn" title="ویرایش">' +
                     '<i class="bi bi-pencil"></i>' +
                 '</button>' +
-                '<button type="button" class="btn btn-sm btn-outline-danger delete-category-btn">' +
+                '<button type="button" class="btn btn-sm btn-outline-danger delete-category-btn" title="حذف">' +
                     '<i class="bi bi-trash"></i>' +
                 '</button>';
 
