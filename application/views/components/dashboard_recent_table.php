@@ -389,14 +389,14 @@
                     document.getElementById('pagination').innerHTML = '';
 
                     document.getElementById('transactionCount').innerText =
-                        "تعداد: 0";
+                        "تعداد: " + formatNumber(0);
 
                     return;
                 }
 
 
                 document.getElementById('transactionCount').innerText =
-                    "تعداد: " + data.transactions.length;
+                    "تعداد: " + formatNumber(data.transactions.length);
 
 
                 renderPagination(data.pagination);
@@ -438,11 +438,7 @@
                             :
                             'text-danger'
                     } fw-bold">
-
-                        ${tx.type === "income" ? '+' : '-'}
-
-                        ${Number(tx.amount).toLocaleString()}
-
+                        ${formatAmount(tx.amount, tx.type)}
                     </td>
 
 
@@ -494,7 +490,7 @@
             <button
                 class="${i == p.current_page ? 'active' : ''}"
                 onclick="loadTransactions(${i})">
-                ${i}
+                ${formatNumber(i)}
             </button>
         `;
         }

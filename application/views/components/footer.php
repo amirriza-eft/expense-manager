@@ -6,7 +6,7 @@
         <div class="row align-items-center justify-content-between g-3">
             <div class="col-md-6 text-center text-md-start">
                 <span class="text-muted small">
-                    Created by <strong class="text-light">Amirreza Eft</strong> &copy; <?= date('Y') ?>
+                    Created by <strong class="text-light">Amirreza Eft</strong> &copy; <?= format_number(date('Y')) ?>
                 </span>
             </div>
             <div class="col-md-6 text-center text-md-end">
@@ -18,6 +18,9 @@
         </div>
     </div>
 </footer>
+
+<!-- App utilities (display formatting) -->
+<script src="<?= base_url('assets/js/format.js') ?>"></script>
 
 <!-- Bootstrap 5 Bundle JS CDN -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
