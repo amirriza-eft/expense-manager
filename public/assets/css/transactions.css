@@ -1,0 +1,184 @@
+/* Transaction cards & list */
+
+.transaction-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.85rem;
+}
+
+.transaction-card {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    gap: 0.85rem 1rem;
+    align-items: start;
+    padding: 1rem 1.1rem;
+    border-radius: 1rem;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid var(--border-subtle);
+    transition: border-color 0.2s ease, background-color 0.2s ease;
+    min-width: 0;
+}
+
+.transaction-card:hover {
+    border-color: rgba(255, 107, 0, 0.28);
+    background: rgba(255, 255, 255, 0.045);
+}
+
+.transaction-card__icon {
+    width: 2.6rem;
+    height: 2.6rem;
+    border-radius: 0.85rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    font-size: 1.15rem;
+}
+
+.transaction-card__icon--income {
+    background: rgba(16, 185, 129, 0.14);
+    color: var(--income-green);
+}
+
+.transaction-card__icon--expense {
+    background: rgba(239, 68, 68, 0.14);
+    color: var(--expense-red);
+}
+
+.transaction-card__body {
+    min-width: 0;
+}
+
+.transaction-card__title {
+    margin: 0 0 0.35rem;
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--text-main);
+    line-height: 1.45;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+}
+
+.transaction-card__meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.4rem 0.55rem;
+    margin-bottom: 0.45rem;
+}
+
+.transaction-card__date {
+    color: var(--text-muted);
+    font-size: 0.82rem;
+    white-space: nowrap;
+}
+
+.transaction-card__description {
+    margin: 0;
+    color: var(--text-muted);
+    font-size: 0.86rem;
+    line-height: 1.55;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+    max-width: 100%;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    overflow: hidden;
+}
+
+.transaction-card__description.is-expanded {
+    display: block;
+    -webkit-line-clamp: unset;
+    line-clamp: unset;
+    overflow: visible;
+}
+
+.transaction-card__toggle-desc {
+    display: none;
+    margin-top: 0.25rem;
+    padding: 0;
+    border: 0;
+    background: none;
+    color: var(--accent-orange);
+    font-size: 0.8rem;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.transaction-card__toggle-desc.is-visible {
+    display: inline-flex;
+}
+
+.transaction-card__side {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 0.65rem;
+    flex-shrink: 0;
+    min-width: 0;
+}
+
+.transaction-card__amount {
+    font-weight: 800;
+    font-size: 1.05rem;
+    white-space: nowrap;
+    font-variant-numeric: tabular-nums;
+}
+
+.transaction-card__amount--income {
+    color: var(--income-green);
+}
+
+.transaction-card__amount--expense {
+    color: var(--expense-red);
+}
+
+.transaction-card__actions {
+    display: flex;
+    gap: 0.35rem;
+}
+
+.transaction-empty {
+    text-align: center;
+    color: var(--text-muted);
+    padding: 3rem 1rem;
+}
+
+.transaction-empty i {
+    font-size: 2rem;
+    display: block;
+    margin-bottom: 0.75rem;
+    opacity: 0.7;
+}
+
+@media (max-width: 767.98px) {
+    .transaction-card {
+        grid-template-columns: auto 1fr;
+        grid-template-areas:
+            "icon body"
+            "icon side";
+    }
+
+    .transaction-card__icon {
+        grid-area: icon;
+    }
+
+    .transaction-card__body {
+        grid-area: body;
+    }
+
+    .transaction-card__side {
+        grid-area: side;
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+        width: 100%;
+        margin-top: 0.15rem;
+    }
+
+    .transaction-card__amount {
+        font-size: 0.98rem;
+    }
+}
