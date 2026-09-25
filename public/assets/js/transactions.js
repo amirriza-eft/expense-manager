@@ -173,8 +173,6 @@
         });
     }
 
-    global.buildTransactionCard = buildTransactionCard;
     global.renderTransactionList = renderTransactionList;
     global.bindTransactionListActions = bindTransactionListActions;
-    global.escapeHtml = escapeHtml;
 })(window);

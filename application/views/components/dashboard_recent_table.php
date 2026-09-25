@@ -231,7 +231,9 @@
             return;
         }
 
-        var g = gregorianDate || new Date().toISOString().split('T')[0];
+        var g = gregorianDate || (typeof todayGregorianDate === 'function'
+            ? todayGregorianDate()
+            : new Date().toISOString().split('T')[0]);
         hidden.value = g;
         display.value = formatPersianDate(g);
     }

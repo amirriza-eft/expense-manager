@@ -95,6 +95,10 @@
                     ? 'alert alert-success py-2 px-3 small'
                     : 'alert alert-danger py-2 px-3 small';
                 box.textContent = data.message;
+
+                if (data.status) {
+                    document.getElementById('passwordForm').reset();
+                }
             })
             .catch(function () {
                 box.classList.remove('d-none');

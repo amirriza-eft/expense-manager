@@ -148,9 +148,14 @@
         document.getElementById('txMessage').classList.add('d-none');
 
         if (typeof setTransactionDateDisplay === 'function') {
-            setTransactionDateDisplay(new Date().toISOString().split('T')[0]);
+            setTransactionDateDisplay(
+                typeof todayGregorianDate === 'function' ? todayGregorianDate() : ''
+            );
         } else {
-            document.getElementById('tx_date').value = new Date().toISOString().split('T')[0];
+            document.getElementById('tx_date').value =
+                typeof todayGregorianDate === 'function'
+                    ? todayGregorianDate()
+                    : new Date().toISOString().split('T')[0];
         }
     }
 
@@ -170,17 +175,22 @@
             document.getElementById('tx_date').value = tx.transaction_date;
         }
 
-        new bootstrap.Modal(document.getElementById('transactionModal')).show();
+        bootstrap.Modal.getOrCreateInstance(document.getElementById('transactionModal')).show();
     }
 
     function confirmDeleteTransaction(id) {
         deleteTransactionId = id;
-        new bootstrap.Modal(document.getElementById('deleteTxConfirmModal')).show();
+        bootstrap.Modal.getOrCreateInstance(document.getElementById('deleteTxConfirmModal')).show();
     }
 
     function deleteTransaction() {
         if (!deleteTransactionId) {
             return;
+        }
+
+        var confirmBtn = document.getElementById('confirmDeleteTxBtn');
+        if (confirmBtn) {
+            confirmBtn.disabled = true;
         }
 
         fetch("<?= site_url('api/transaction/delete') ?>", {
@@ -195,7 +205,12 @@
                     return;
                 }
 
-                bootstrap.Modal.getInstance(document.getElementById('deleteTxConfirmModal')).hide();
+                var deleteModal = bootstrap.Modal.getInstance(
+                    document.getElementById('deleteTxConfirmModal')
+                );
+                if (deleteModal) {
+                    deleteModal.hide();
+                }
                 deleteTransactionId = null;
 
                 if (typeof loadTransactions === 'function') {
@@ -211,6 +226,11 @@
             .catch(function (error) {
                 console.error(error);
                 alert('خطا در ارتباط با سرور');
+            })
+            .finally(function () {
+                if (confirmBtn) {
+                    confirmBtn.disabled = false;
+                }
             });
     }
 
@@ -232,7 +252,7 @@
             return;
         }
 
-        fetch('/api/categories/delete/' + id, { method: 'POST' })
+        fetch("<?= site_url('api/categories/delete/') ?>" + id, { method: 'POST' })
             .then(function (response) { return response.json(); })
             .then(function (data) {
                 if (!data.status) {
@@ -242,7 +262,6 @@
                 if (typeof loadCategories === 'function') {
                     loadCategories();
                 }
-                loadDeletedCategories();
             })
             .catch(function (error) {
                 console.error(error);
@@ -251,7 +270,7 @@
     }
 
     function restoreCategory(id) {
-        fetch('/api/categories/restore/' + id, { method: 'POST' })
+        fetch("<?= site_url('api/categories/restore/') ?>" + id, { method: 'POST' })
             .then(function (response) { return response.json(); })
             .then(function (data) {
                 if (!data.status) {
@@ -261,7 +280,6 @@
                 if (typeof loadCategories === 'function') {
                     loadCategories();
                 }
-                loadDeletedCategories();
             })
             .catch(function (error) {
                 console.error(error);
@@ -381,6 +399,18 @@
 
     document.getElementById('confirmDeleteTxBtn').addEventListener('click', deleteTransaction);
 
+    var categoryManagerModal = document.getElementById('categoryManagerModal');
+    if (categoryManagerModal) {
+        categoryManagerModal.addEventListener('hidden.bs.modal', resetCategoryForm);
+    }
+
+    var deleteTxConfirmModal = document.getElementById('deleteTxConfirmModal');
+    if (deleteTxConfirmModal) {
+        deleteTxConfirmModal.addEventListener('hidden.bs.modal', function () {
+            deleteTransactionId = null;
+        });
+    }
+
     document.getElementById('txForm').addEventListener('submit', function (e) {
         e.preventDefault();
 
@@ -443,8 +473,8 @@
         }
 
         var url = id
-            ? '/api/categories/update/' + id
-            : '/api/categories/create';
+            ? "<?= site_url('api/categories/update/') ?>" + id
+            : "<?= site_url('api/categories/create') ?>";
 
         fetch(url, {
             method: 'POST',
@@ -461,7 +491,6 @@
                 if (typeof loadCategories === 'function') {
                     loadCategories();
                 }
-                loadDeletedCategories();
             })
             .catch(function (error) {
                 console.error(error);

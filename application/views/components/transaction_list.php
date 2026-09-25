@@ -10,7 +10,7 @@
 
     <div class="d-flex justify-content-center mt-4">
         <nav aria-label="صفحه‌بندی تراکنش‌ها">
-            <div id="pagination" class="pagination pagination-dark"></div>
+            <div id="pagination" class="pagination"></div>
         </nav>
     </div>
 

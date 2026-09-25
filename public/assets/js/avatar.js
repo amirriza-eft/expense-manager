@@ -24,10 +24,17 @@
             return;
         }
 
-        img.addEventListener('error', function onError() {
-            img.removeEventListener('error', onError);
+        if (img._avatarErrorHandler) {
+            img.removeEventListener('error', img._avatarErrorHandler);
+        }
+
+        img._avatarErrorHandler = function onError() {
+            img.removeEventListener('error', img._avatarErrorHandler);
+            img._avatarErrorHandler = null;
             img.src = fallbackAvatarUrl(name, size);
-        });
+        };
+
+        img.addEventListener('error', img._avatarErrorHandler);
     }
 
     function setAvatar(img, filename, name, size) {
@@ -38,8 +45,5 @@
         bindAvatarFallback(img, name, size);
     }
 
-    global.fallbackAvatarUrl = fallbackAvatarUrl;
-    global.resolveAvatarUrl = resolveAvatarUrl;
-    global.bindAvatarFallback = bindAvatarFallback;
     global.setAvatar = setAvatar;
 })(window);

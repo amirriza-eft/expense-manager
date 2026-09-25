@@ -101,12 +101,18 @@
         return toPersianDigits(toEnglishDigits(formatted));
     }
 
-    /** Today's date as Shamsi YYYY/MM/DD for picker display. */
-    function todayPersianDate() {
-        if (typeof persianDate === 'undefined') {
-            return '';
+    /** Local calendar YYYY-MM-DD (not UTC) for form defaults. */
+    function todayGregorianDate() {
+        var d = new Date();
+        var month = String(d.getMonth() + 1);
+        var day = String(d.getDate());
+        if (month.length < 2) {
+            month = '0' + month;
         }
-        return toPersianDigits(toEnglishDigits(new persianDate().format('YYYY/MM/DD')));
+        if (day.length < 2) {
+            day = '0' + day;
+        }
+        return d.getFullYear() + '-' + month + '-' + day;
     }
 
     global.toPersianDigits = toPersianDigits;
@@ -115,5 +121,5 @@
     global.formatAmount = formatAmount;
     global.convertPersianToGregorian = convertPersianToGregorian;
     global.formatPersianDate = formatPersianDate;
-    global.todayPersianDate = todayPersianDate;
+    global.todayGregorianDate = todayGregorianDate;
 })(window);

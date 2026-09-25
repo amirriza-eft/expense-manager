@@ -1,5 +1,3 @@
-/* Transaction cards & list */
-
 .transaction-list {
     display: flex;
     flex-direction: column;
