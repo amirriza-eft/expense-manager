@@ -29,7 +29,7 @@ class Transaction extends Base_API_Controller
         }
 
         $page = (int)$this->input->get('page') ?: 1;
-        $limit = 8;
+        $limit = 5;
         $offset = ($page - 1) * $limit;
 
         $transactions = $this->Transaction_model

@@ -71,7 +71,16 @@
         var current = Number(pagination && pagination.current_page) || 1;
         var html = '';
 
-        for (var i = 1; i <= totalPages; i++) {
+        if (totalPages <= 1) {
+            el.innerHTML = '';
+            return;
+        }
+
+        // Show 1 page on the left of current, and 2 on the right
+        var start = Math.max(1, current - 1);
+        var end = Math.min(totalPages, current + 2);
+
+        for (var i = start; i <= end; i++) {
             html +=
                 '<button type="button" class="' + (i === current ? 'active' : '') + '" ' +
                 'onclick="loadTransactions(' + i + ')">' +
