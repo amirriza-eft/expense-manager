@@ -61,27 +61,6 @@
     </form>
 </div>
 
-<style>
-    .profile-avatar-wrap {
-        width: 100px;
-        height: 100px;
-    }
-
-    .profile-avatar-loading {
-        position: absolute;
-        inset: 0;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        border-radius: 50%;
-        background: rgba(18, 18, 18, 0.55);
-    }
-
-    .profile-avatar-loading:not(.d-none) {
-        display: flex;
-    }
-</style>
-
 <script>
     document.addEventListener('DOMContentLoaded', function () {
         var preview = document.getElementById('avatarPreview');

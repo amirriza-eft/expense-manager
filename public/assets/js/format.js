@@ -5,12 +5,20 @@
 (function (global) {
     'use strict';
 
+    var PERSIAN_DIGITS = ['۰', '۱', '۲', '۳', '۴', '۵', '۶', '۷', '۸', '۹'];
+
     function toNumber(value) {
         if (value === null || value === undefined || value === '') {
             return 0;
         }
         var n = Number(value);
         return Number.isFinite(n) ? n : 0;
+    }
+
+    function toPersianDigits(value) {
+        return String(value == null ? '' : value).replace(/\d/g, function (digit) {
+            return PERSIAN_DIGITS[digit];
+        });
     }
 
     function formatNumber(value, options) {
@@ -22,6 +30,7 @@
         return sign + formatNumber(value);
     }
 
+    global.toPersianDigits = toPersianDigits;
     global.formatNumber = formatNumber;
     global.formatAmount = formatAmount;
 })(window);
