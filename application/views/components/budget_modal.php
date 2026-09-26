@@ -193,12 +193,14 @@
             confirmBtn.disabled = true;
         }
 
-        fetch("<?= site_url('api/transaction/delete') ?>", {
+        fetch("<?= site_url('api/transaction/delete/') ?>" + deleteTransactionId, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-            body: new URLSearchParams({ id: deleteTransactionId })
+            headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+            body: new URLSearchParams({id: deleteTransactionId})
         })
-            .then(function (res) { return res.json(); })
+            .then(function (res) {
+                return res.json();
+            })
             .then(function (data) {
                 if (!data.status) {
                     alert(data.message);
@@ -252,8 +254,10 @@
             return;
         }
 
-        fetch("<?= site_url('api/categories/delete/') ?>" + id, { method: 'POST' })
-            .then(function (response) { return response.json(); })
+        fetch("<?= site_url('api/categories/delete/') ?>" + id, {method: 'POST'})
+            .then(function (response) {
+                return response.json();
+            })
             .then(function (data) {
                 if (!data.status) {
                     alert(data.message);
@@ -270,8 +274,10 @@
     }
 
     function restoreCategory(id) {
-        fetch("<?= site_url('api/categories/restore/') ?>" + id, { method: 'POST' })
-            .then(function (response) { return response.json(); })
+        fetch("<?= site_url('api/categories/restore/') ?>" + id, {method: 'POST'})
+            .then(function (response) {
+                return response.json();
+            })
             .then(function (data) {
                 if (!data.status) {
                     alert(data.message);
@@ -313,10 +319,10 @@
             actions.className = 'btn-group btn-group-sm';
             actions.innerHTML =
                 '<button type="button" class="btn btn-sm btn-outline-secondary edit-category-btn" title="ویرایش">' +
-                    '<i class="bi bi-pencil"></i>' +
+                '<i class="bi bi-pencil"></i>' +
                 '</button>' +
                 '<button type="button" class="btn btn-sm btn-outline-danger delete-category-btn" title="حذف">' +
-                    '<i class="bi bi-trash"></i>' +
+                '<i class="bi bi-trash"></i>' +
                 '</button>';
 
             actions.querySelector('.edit-category-btn').addEventListener('click', function () {
@@ -385,7 +391,9 @@
 
     function loadDeletedCategories() {
         fetch(CATEGORIES_DELETED_API)
-            .then(function (response) { return response.json(); })
+            .then(function (response) {
+                return response.json();
+            })
             .then(function (data) {
                 if (!data.status) {
                     return;
@@ -440,8 +448,10 @@
         button.disabled = true;
         button.textContent = 'در حال ذخیره...';
 
-        fetch(url, { method: 'POST', body: new FormData(form) })
-            .then(function (res) { return res.json(); })
+        fetch(url, {method: 'POST', body: new FormData(form)})
+            .then(function (res) {
+                return res.json();
+            })
             .then(function (data) {
                 message.classList.remove('d-none');
                 message.textContent = data.message;
@@ -450,7 +460,9 @@
                     : 'alert alert-danger py-2 px-3 small';
 
                 if (data.status) {
-                    setTimeout(function () { location.reload(); }, 700);
+                    setTimeout(function () {
+                        location.reload();
+                    }, 700);
                 }
             })
             .catch(function () {
@@ -478,10 +490,12 @@
 
         fetch(url, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-            body: new URLSearchParams({ title: title })
+            headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+            body: new URLSearchParams({title: title})
         })
-            .then(function (response) { return response.json(); })
+            .then(function (response) {
+                return response.json();
+            })
             .then(function (data) {
                 if (!data.status) {
                     alert(data.message);

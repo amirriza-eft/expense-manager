@@ -57,29 +57,29 @@ $route['login'] = 'Auth/login';
 $route['signup'] = 'Auth/register';
 $route['profile'] = 'Auth/profile';
 
-$route['api/auth/login'] = 'api/Auth/login';
-$route['api/auth/logout'] = 'api/Auth/logout';
-$route['api/auth/restore'] = 'api/Auth/restore';
-$route['api/auth/register'] = 'api/Auth/register';
+$route['api/auth/login'] = 'api/Auth_API_Controller/login';
+$route['api/auth/logout'] = 'api/Auth_API_Controller/logout';
+$route['api/auth/restore'] = 'api/Auth_API_Controller/restore';
+$route['api/auth/register'] = 'api/Auth_API_Controller/register';
 
-$route['api/profile'] = 'api/Profile/get';
-$route['api/profile/update'] = 'api/Profile/update';
-$route['api/profile/password'] = 'api/Profile/change_password';
+$route['api/profile'] = 'api/Profile_API_Controller/get';
+$route['api/profile/update'] = 'api/Profile_API_Controller/update';
+$route['api/profile/password'] = 'api/Profile_API_Controller/change_password';
 
-$route['api/dashboard'] = 'api/Dashboard/summary';
+$route['api/dashboard'] = 'api/Dashboard_API_Controller/summary';
 
-$route['api/transactions'] = 'api/transaction/index';
-$route['api/transactions'] = 'api/Transaction/create';
-$route['api/transactions/delete/(:num)'] = 'api/transaction/delete/$1';
-$route['api/transactions/update/(:num)'] = 'api/transaction/update/$1';
-$route['api/transaction/deleted'] = 'api/Transaction/deleted';
-$route['api/transaction/restore'] = 'api/Transaction/restore';
+$route['api/transaction'] = 'api/Transaction_API_Controller/index';
+$route['api/transaction/create'] = 'api/Transaction_API_Controller/create';
+$route['api/transaction/delete/(:num)'] = 'api/Transaction_API_Controller/delete/$1';
+$route['api/transaction/update/(:num)'] = 'api/Transaction_API_Controller/update/$1';
+$route['api/transaction/deleted'] = 'api/Transaction_API_Controller/deleted';
+$route['api/transaction/restore'] = 'api/Transaction_API_Controller/restore';
 
-$route['api/categories'] = 'api/Category/index';
-$route['api/categories/deleted'] = 'api/Category/deleted';
-$route['api/categories/create'] = 'api/Category/create';
-$route['api/categories/update/(:num)'] = 'api/Category/update/$1';
-$route['api/categories/delete/(:num)'] = 'api/Category/delete/$1';
-$route['api/categories/restore/(:num)'] = 'api/Category/restore/$1';
+$route['api/categories'] = 'api/Category_API_Controller/index';
+$route['api/categories/deleted'] = 'api/Category_API_Controller/deleted';
+$route['api/categories/create'] = 'api/Category_API_Controller/create';
+$route['api/categories/update/(:num)'] = 'api/Category_API_Controller/update/$1';
+$route['api/categories/delete/(:num)'] = 'api/Category_API_Controller/delete/$1';
+$route['api/categories/restore/(:num)'] = 'api/Category_API_Controller/restore/$1';
 
-$route['api/user/delete'] = 'api/auth/delete_account';
+$route['api/user/delete'] = 'api/Auth_API_Controller/delete_account';

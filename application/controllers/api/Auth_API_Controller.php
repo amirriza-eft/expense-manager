@@ -4,7 +4,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
 
 require_once(APPPATH . 'controllers/api/Base_API_Controller.php');
 
-class Auth extends Base_API_Controller
+class Auth_API_Controller extends Base_API_Controller
 {
     public function __construct()
     {
