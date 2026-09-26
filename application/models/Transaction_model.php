@@ -392,4 +392,36 @@ class Transaction_model extends CI_Model
             ->row()
             ->amount ?? 0;
     }
+
+    public function recalculate_budget($user_id)
+    {
+        $income = $this->db
+            ->select_sum('amount')
+            ->where('user_id', $user_id)
+            ->where('type', 'income')
+            ->where('deleted_at IS NULL', null, false)
+            ->get($this->table)
+            ->row()
+            ->amount;
+
+        $expense = $this->db
+            ->select_sum('amount')
+            ->where('user_id', $user_id)
+            ->where('type', 'expense')
+            ->where('deleted_at IS NULL', null, false)
+            ->get($this->table)
+            ->row()
+            ->amount;
+
+        $income = (float)($income ?? 0);
+        $expense = (float)($expense ?? 0);
+
+        $balance = $income - $expense;
+
+        return $this->db
+            ->where('user_id', $user_id)
+            ->update('budgets', [
+                'amount' => $balance
+            ]);
+    }
 }
