@@ -29,8 +29,8 @@ class Factory extends CI_Controller
 
         $transactions = [];
 
-        $start = Carbon::now()->subYear();
-        $end = Carbon::now();
+        $start = Carbon::now()->startOfMonth();
+        $end = Carbon::now()->endOfMonth();
 
         for ($i = 0; $i < $count; $i++) {
 
@@ -38,7 +38,7 @@ class Factory extends CI_Controller
                 ? 'income'
                 : 'expense';
 
-            $amount = rand(10, 1000);
+            $amount = rand(100000, 5000000);
 
             $transaction_date = Carbon::createFromTimestamp(
                 rand(
