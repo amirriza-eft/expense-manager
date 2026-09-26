@@ -22,9 +22,7 @@ class Base_Controller extends CI_Controller
         }
     }
 
-    /**
-     * Keep display fields (name/avatar) in session for navbar and profile UI.
-     */
+
     protected function syncSessionProfile()
     {
         if ($this->session->userdata('avatar_synced')) {

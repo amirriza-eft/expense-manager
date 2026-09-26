@@ -19,15 +19,21 @@ class Transaction_model extends CI_Model
 
         $result = $this->db->insert($this->table, $data);
 
-        if ($result) {
+        if (!$result) {
+            $this->db->trans_rollback();
+            return false;
+        }
 
-            $this->change_budget(
-                $data['user_id'],
-                $data['amount'],
-                $data['type'],
-                true
-            );
+        $budget_changed = $this->change_budget(
+            $data['user_id'],
+            $data['amount'],
+            $data['type'],
+            true
+        );
 
+        if (!$budget_changed) {
+            $this->db->trans_rollback();
+            return false;
         }
 
         $this->db->trans_complete();
@@ -175,11 +181,10 @@ class Transaction_model extends CI_Model
 
     public function update($id, $user_id, $data)
     {
-        $this->db->trans_start();
-
         $old = $this->db
             ->where('id', $id)
             ->where('user_id', $user_id)
+            ->where('deleted_at IS NULL', null, false)
             ->get($this->table)
             ->row();
 
@@ -187,24 +192,42 @@ class Transaction_model extends CI_Model
             return false;
         }
 
-        $this->change_budget(
+        $this->db->trans_start();
+
+        $old_budget_changed = $this->change_budget(
             $user_id,
             $old->amount,
             $old->type,
             false
         );
 
-        $this->change_budget(
+        if (!$old_budget_changed) {
+            $this->db->trans_rollback();
+            return false;
+        }
+
+        $new_budget_changed = $this->change_budget(
             $user_id,
             $data['amount'],
             $data['type'],
             true
         );
 
-        $this->db
+        if (!$new_budget_changed) {
+            $this->db->trans_rollback();
+            return false;
+        }
+
+        $updated = $this->db
             ->where('id', $id)
             ->where('user_id', $user_id)
+            ->where('deleted_at IS NULL', null, false)
             ->update($this->table, $data);
+
+        if (!$updated) {
+            $this->db->trans_rollback();
+            return false;
+        }
 
         $this->db->trans_complete();
 
@@ -213,8 +236,6 @@ class Transaction_model extends CI_Model
 
     public function delete($id, $user_id)
     {
-        $this->db->trans_start();
-
         $transaction = $this->db
             ->where('id', $id)
             ->where('user_id', $user_id)
@@ -226,19 +247,32 @@ class Transaction_model extends CI_Model
             return false;
         }
 
-        $this->change_budget(
+        $this->db->trans_start();
+
+        $budget_changed = $this->change_budget(
             $user_id,
             $transaction->amount,
             $transaction->type,
             false
         );
 
-        $this->db
+        if (!$budget_changed) {
+            $this->db->trans_rollback();
+            return false;
+        }
+
+        $deleted = $this->db
             ->where('id', $id)
             ->where('user_id', $user_id)
+            ->where('deleted_at IS NULL', null, false)
             ->update($this->table, [
                 'deleted_at' => date('Y-m-d H:i:s')
             ]);
+
+        if (!$deleted) {
+            $this->db->trans_rollback();
+            return false;
+        }
 
         $this->db->trans_complete();
 
@@ -265,8 +299,6 @@ class Transaction_model extends CI_Model
 
     public function restore($id, $user_id)
     {
-        $this->db->trans_start();
-
         $transaction = $this->db
             ->where('id', $id)
             ->where('user_id', $user_id)
@@ -275,21 +307,35 @@ class Transaction_model extends CI_Model
             ->row();
 
         if (!$transaction) {
-            $this->db->trans_complete();
             return false;
         }
 
-        $this->db->set('deleted_at', null);
-        $this->db->where('id', $id);
-        $this->db->where('user_id', $user_id);
-        $this->db->update($this->table);
+        $this->db->trans_start();
 
-        $this->change_budget(
+        $budget_changed = $this->change_budget(
             $user_id,
             $transaction->amount,
             $transaction->type,
             true
         );
+
+        if (!$budget_changed) {
+            $this->db->trans_rollback();
+            return false;
+        }
+
+        $restored = $this->db
+            ->where('id', $id)
+            ->where('user_id', $user_id)
+            ->where('deleted_at IS NOT NULL', null, false)
+            ->update($this->table, [
+                'deleted_at' => null
+            ]);
+
+        if (!$restored) {
+            $this->db->trans_rollback();
+            return false;
+        }
 
         $this->db->trans_complete();
 
