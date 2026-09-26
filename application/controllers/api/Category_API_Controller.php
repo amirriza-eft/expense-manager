@@ -24,7 +24,7 @@ class Category_API_Controller extends Base_API_Controller
         if (!$user_id) {
             return $this->json([
                 'status' => false,
-                'message' => 'Unauthorized'
+                'message' => 'لطفا ابتدا وارد شوید'
             ], 401);
         }
 
@@ -97,7 +97,7 @@ class Category_API_Controller extends Base_API_Controller
             ], 401);
         }
 
-        $cat = $this->db->get_where('categories', ['id' => $id])->row();
+        $cat = $this->Category_model->get_by_id($id);
 
         if (!$this->category_policy->can_update($user_id, $cat)) {
             return $this->json([
@@ -139,7 +139,7 @@ class Category_API_Controller extends Base_API_Controller
             ], 401);
         }
 
-        $cat = $this->db->get_where('categories', ['id' => $id])->row();
+        $cat = $this->Category_model->get_by_id($id);
 
         if (!$this->category_policy->can_delete($user_id, $cat)) {
             return $this->json([

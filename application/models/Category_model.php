@@ -32,6 +32,13 @@ class Category_model extends CI_Model
             ->result();
     }
 
+    public function get_by_id($id)
+    {
+        return $this->db
+            ->get_where('categories', ['id' => $id])
+            ->row();
+    }
+
     public function create($data)
     {
         return $this->db->insert($this->table, $data);
