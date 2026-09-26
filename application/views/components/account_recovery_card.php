@@ -50,11 +50,11 @@
 
 <script>
     document.addEventListener('DOMContentLoaded', function () {
-        var recoveryForm = document.getElementById('recoveryForm');
-        var recoveryError = document.getElementById('recoveryError');
-        var recoverySuccess = document.getElementById('recoverySuccess');
-        var recoverySubmitBtn = document.getElementById('recoverySubmitBtn');
-        var backToLoginBtn = document.getElementById('backToLoginBtn');
+        let recoveryForm = document.getElementById('recoveryForm');
+        let recoveryError = document.getElementById('recoveryError');
+        let recoverySuccess = document.getElementById('recoverySuccess');
+        let recoverySubmitBtn = document.getElementById('recoverySubmitBtn');
+        let backToLoginBtn = document.getElementById('backToLoginBtn');
 
         backToLoginBtn.addEventListener('click', function () {
             if (typeof showLoginPanel === 'function') {
@@ -74,7 +74,9 @@
                 method: 'POST',
                 body: new FormData(this)
             })
-                .then(function (response) { return response.json(); })
+                .then(function (response) {
+                    return response.json();
+                })
                 .then(function (data) {
                     if (data.status) {
                         recoverySuccess.textContent = data.message;

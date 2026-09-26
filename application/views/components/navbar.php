@@ -9,11 +9,13 @@
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;700;900&display=swap"
+          rel="stylesheet">
 
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.rtl.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/persian-datepicker@1.2.0/dist/css/persian-datepicker.min.css">
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/persian-datepicker@1.2.0/dist/css/persian-datepicker.min.css">
 
     <link rel="stylesheet" href="<?= base_url('assets/css/app.css') ?>">
 
@@ -37,7 +39,7 @@
             <?php
             $avatar = $this->session->userdata('user_avatar');
             $user_name = $this->session->userdata('user_name')
-                ?: ($this->session->userdata('full_name') ?: 'کاربر');
+                    ?: ($this->session->userdata('full_name') ?: 'کاربر');
             ?>
             <div class="d-flex align-items-center gap-3">
                 <a href="#" id="logoutBtn" class="btn btn-outline-danger" title="خروج">
@@ -46,12 +48,12 @@
                 </a>
                 <a href="<?= site_url('profile') ?>" class="text-decoration-none" title="پروفایل">
                     <?php $this->load->view('components/profile_avatar', [
-                        'avatar_filename' => $avatar,
-                        'user_name' => $user_name,
-                        'size' => 38,
-                        'css_class' => 'user-nav-avatar',
-                        'element_id' => 'navbarAvatar',
-                        'alt' => 'آواتار کاربر',
+                            'avatar_filename' => $avatar,
+                            'user_name' => $user_name,
+                            'size' => 38,
+                            'css_class' => 'user-nav-avatar',
+                            'element_id' => 'navbarAvatar',
+                            'alt' => 'آواتار کاربر',
                     ]); ?>
                 </a>
             </div>
@@ -70,19 +72,80 @@
 
 <main class="flex-grow-1">
 
-<script>
-    document.getElementById('logoutBtn')?.addEventListener('click', function (e) {
-        e.preventDefault();
+    <div class="modal fade" id="logoutModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-sm">
+            <div class="modal-content glass-panel text-white"
+                 style="background: #1e1e24; border: 1px solid var(--border-subtle);">
+                <div class="modal-body text-center p-4">
+                    <i class="bi bi-box-arrow-right text-danger fs-1 mb-2 d-block"></i>
+                    <h6 class="fw-bold mb-2">
+                        خروج از حساب
+                    </h6>
+                    <p class="text-muted small mb-0">
+                        آیا مطمئن هستید که می‌خواهید از حساب خود خارج شوید؟
+                    </p>
+                    <div class="d-flex justify-content-center gap-2 mt-3">
+                        <button type="button"
+                                class="btn btn-secondary"
+                                data-bs-dismiss="modal">
+                            انصراف
+                        </button>
+                        <button type="button"
+                                class="btn btn-danger"
+                                id="confirmLogoutBtn">
+                            بله، خارج شو
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
-        fetch("<?= site_url('api/auth/logout') ?>", { method: 'POST' })
-            .then(function (response) { return response.json(); })
-            .then(function (data) {
-                if (data.status) {
-                    window.location.href = "<?= site_url('login') ?>";
-                }
-            })
-            .catch(function (error) {
-                console.error(error);
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        const logoutBtn = document.getElementById('logoutBtn');
+        const confirmLogoutBtn = document.getElementById('confirmLogoutBtn');
+        const logoutModalElement = document.getElementById('logoutModal');
+
+        if (logoutBtn && logoutModalElement && confirmLogoutBtn) {
+
+            const logoutModal = new bootstrap.Modal(logoutModalElement);
+
+            logoutBtn.addEventListener('click', function (e) {
+                e.preventDefault();
+                logoutModal.show();
             });
-    });
-</script>
+
+            confirmLogoutBtn.addEventListener('click', function () {
+
+                confirmLogoutBtn.disabled = true;
+                confirmLogoutBtn.innerHTML =
+                    '<span class="spinner-border spinner-border-sm me-1"></span> در حال خروج...';
+
+                fetch("<?= site_url('api/auth/logout') ?>", {
+                    method: 'POST'
+                })
+                    .then(function (response) {
+                        return response.json();
+                    })
+                    .then(function (data) {
+
+                        if (data.status) {
+                            window.location.href = "<?= site_url('login') ?>";
+                        } else {
+                            confirmLogoutBtn.disabled = false;
+                            confirmLogoutBtn.innerHTML = 'بله، خارج شو';
+                        }
+
+                    })
+                    .catch(function (error) {
+
+                        console.error(error);
+
+                        confirmLogoutBtn.disabled = false;
+                        confirmLogoutBtn.innerHTML = 'بله، خارج شو';
+
+                    });
+            });
+        }
+    </script>
