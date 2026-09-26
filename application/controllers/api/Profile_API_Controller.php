@@ -11,6 +11,9 @@ class Profile_API_Controller extends Base_API_Controller
         parent::__construct();
         $this->load->model('User_model');
         $this->load->library('upload');
+
+        require_once APPPATH . 'policies/User_policy.php';
+        $this->User_policy = new User_policy();
     }
 
 
@@ -38,10 +41,24 @@ class Profile_API_Controller extends Base_API_Controller
         $user_id = $this->session->userdata('user_id');
 
         $data = [
-            'full_name' => $this->input->post('full_name', true),
-            'email' => $this->input->post('email', true),
+            'full_name' => trim($this->input->post('full_name', true)),
+            'email' => trim($this->input->post('email', true)),
             'updated_at' => date('Y-m-d H:i:s')
         ];
+
+        if (!$this->User_policy->can_update($user_id, $data)) {
+            return $this->json([
+                'status' => false,
+                'message' => 'نام و ایمیل الزامی هستند و ایمیل باید معتبر باشد'
+            ], 422);
+        }
+
+        if ($this->User_model->email_exists($data['email'], $user_id)) {
+            return $this->json([
+                'status' => false,
+                'message' => 'این ایمیل قبلاً استفاده شده است'
+            ], 422);
+        }
 
         if (!empty($_FILES['avatar']['name'])) {
 
@@ -67,6 +84,7 @@ class Profile_API_Controller extends Base_API_Controller
         }
 
         if ($this->User_model->update($user_id, $data)) {
+
             $session_data = [
                 'full_name' => $data['full_name'],
                 'user_name' => $data['full_name'],
@@ -99,7 +117,6 @@ class Profile_API_Controller extends Base_API_Controller
             'message' => 'خطا در ذخیره اطلاعات'
         ], 500);
     }
-
 
     public function change_password()
     {
