@@ -69,56 +69,45 @@ class Transaction_model extends CI_Model
         }
 
         if (!empty($type)) {
-
             $this->db->where(
                 'transactions.type',
                 $type
             );
-
         }
 
         if (!empty($category_id)) {
-
             $this->db->where(
                 'transactions.category_id',
                 $category_id
             );
-
         }
 
         if (!empty($from_date)) {
-
             $this->db->where(
                 'transactions.transaction_date >=',
                 $from_date
             );
-
         }
 
 
         if (!empty($to_date)) {
-
             $this->db->where(
                 'transactions.transaction_date <=',
                 $to_date
             );
-
         }
 
         if ($sort === 'oldest') {
-
             $this->db
                 ->order_by('transactions.transaction_date', 'ASC')
                 ->order_by('transactions.id', 'ASC');
 
         } else {
-
             $this->db
                 ->order_by('transactions.transaction_date', 'DESC')
                 ->order_by('transactions.id', 'DESC');
 
         }
-
         return $this->db
             ->limit($limit, $offset)
             ->get()
@@ -145,50 +134,40 @@ class Transaction_model extends CI_Model
             ->where('transactions.deleted_at IS NULL', null, false);
 
         if (!empty($search)) {
-
             $this->db->group_start()
                 ->like('transactions.title', $search)
                 ->or_like('transactions.description', $search)
                 ->or_like('categories.title', $search)
                 ->group_end();
-
         }
 
         if (!empty($type)) {
-
             $this->db->where(
                 'transactions.type',
                 $type
             );
-
         }
 
         if (!empty($category_id)) {
-
             $this->db->where(
                 'transactions.category_id',
                 $category_id
             );
-
         }
 
         if (!empty($from_date)) {
-
             $this->db->where(
                 'transactions.transaction_date >=',
                 $from_date
             );
-
         }
 
 
         if (!empty($to_date)) {
-
             $this->db->where(
                 'transactions.transaction_date <=',
                 $to_date . ' 23:59:59'
             );
-
         }
 
         return $this->db->count_all_results();

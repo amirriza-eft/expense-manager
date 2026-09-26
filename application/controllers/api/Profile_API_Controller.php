@@ -79,7 +79,6 @@ class Profile_API_Controller extends Base_API_Controller
 
             $this->session->set_userdata($session_data);
 
-            // Force navbar/profile to re-read avatar after update
             $this->session->unset_userdata('avatar_synced');
 
             $user = $this->User_model->find($user_id);
