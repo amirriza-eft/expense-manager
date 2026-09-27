@@ -282,7 +282,14 @@ class Transaction_model extends CI_Model
     public function get_user_deleted_transactions($user_id)
     {
         return $this->db
-            ->select('transactions.*, categories.title as category_name')
+            ->select("
+                transactions.*, 
+                categories.title as category_name,
+                DATEDIFF(
+                    DATE_ADD(transactions.deleted_at, INTERVAL 30 DAY),
+                    NOW()
+                ) AS days_left
+            ")
             ->from('transactions')
             ->join(
                 'categories',
@@ -291,6 +298,10 @@ class Transaction_model extends CI_Model
             )
             ->where('transactions.user_id', $user_id)
             ->where('transactions.deleted_at IS NOT NULL', null, false)
+            ->where(
+                'transactions.deleted_at >=',
+                date('Y-m-d H:i:s', strtotime('-30 days'))
+            )
             ->order_by('transactions.deleted_at', 'DESC')
             ->order_by('transactions.id', 'DESC')
             ->get()

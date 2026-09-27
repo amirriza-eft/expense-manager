@@ -35,7 +35,9 @@
 
     function loadCategories() {
         fetch(CATEGORIES_API)
-            .then(function (res) { return res.json(); })
+            .then(function (res) {
+                return res.json();
+            })
             .then(function (data) {
                 if (!data.status) {
                     return;
@@ -66,27 +68,51 @@
     }
 
     function renderPagination(pagination) {
+
         var el = document.getElementById('pagination');
-        var totalPages = Number(pagination && pagination.total_pages) || 0;
-        var current = Number(pagination && pagination.current_page) || 1;
-        var html = '';
+
+        var totalPages = Number(pagination.total_pages);
+        var current = Number(pagination.current_page);
 
         if (totalPages <= 1) {
             el.innerHTML = '';
             return;
         }
 
-        // Show 1 page on the left of current, and 2 on the right
-        var start = Math.max(1, current - 1);
+        var html = '';
+
+        html += `
+            <button
+            onclick="loadTransactions(1)"
+            ${current === 1 ? 'disabled' : ''}>
+                اولین
+            </button>
+        `;
+
+        var start = Math.max(1, current - 2);
         var end = Math.min(totalPages, current + 2);
 
-        for (var i = start; i <= end; i++) {
-            html +=
-                '<button type="button" class="' + (i === current ? 'active' : '') + '" ' +
-                'onclick="loadTransactions(' + i + ')">' +
-                formatNumber(i) +
-                '</button>';
+        for (let i = start; i <= end; i++) {
+
+            html += `
+                <button
+                    class="${i === current ? 'active' : ''}"
+                    onclick="loadTransactions(${i})">
+
+                    ${formatNumber(i)}
+
+                </button>
+            `;
         }
+
+        html += `
+            <button
+            onclick="loadTransactions(${totalPages})"
+            ${current === totalPages ? 'disabled' : ''}>
+                آخرین
+            </button>
+        `;
+
 
         el.innerHTML = html;
     }
@@ -105,7 +131,9 @@
         });
 
         fetch(TRANSACTION_API + '?' + params)
-            .then(function (res) { return res.json(); })
+            .then(function (res) {
+                return res.json();
+            })
             .then(function (data) {
                 var list = document.getElementById('transactionList');
                 var countEl = document.getElementById('transactionCount');
@@ -141,7 +169,9 @@
         }
 
         fetch(TRANSACTION_DELETED_API)
-            .then(function (res) { return res.json(); })
+            .then(function (res) {
+                return res.json();
+            })
             .then(function (data) {
                 if (!data.status) {
                     return;
@@ -175,10 +205,12 @@
 
         fetch(TRANSACTION_RESTORE_API, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-            body: new URLSearchParams({ id: id })
+            headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+            body: new URLSearchParams({id: id})
         })
-            .then(function (res) { return res.json(); })
+            .then(function (res) {
+                return res.json();
+            })
             .then(function (data) {
                 if (!data.status) {
                     alert(data.message || 'خطا در بازیابی');
