@@ -1,6 +1,8 @@
 <?php defined('BASEPATH') or exit('No direct script access allowed'); ?>
 
-<div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-4">
+<br>
+<br>
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-4 mb-4">
     <div class="d-flex flex-wrap gap-2">
         <button
             type="button"
