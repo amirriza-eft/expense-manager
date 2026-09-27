@@ -119,10 +119,8 @@ class Auth_API_Controller extends Base_API_Controller
 
     public function login()
     {
-        $data = json_decode($this->input->raw_input_stream, true);
-
-        $email = $data['email'] ?? null;
-        $password = $data['password'] ?? null;
+        $email = $this->input->post('email', true);
+        $password = $this->input->post('password');
 
         $user = $this->User_model->find_by_email($email);
 
