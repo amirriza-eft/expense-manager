@@ -17,13 +17,14 @@ class Chart_API_Controller extends Base_API_Controller
     {
         $user_id = $this->session->userdata('user_id');
 
-        $data = $this->Budget_model
-            ->get_monthly_chart_data($user_id);
+        $period = $this->input->get('period') ?? 'monthly';
 
+        $data = $this->Budget_model
+            ->get_chart_data($user_id, $period);
 
         return $this->json([
-            "status"=>true,
-            "data"=>$data
+            "status" => true,
+            "data" => $data
         ]);
     }
 }

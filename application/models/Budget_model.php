@@ -19,21 +19,53 @@ class Budget_model extends CI_Model
             ->row();
     }
 
-    public function get_monthly_chart_data($user_id)
+    public function get_chart_data($user_id, $period = 'monthly')
     {
+
+        if ($period === 'weekly') {
+
+            $days = 8;
+
+        } else {
+
+            $days = 30;
+
+        }
+
+
         $this->db
             ->select("
-            DAY(transactions.transaction_date) as day,
-            SUM(CASE WHEN transactions.type = 'income' THEN transactions.amount ELSE 0 END) as income,
-            SUM(CASE WHEN transactions.type = 'expense' THEN transactions.amount ELSE 0 END) as expense
+            DATE(transactions.transaction_date) as day,
+
+            SUM(
+                CASE 
+                    WHEN transactions.type='income'
+                    THEN transactions.amount
+                    ELSE 0
+                END
+            ) as income,
+
+            SUM(
+                CASE 
+                    WHEN transactions.type='expense'
+                    THEN transactions.amount
+                    ELSE 0
+                END
+            ) as expense
         ")
             ->from('transactions')
-            ->where('transactions.user_id', $user_id)
-            ->where('transactions.deleted_at IS NULL', null, false)
-            ->where('MONTH(transaction_date)', date('m'))
-            ->where('YEAR(transaction_date)', date('Y'))
-            ->group_by('DAY(transaction_date)')
-            ->order_by('day', 'ASC');
+            ->where('transactions.user_id',$user_id)
+            ->where('transactions.deleted_at IS NULL',null,false)
+            ->where(
+                'transactions.transaction_date >=',
+                date('Y-m-d',strtotime("-{$days} days"))
+            )
+            ->where(
+                'transactions.transaction_date <=',
+                date('Y-m-d')
+            )
+            ->group_by('DATE(transactions.transaction_date)')
+            ->order_by('day','ASC');
 
         return $this->db->get()->result();
     }

@@ -29,6 +29,7 @@
     </div>
 
     <?php $this->load->view('components/dashboard_summary'); ?>
+    <br>
     <?php $this->load->view('components/dashboard_recent_table'); ?>
 </div>
 
