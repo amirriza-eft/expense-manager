@@ -65,14 +65,6 @@
     <!-- Chart -->
     <div id="hs-curved-area-charts"></div>
 
-
-    <!-- Months -->
-    <div class="d-flex justify-content-between px-3 mt-1 small text-secondary">
-        <span id="chart-current-month"></span>
-        <span id="chart-next-month"></span>
-    </div>
-
-
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
@@ -94,54 +86,35 @@
 
                 let rows = result.data;
 
-                let now = new Date();
-
-                let currentMonth = now.toLocaleDateString('fa-IR', {
-                    month:'long',
-                    year:'numeric'
-                });
-
-
-                let nextMonthDate = new Date(
-                    now.getFullYear(),
-                    now.getMonth()+1,
-                    1
-                );
-
-
-                let nextMonth = nextMonthDate.toLocaleDateString('fa-IR', {
-                    month:'long',
-                    year:'numeric'
-                });
-
-
-                document.getElementById('chart-current-month').innerText =
-                    currentMonth;
-
-
-                document.getElementById('chart-next-month').innerText =
-                    nextMonth;
+                if(!rows || rows.length === 0){
+                    console.log("No chart data");
+                    return;
+                }
 
                 let categories = [];
                 let incomes = [];
                 let expenses = [];
 
 
-                rows.forEach(function(item){
+                rows.forEach(function(item, index){
 
-                    categories.push(
-                        "روز " + Number(item.day).toLocaleString('fa-IR')
+                    let day = Number(item.day);
+
+                    let date = new Date(
+                        new Date().getFullYear(),
+                        new Date().getMonth(),
+                        day
                     );
 
 
-                    incomes.push(
-                        Number(item.income)
-                    );
+                    let shamsi = date.toLocaleDateString('fa-IR');
 
 
-                    expenses.push(
-                        Number(item.expense)
-                    );
+                    categories.push(shamsi);
+
+                    incomes.push(Number(item.income) || 0);
+
+                    expenses.push(Number(item.expense) || 0);
 
                 });
 
@@ -206,8 +179,31 @@
 
                         categories: categories,
 
+                        tickAmount: 8,
+
                         labels: {
-                            show: false
+
+                            show:true,
+
+                            style:{
+                                colors:'#6c757d',
+                                fontSize:'12px',
+                                fontWeight:600
+                            },
+
+
+                            formatter:function(value, timestamp, opts){
+
+                                if(opts && opts.tickAmount){
+
+                                    return value;
+
+                                }
+
+                                return value;
+
+                            }
+
                         },
 
                         axisBorder:{
