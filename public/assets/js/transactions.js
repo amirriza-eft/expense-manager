@@ -28,6 +28,7 @@
     function buildTransactionCard(tx, options) {
         options = options || {};
         var isDeleted = !!options.deleted;
+        var expirationHtml = "";
         var isIncome = tx.type === 'income';
         var typeClass = isIncome ? 'income' : 'expense';
         var category = tx.category_name || 'بدون دسته';
@@ -38,6 +39,15 @@
 
         var payload = encodeURIComponent(JSON.stringify(tx));
         var cardClass = 'transaction-card' + (isDeleted ? ' transaction-card--deleted' : '');
+
+        if (isDeleted && tx.days_left !== undefined) {
+            expirationHtml =
+              '<span class="badge bg-warning">' +
+                "حذف دائمی تا " +
+                tx.days_left +
+                " روز دیگر" +
+              "</span>";
+        }
 
         var actionsHtml = isDeleted
             ? (
@@ -79,7 +89,10 @@
                             '<div class="transaction-card__meta">' +
                                 '<span class="badge ' + typeBadgeClass(tx.type) + '">' + typeLabel(tx.type) + '</span>' +
                                 '<span class="badge bg-secondary">' + escapeHtml(category) + '</span>' +
-                                (isDeleted ? '<span class="badge badge-deleted">حذف‌شده</span>' : '') +
+                                (isDeleted
+                                        ? '<span class="badge badge-deleted">حذف‌شده</span>' + expirationHtml
+                                        : ''
+                                ) +
                             '</div>' +
                             '<div class="transaction-card__date">' +
                                 '<i class="bi bi-calendar3 ms-1"></i>' +
