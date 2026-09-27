@@ -93,6 +93,12 @@ $route['api/dashboard']['GET'] =
 
 
 
+//=== Chart ===//
+$route['api/chart']['GET'] =
+    'api/Chart_API_Controller/chart';
+
+
+
 //=== Transactions ===//
 $route['api/transaction']['GET'] =
     'api/Transaction_API_Controller/index';
