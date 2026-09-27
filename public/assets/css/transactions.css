@@ -262,3 +262,14 @@
     opacity: 0.92;
     border-style: dashed !important;
 }
+
+.badge-expiration {
+    background: rgba(255, 193, 7, 0.15);
+    color: #ffc107;
+    border: 1px solid rgba(255, 193, 7, 0.4);
+    padding: 5px 10px;
+    border-radius: 8px;
+    font-size: 0.75rem;
+    display: inline-flex;
+    align-items: center;
+}

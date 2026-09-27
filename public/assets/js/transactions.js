@@ -42,11 +42,12 @@
 
         if (isDeleted && tx.days_left !== undefined) {
             expirationHtml =
-              '<span class="badge bg-warning">' +
+                '<span class="badge badge-expiration">' +
+                '<i class="bi bi-clock-history ms-1"></i>' +
                 "حذف دائمی تا " +
                 tx.days_left +
                 " روز دیگر" +
-              "</span>";
+                "</span>";
         }
 
         var actionsHtml = isDeleted
