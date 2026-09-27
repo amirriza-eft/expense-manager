@@ -114,6 +114,7 @@ class Transaction_model extends CI_Model
                 ->order_by('transactions.id', 'DESC');
 
         }
+
         return $this->db
             ->limit($limit, $offset)
             ->get()
