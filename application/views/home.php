@@ -33,4 +33,5 @@
 </div>
 
 <?php $this->load->view('components/budget_modal'); ?>
+<?php $this->load->view('components/line_chart.php'); ?>
 <?php $this->load->view('components/footer'); ?>
