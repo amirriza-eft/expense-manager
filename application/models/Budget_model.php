@@ -28,7 +28,7 @@ class Budget_model extends CI_Model
 
         } else {
 
-            $days = 31;
+            $days = 30;
 
         }
 
