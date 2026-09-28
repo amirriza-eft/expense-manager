@@ -15,16 +15,7 @@ class Chart_API_Controller extends Base_API_Controller
 
     public function chart()
     {
-        $user_id = $this->session->userdata('user_id');
-
-        if(!$user_id){
-
-            return $this->json([
-                'status'=>false,
-                'message'=>'ابتدا وارد حساب شوید'
-            ],401);
-
-        }
+        $user_id = $this->auth_user();
 
         $period = $this->input->get('period') ?: 'monthly';
 

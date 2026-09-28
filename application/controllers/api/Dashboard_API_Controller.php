@@ -18,23 +18,11 @@ class Dashboard_API_Controller extends Base_API_Controller
 
     public function summary()
     {
-        $user_id = $this->session->userdata('user_id');
-
-        if(!$user_id){
-
-            return $this->json([
-
-                'status'=>false,
-                'message'=>'ابتدا وارد شوید'
-
-            ],401);
-
-        }
+        $user_id = $this->auth_user();
 
         $budget =
             $this->Budget_model
                 ->get_user_budget($user_id);
-
 
         return $this->json([
 
@@ -50,7 +38,6 @@ class Dashboard_API_Controller extends Base_API_Controller
             'monthly_expense'=>
                 $this->Transaction_model
                     ->get_monthly_expense($user_id)
-
         ]);
     }
 }

@@ -17,4 +17,20 @@ class Base_API_Controller extends CI_Controller
         echo json_encode($data, JSON_UNESCAPED_UNICODE);
         exit;
     }
+
+    protected function auth_user()
+    {
+        $user_id = $this->session->userdata('user_id');
+
+        if (!$user_id) {
+
+            $this->json([
+                'status'=>false,
+                'message'=>'ابتدا وارد شوید'
+            ],401);
+
+        }
+
+        return $user_id;
+    }
 }

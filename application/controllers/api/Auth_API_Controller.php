@@ -11,7 +11,6 @@ class Auth_API_Controller extends Base_API_Controller
     protected $auth_service;
     protected $validator;
 
-
     public function __construct()
     {
         parent::__construct();
@@ -39,7 +38,6 @@ class Auth_API_Controller extends Base_API_Controller
             );
 
     }
-
 
     public function register()
     {
@@ -73,7 +71,6 @@ class Auth_API_Controller extends Base_API_Controller
 
     }
 
-
     public function login()
     {
         return $this->json(
@@ -87,7 +84,6 @@ class Auth_API_Controller extends Base_API_Controller
             )
         );
     }
-
 
     public function restore()
     {
@@ -103,7 +99,6 @@ class Auth_API_Controller extends Base_API_Controller
         );
     }
 
-
     public function logout()
     {
         $this->session->sess_destroy();
@@ -116,20 +111,9 @@ class Auth_API_Controller extends Base_API_Controller
         ]);
     }
 
-
     public function delete_account()
     {
-        $user_id =
-            $this->session->userdata('user_id');
-
-        if(!$user_id){
-            return $this->json([
-
-                'status'=>false,
-                'message'=>'ابتدا وارد شوید'
-
-            ],401);
-        }
+        $user_id = $this->auth_user();
 
         return $this->json(
 
@@ -141,5 +125,4 @@ class Auth_API_Controller extends Base_API_Controller
             )
         );
     }
-
 }

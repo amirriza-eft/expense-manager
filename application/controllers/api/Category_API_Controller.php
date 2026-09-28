@@ -37,37 +37,18 @@ class Category_API_Controller extends Base_API_Controller
 
     public function index()
     {
-        $user_id=$this->user();
-
-        if(!$user_id){
-
-            return $this->json([
-                'status'=>false,
-                'message'=>'لطفا ابتدا وارد شوید'
-            ],401);
-
-        }
+        $user_id = $this->auth_user();
 
         return $this->json(
 
             $this->category_service
                 ->index($user_id)
-
         );
     }
 
     public function deleted()
     {
-        $user_id=$this->user();
-
-        if(!$user_id){
-
-            return $this->json([
-                'status'=>false,
-                'message'=>'ابتدا وارد حساب خود شوید'
-            ],401);
-
-        }
+        $user_id = $this->auth_user();
 
         return $this->json(
 
@@ -101,13 +82,9 @@ class Category_API_Controller extends Base_API_Controller
         $result =
             $this->category_service
                 ->update(
-
                     $this->user(),
-
                     $id,
-
                     $this->input->post('title',true)
-
                 );
 
         return $this->json(
@@ -121,11 +98,8 @@ class Category_API_Controller extends Base_API_Controller
         $result =
             $this->category_service
                 ->delete(
-
                     $this->user(),
-
                     $id
-
                 );
 
         return $this->json(
@@ -140,11 +114,8 @@ class Category_API_Controller extends Base_API_Controller
         $result =
             $this->category_service
                 ->restore(
-
                     $this->user(),
-
                     $id
-
                 );
 
         return $this->json(
