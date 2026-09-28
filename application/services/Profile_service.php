@@ -30,7 +30,12 @@ class Profile_service
 
         return [
             'status' => true,
-            'user' => $user
+            'user'=>[
+                'id'=>$user->id,
+                'full_name'=>$user->full_name,
+                'email'=>$user->email,
+                'avatar'=>$user->avatar
+            ]
         ];
     }
 
