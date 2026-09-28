@@ -61,7 +61,6 @@ class Category_service
 
         }
 
-
         $data=[
 
             'user_id'=>$user_id,
@@ -69,7 +68,6 @@ class Category_service
             'title'=>$title
 
         ];
-
 
         if(
             $this->category_model

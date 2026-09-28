@@ -125,7 +125,6 @@ class Transaction_service
             ];
         }
 
-
         if(!$this->policy->can_update($user_id,$transaction)){
 
             return [
@@ -134,7 +133,6 @@ class Transaction_service
                 'message'=>'اجازه ویرایش این تراکنش را ندارید'
             ];
         }
-
 
         $data=[
             'category_id'=>$this->CI->input->post('category_id',true) ?: null,
@@ -145,7 +143,6 @@ class Transaction_service
             'description'=>$this->CI->input->post('description',true)
         ];
 
-
         if($this->model->update($id,$user_id,$data)){
 
             return [
@@ -153,7 +150,6 @@ class Transaction_service
                 'message'=>'تراکنش بروزرسانی شد'
             ];
         }
-
 
         return [
             'status'=>false,

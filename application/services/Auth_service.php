@@ -128,8 +128,6 @@ class Auth_service
     }
 
 
-
-
     public function restore($email,$password)
     {
         $user =
@@ -186,14 +184,12 @@ class Auth_service
 
         }
 
-
         if(
             $this->user_model
                 ->soft_delete($user_id)
         ){
 
             $this->session->sess_destroy();
-
 
             return [
                 'status'=>true,
