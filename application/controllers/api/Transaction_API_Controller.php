@@ -36,7 +36,6 @@ class Transaction_API_Controller extends Base_API_Controller
             ],401);
         }
 
-
         return $this->json(
             $this->service->index(
                 $user_id,
@@ -46,11 +45,9 @@ class Transaction_API_Controller extends Base_API_Controller
     }
 
 
-
     public function create()
     {
         $user_id = $this->session->userdata('user_id');
-
 
         if(!$this->validator->validate_create()){
 
@@ -60,9 +57,7 @@ class Transaction_API_Controller extends Base_API_Controller
             ],400);
         }
 
-
         $result = $this->service->create($user_id);
-
 
         return $this->json(
             $result,
@@ -71,11 +66,9 @@ class Transaction_API_Controller extends Base_API_Controller
     }
 
 
-
     public function update()
     {
         $user_id = $this->session->userdata('user_id');
-
 
         if(!$user_id){
 
@@ -84,7 +77,6 @@ class Transaction_API_Controller extends Base_API_Controller
                 'message'=>'ابتدا وارد شوید'
             ],401);
         }
-
 
         if(!$this->validator->validate_update()){
 
@@ -94,29 +86,24 @@ class Transaction_API_Controller extends Base_API_Controller
             ],400);
         }
 
-
         $id = $this->input->post('id',true);
-
 
         $result = $this->service->update(
             $user_id,
             $id
         );
 
-
         return $this->json(
             $result,
             $result['code'] ?? 200
         );
     }
-
 
 
     public function delete()
     {
         $user_id = $this->session->userdata('user_id');
 
-
         if(!$user_id){
 
             return $this->json([
@@ -125,15 +112,12 @@ class Transaction_API_Controller extends Base_API_Controller
             ],401);
         }
 
-
         $id = $this->input->post('id',true);
-
 
         $result = $this->service->delete(
             $user_id,
             $id
         );
-
 
         return $this->json(
             $result,
@@ -142,11 +126,9 @@ class Transaction_API_Controller extends Base_API_Controller
     }
 
 
-
     public function deleted()
     {
         $user_id = $this->session->userdata('user_id');
-
 
         if(!$user_id){
 
@@ -156,27 +138,21 @@ class Transaction_API_Controller extends Base_API_Controller
             ],401);
         }
 
-
         return $this->json(
             $this->service->deleted($user_id)
         );
     }
 
-
-
     public function restore()
     {
         $user_id = $this->session->userdata('user_id');
 
-
         $id = $this->input->post('id',true);
-
 
         $result = $this->service->restore(
             $user_id,
             $id
         );
-
 
         return $this->json(
             $result,

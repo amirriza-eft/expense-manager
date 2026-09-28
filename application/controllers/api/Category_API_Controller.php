@@ -96,7 +96,6 @@ class Category_API_Controller extends Base_API_Controller
 
     }
 
-
     public function update($id)
     {
         $result =

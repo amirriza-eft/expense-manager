@@ -8,11 +8,8 @@ require_once(APPPATH.'controllers/api/Base_API_Controller.php');
 
 class Auth_API_Controller extends Base_API_Controller
 {
-
-
     protected $auth_service;
     protected $validator;
-
 
 
     public function __construct()
@@ -44,12 +41,8 @@ class Auth_API_Controller extends Base_API_Controller
     }
 
 
-
-
     public function register()
     {
-
-
         if(!$this->validator->register()){
 
             return $this->json([
@@ -60,8 +53,6 @@ class Auth_API_Controller extends Base_API_Controller
             ],400);
 
         }
-
-
 
         return $this->json(
 
@@ -83,11 +74,8 @@ class Auth_API_Controller extends Base_API_Controller
     }
 
 
-
-
     public function login()
     {
-
         return $this->json(
 
             $this->auth_service->login(
@@ -97,18 +85,12 @@ class Auth_API_Controller extends Base_API_Controller
                 $this->input->post('password')
 
             )
-
         );
-
     }
-
-
-
 
 
     public function restore()
     {
-
         return $this->json(
 
             $this->auth_service->restore(
@@ -118,20 +100,13 @@ class Auth_API_Controller extends Base_API_Controller
                 $this->input->post('password')
 
             )
-
         );
-
     }
-
-
-
 
 
     public function logout()
     {
-
         $this->session->sess_destroy();
-
 
         return $this->json([
 
@@ -139,32 +114,22 @@ class Auth_API_Controller extends Base_API_Controller
             'message'=>'خروج موفق'
 
         ]);
-
     }
-
-
-
 
 
     public function delete_account()
     {
-
         $user_id =
             $this->session->userdata('user_id');
 
-
         if(!$user_id){
-
             return $this->json([
 
                 'status'=>false,
                 'message'=>'ابتدا وارد شوید'
 
             ],401);
-
         }
-
-
 
         return $this->json(
 
@@ -173,12 +138,8 @@ class Auth_API_Controller extends Base_API_Controller
                 $user_id,
 
                 $this->input->post('password')
-
             )
-
         );
-
     }
-
 
 }

@@ -18,7 +18,6 @@ class Dashboard_API_Controller extends Base_API_Controller
 
     public function summary()
     {
-
         $user_id = $this->session->userdata('user_id');
 
         if(!$user_id){
@@ -31,7 +30,6 @@ class Dashboard_API_Controller extends Base_API_Controller
             ],401);
 
         }
-
 
         $budget =
             $this->Budget_model
