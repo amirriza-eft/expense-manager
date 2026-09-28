@@ -40,8 +40,7 @@ class User_model extends CI_Model
             $this->db->where('id !=', $except_user_id);
         }
 
-        return $this->db
-                ->count_all_results($this->table) > 0;
+        return $this->db->count_all_results($this->table) > 0;
     }
 
     public function find_by_email($email)

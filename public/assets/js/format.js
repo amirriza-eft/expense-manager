@@ -123,3 +123,4 @@
     global.formatPersianDate = formatPersianDate;
     global.todayGregorianDate = todayGregorianDate;
 })(window);
+

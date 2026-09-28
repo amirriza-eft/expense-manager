@@ -9,7 +9,6 @@ class Transaction_API_Controller extends Base_API_Controller
     protected $service;
     protected $validator;
 
-
     public function __construct()
     {
         parent::__construct();
@@ -110,6 +109,7 @@ class Transaction_API_Controller extends Base_API_Controller
             $this->service->deleted($user_id)
         );
     }
+
 
     public function restore()
     {

@@ -39,8 +39,13 @@
                     <div class="row g-2 mb-3">
                         <div class="col-6">
                             <label for="tx_amount" class="form-label small text-muted">مبلغ (تومان)</label>
-                            <input type="number" class="form-control" name="amount" id="tx_amount" required min="1"
-                                   placeholder="مثال: ۵۰۰۰۰۰۰" inputmode="numeric">
+                            <input type="text"
+                                   class="form-control"
+                                   name="amount"
+                                   id="tx_amount"
+                                   required
+                                   placeholder="مثال: ۵۰۰۰۰۰۰"
+                                   inputmode="numeric">
                         </div>
                         <div class="col-6">
                             <label for="tx_date_display" class="form-label small text-muted">تاریخ تراکنش</label>
@@ -460,9 +465,37 @@
                     : 'alert alert-danger py-2 px-3 small';
 
                 if (data.status) {
-                    setTimeout(function () {
-                        location.reload();
-                    }, 700);
+
+                    var modal = bootstrap.Modal.getInstance(
+                        document.getElementById('transactionModal')
+                    );
+
+                    if (modal) {
+                        modal.hide();
+                    }
+
+                    var isCreate = !id;
+
+                    if (typeof loadTransactions === 'function') {
+
+                        if (isCreate) {
+                            loadTransactions(1);
+                        } else {
+                            loadTransactions(
+                                typeof currentPage !== 'undefined'
+                                    ? currentPage
+                                    : 1
+                            );
+                        }
+                    }
+
+                    if (typeof loadDashboardSummary === 'function') {
+                        loadDashboardSummary();
+                    }
+
+                    form.reset();
+
+                    document.getElementById('tx_id').value = '';
                 }
             })
             .catch(function () {
