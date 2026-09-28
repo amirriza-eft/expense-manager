@@ -15,15 +15,12 @@ class Auth_API_Controller extends Base_API_Controller
     {
         parent::__construct();
 
-
         $this->load->model('User_model');
         $this->load->library('session');
         $this->load->library('form_validation');
 
-
         require_once APPPATH.'services/Auth_service.php';
         require_once APPPATH.'validators/Auth_validator.php';
-
 
         $this->auth_service =
             new Auth_service(
@@ -31,12 +28,10 @@ class Auth_API_Controller extends Base_API_Controller
                 $this->session
             );
 
-
         $this->validator =
             new Auth_validator(
                 $this->form_validation
             );
-
     }
 
     public function register()
@@ -104,10 +99,8 @@ class Auth_API_Controller extends Base_API_Controller
         $this->session->sess_destroy();
 
         return $this->json([
-
             'status'=>true,
             'message'=>'خروج موفق'
-
         ]);
     }
 

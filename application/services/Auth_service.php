@@ -16,11 +16,8 @@ class Auth_service
 
     public function register($data)
     {
-        if(
-            $this->user_model
-                ->find_any_by_email($data['email'])
-        ){
-
+        if( $this->user_model->find_any_by_email($data['email']) )
+        {
             return [
                 'status'=>false,
                 'message'=>'این ایمیل قبلا ثبت شده است'
@@ -38,24 +35,16 @@ class Auth_service
             date('Y-m-d H:i:s');
 
 
-        $user_id =
-            $this->user_model
-                ->create($data);
-
+        $user_id = $this->user_model->create($data);
 
         if(!$user_id){
-
             return [
                 'status'=>false,
                 'message'=>'خطا در ایجاد حساب'
             ];
-
         }
 
-
-        $this->user_model
-            ->create_budget($user_id);
-
+        $this->user_model->create_budget($user_id);
 
         return [
             'status'=>true,
@@ -65,9 +54,7 @@ class Auth_service
 
     public function login($email, $password)
     {
-
-        $user = $this->user_model
-            ->find_by_email($email);
+        $user = $this->user_model->find_by_email($email);
 
         if ($user) {
 
@@ -98,26 +85,16 @@ class Auth_service
 
         }
 
-        $deleted = $this->user_model
-            ->find_deleted_by_email($email);
+        $deleted = $this->user_model->find_deleted_by_email($email);
 
-
-        if (
-            $deleted &&
-            password_verify($password, $deleted->password)
-        ) {
-
+        if ( $deleted && password_verify($password, $deleted->password) )
+        {
             return [
-
                 'status' => false,
-
                 'code' => 'account_deleted',
-
                 'message' =>
                     'این حساب حذف شده است. برای بازیابی حساب کلیک کنید.'
-
             ];
-
         }
 
         return [
@@ -130,79 +107,56 @@ class Auth_service
 
     public function restore($email,$password)
     {
-        $user =
-            $this->user_model
-                ->find_deleted_by_email($email);
+        $user = $this->user_model->find_deleted_by_email($email);
 
-        if(
-            !$user ||
-            !password_verify($password,$user->password)
-        ){
-
+        if( !$user || !password_verify($password,$user->password) )
+        {
             return [
                 'status'=>false,
                 'message'=>'ایمیل یا رمز عبور اشتباه است'
             ];
-
         }
 
-        if(
-            $this->user_model
-                ->restore($user->id)
-        ){
-
+        if( $this->user_model->restore($user->id) )
+        {
             return [
                 'status'=>true,
                 'message'=>'حساب شما بازیابی شد'
             ];
-
         }
 
         return [
             'status'=>false,
             'message'=>'خطا در بازیابی حساب'
         ];
-
     }
 
     public function delete($user_id,$password)
     {
 
-        $user =
-            $this->user_model
-                ->find($user_id);
+        $user = $this->user_model->find($user_id);
 
-        if(
-            !$user ||
-            !password_verify($password,$user->password)
-        ){
-
+        if( !$user || !password_verify($password,$user->password) )
+        {
             return [
                 'status'=>false,
                 'message'=>'رمز عبور اشتباه است'
             ];
-
         }
 
-        if(
-            $this->user_model
-                ->soft_delete($user_id)
-        ){
-
+        if( $this->user_model->soft_delete($user_id) )
+        {
             $this->session->sess_destroy();
 
             return [
                 'status'=>true,
                 'message'=>'حساب شما حذف شد'
             ];
-
         }
 
         return [
             'status'=>false,
             'message'=>'خطا در حذف حساب'
         ];
-
     }
-
 }

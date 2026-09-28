@@ -59,6 +59,9 @@ $route['profile'] = 'Auth/profile';
 
 
 //=== Auth ===//
+$route['api/auth/register']['POST'] =
+    'api/Auth_API_Controller/register';
+
 $route['api/auth/login']['POST'] =
     'api/Auth_API_Controller/login';
 
@@ -67,9 +70,6 @@ $route['api/auth/logout']['POST'] =
 
 $route['api/auth/restore']['POST'] =
     'api/Auth_API_Controller/restore';
-
-$route['api/auth/register']['POST'] =
-    'api/Auth_API_Controller/register';
 
 $route['api/user/delete'] =
     'api/Auth_API_Controller/delete_account';
