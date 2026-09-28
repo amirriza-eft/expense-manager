@@ -466,35 +466,41 @@
 
                 if (data.status) {
 
-                    var modal = bootstrap.Modal.getInstance(
-                        document.getElementById('transactionModal')
-                    );
+                    var modalElement = document.getElementById('transactionModal');
+                    var modal = bootstrap.Modal.getInstance(modalElement);
 
                     if (modal) {
                         modal.hide();
                     }
 
-                    var isCreate = !id;
+                    modalElement.addEventListener('hidden.bs.modal', function handleModalHidden() {
 
-                    if (typeof loadTransactions === 'function') {
+                        modalElement.removeEventListener('hidden.bs.modal', handleModalHidden);
 
-                        if (isCreate) {
-                            loadTransactions(1);
-                        } else {
+                        document.querySelectorAll('.modal-backdrop').forEach(function (backdrop) {
+                            backdrop.remove();
+                        });
+
+                        document.body.classList.remove('modal-open');
+                        document.body.style.removeProperty('overflow');
+                        document.body.style.removeProperty('padding-right');
+
+                        var isCreate = !id;
+
+                        if (typeof loadTransactions === 'function') {
                             loadTransactions(
-                                typeof currentPage !== 'undefined'
-                                    ? currentPage
-                                    : 1
+                                isCreate
+                                    ? 1
+                                    : (typeof currentPage !== 'undefined' ? currentPage : 1)
                             );
                         }
-                    }
 
-                    if (typeof loadDashboardSummary === 'function') {
-                        loadDashboardSummary();
-                    }
+                        if (typeof loadDashboardSummary === 'function') {
+                            loadDashboardSummary();
+                        }
+                    });
 
                     form.reset();
-
                     document.getElementById('tx_id').value = '';
                 }
             })
