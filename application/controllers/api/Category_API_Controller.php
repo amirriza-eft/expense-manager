@@ -54,7 +54,6 @@ class Category_API_Controller extends Base_API_Controller
 
             $this->category_service
                 ->deleted($user_id)
-
         );
     }
 

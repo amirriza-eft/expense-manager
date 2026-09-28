@@ -20,9 +20,7 @@ class Dashboard_API_Controller extends Base_API_Controller
     {
         $user_id = $this->auth_user();
 
-        $budget =
-            $this->Budget_model
-                ->get_user_budget($user_id);
+        $budget = $this->Budget_model->get_user_budget($user_id);
 
         return $this->json([
 

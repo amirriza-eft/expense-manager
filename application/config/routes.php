@@ -79,10 +79,10 @@ $route['api/user/delete'] =
 $route['api/profile']['GET'] =
     'api/Profile_API_Controller/get';
 
-$route['api/profile/update'] =
+$route['api/profile/update']['POST'] =
     'api/Profile_API_Controller/update';
 
-$route['api/profile/password'] =
+$route['api/profile/password']['POST'] =
     'api/Profile_API_Controller/change_password';
 
 

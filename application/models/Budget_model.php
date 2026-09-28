@@ -21,7 +21,6 @@ class Budget_model extends CI_Model
 
     public function get_chart_data($user_id, $period = 'monthly')
     {
-
         if ($period === 'weekly') {
 
             $days = 6;
@@ -31,7 +30,6 @@ class Budget_model extends CI_Model
             $days = 30;
 
         }
-
 
         $this->db
             ->select("
