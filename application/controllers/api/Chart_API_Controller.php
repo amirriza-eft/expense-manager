@@ -17,14 +17,25 @@ class Chart_API_Controller extends Base_API_Controller
     {
         $user_id = $this->session->userdata('user_id');
 
-        $period = $this->input->get('period') ?? 'monthly';
+        if(!$user_id){
 
-        $data = $this->Budget_model
-            ->get_chart_data($user_id, $period);
+            return $this->json([
+                'status'=>false,
+                'message'=>'ابتدا وارد حساب شوید'
+            ],401);
+
+        }
+
+        $period = $this->input->get('period') ?: 'monthly';
 
         return $this->json([
-            "status" => true,
-            "data" => $data
+
+            'status'=>true,
+            'data'=>$this->Budget_model
+                ->get_chart_data(
+                    $user_id,
+                    $period
+                )
         ]);
     }
 }
