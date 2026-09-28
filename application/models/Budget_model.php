@@ -24,11 +24,11 @@ class Budget_model extends CI_Model
 
         if ($period === 'weekly') {
 
-            $days = 8;
+            $days = 6;
 
         } else {
 
-            $days = 30;
+            $days = 31;
 
         }
 

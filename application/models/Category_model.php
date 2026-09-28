@@ -32,10 +32,12 @@ class Category_model extends CI_Model
             ->result();
     }
 
-    public function get_by_id($id)
+    public function get_by_id($id,$user_id)
     {
         return $this->db
-            ->get_where('categories', ['id' => $id])
+            ->where('id',$id)
+            ->where('user_id',$user_id)
+            ->get($this->table)
             ->row();
     }
 

@@ -94,7 +94,7 @@ class Category_service
 
         $cat =
             $this->category_model
-                ->get_by_id($id);
+                ->get_by_id($id,$user_id);
 
         if(
             !$this->category_policy
@@ -150,7 +150,7 @@ class Category_service
 
         $cat =
             $this->category_model
-                ->get_by_id($id);
+                ->get_by_id($id,$user_id);
 
 
         if(

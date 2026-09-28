@@ -15,8 +15,11 @@ class User_model extends CI_Model
 
     public function create($data)
     {
-        $this->db->insert($this->table, $data);
-        return $this->db->insert_id();
+        if($this->db->insert($this->table,$data)){
+            return $this->db->insert_id();
+        }
+
+        return false;
     }
 
     public function create_budget($user_id)
@@ -67,11 +70,13 @@ class User_model extends CI_Model
             ->row();
     }
 
-    public function update($id, $data)
+    public function update($id,$data)
     {
+        $data['updated_at'] = date('Y-m-d H:i:s');
+
         return $this->db
-            ->where('id', $id)
-            ->update($this->table, $data);
+            ->where('id',$id)
+            ->update($this->table,$data);
     }
 
     public function soft_delete($id)
@@ -94,11 +99,12 @@ class User_model extends CI_Model
 
     public function restore($id)
     {
-        $this->db->set('deleted_at', null);
-        $this->db->set('updated_at', date('Y-m-d H:i:s'));
-        $this->db->where('id', $id);
-        $this->db->where('deleted_at IS NOT NULL', null, false);
-
-        return $this->db->update($this->table);
+        return $this->db
+            ->where('id',$id)
+            ->where('deleted_at IS NOT NULL',null,false)
+            ->update($this->table,[
+                'deleted_at'=>null,
+                'updated_at'=>date('Y-m-d H:i:s')
+            ]);
     }
 }
