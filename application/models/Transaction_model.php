@@ -41,6 +41,15 @@ class Transaction_model extends CI_Model
         return $this->db->trans_status();
     }
 
+    public function get_by_id($id)
+    {
+        return $this->db
+            ->where('id',$id)
+            ->where('deleted_at IS NULL',null,false)
+            ->get('transactions')
+            ->row();
+    }
+
     public function get_user_transactions(
         $user_id,
         $limit,
