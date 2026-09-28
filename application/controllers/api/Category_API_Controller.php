@@ -1,187 +1,156 @@
 <?php
 
-defined('BASEPATH') or exit('No direct script access allowed');
+defined('BASEPATH') OR exit('No direct script access allowed');
 
-require_once(APPPATH . 'controllers/api/Base_API_Controller.php');
+
+require_once(APPPATH.'controllers/api/Base_API_Controller.php');
+
 
 class Category_API_Controller extends Base_API_Controller
 {
+
+    protected $category_service;
+
+
     public function __construct()
     {
         parent::__construct();
 
         $this->load->model('Category_model');
-        $this->load->library('session');
 
-        require_once APPPATH . 'policies/Category_policy.php';
-        $this->category_policy = new Category_policy();
+        require_once APPPATH.'services/Category_service.php';
+        require_once APPPATH.'policies/Category_policy.php';
+
+        $policy = new Category_policy();
+
+        $this->category_service =
+            new Category_service(
+                $this->Category_model,
+                $policy
+            );
+    }
+
+    private function user()
+    {
+        return $this->session->userdata('user_id');
     }
 
     public function index()
     {
-        $user_id = $this->session->userdata('user_id');
+        $user_id=$this->user();
 
-        if (!$user_id) {
+        if(!$user_id){
+
             return $this->json([
-                'status' => false,
-                'message' => 'لطفا ابتدا وارد شوید'
-            ], 401);
+                'status'=>false,
+                'message'=>'لطفا ابتدا وارد شوید'
+            ],401);
+
         }
 
-        $categories = $this->Category_model
-            ->get_user_categories($user_id);
+        return $this->json(
 
-        return $this->json([
-            'status' => true,
-            'categories' => $categories
-        ]);
+            $this->category_service
+                ->index($user_id)
+
+        );
     }
 
     public function deleted()
     {
-        $user_id = $this->session->userdata('user_id');
+        $user_id=$this->user();
 
-        if (!$user_id) {
+        if(!$user_id){
+
             return $this->json([
-                'status' => false,
-                'message' => 'ابتدا وارد حساب خود شوید'
-            ], 401);
+                'status'=>false,
+                'message'=>'ابتدا وارد حساب خود شوید'
+            ],401);
+
         }
 
-        $categories = $this->Category_model
-            ->get_user_deleted_categories($user_id);
+        return $this->json(
 
-        return $this->json([
-            'status' => true,
-            'categories' => $categories
-        ]);
+            $this->category_service
+                ->deleted($user_id)
+
+        );
     }
+
 
     public function create()
     {
-        $user_id = $this->session->userdata('user_id');
+        $user_id=$this->user();
 
-        if (!$this->category_policy->can_create($user_id)) {
-            return $this->json([
-                'status' => false,
-                'message' => 'ابتدا وارد حساب خود شوید'
-            ], 401);
-        }
+        $result =
+            $this->category_service
+                ->create(
+                    $user_id,
+                    $this->input->post('title',true)
+                );
 
-        $data = [
-            'user_id' => $user_id,
-            'title' => $this->input->post('title', true)
-        ];
+        return $this->json(
+            $result,
+            $result['code'] ?? 200
+        );
 
-        if ($this->Category_model->create($data)) {
-            return $this->json([
-                'status' => true,
-                'message' => 'دسته‌بندی با موفقیت ایجاد شد'
-            ]);
-        }
-
-        return $this->json([
-            'status' => false,
-            'message' => 'خطا در ایجاد دسته‌بندی'
-        ], 500);
     }
+
 
     public function update($id)
     {
-        $user_id = $this->session->userdata('user_id');
+        $result =
+            $this->category_service
+                ->update(
 
-        if (!$user_id) {
-            return $this->json([
-                'status' => false,
-                'message' => 'ابتدا وارد حساب خود شوید'
-            ], 401);
-        }
+                    $this->user(),
 
-        $cat = $this->Category_model->get_by_id($id);
+                    $id,
 
-        if (!$this->category_policy->can_update($user_id, $cat)) {
-            return $this->json([
-                'status' => false,
-                'message' => 'اجازه ویرایش این دسته را ندارید'
-            ], 403);
-        }
+                    $this->input->post('title',true)
 
-        $title = $this->input->post('title', true);
+                );
 
-        if (!$title) {
-            return $this->json([
-                'status' => false,
-                'message' => 'نام دسته الزامی است'
-            ], 400);
-        }
-
-        if ($this->Category_model->update($id, $user_id, ['title' => $title])) {
-            return $this->json([
-                'status' => true,
-                'message' => 'دسته‌بندی با موفقیت بروزرسانی شد'
-            ]);
-        }
-
-        return $this->json([
-            'status' => false,
-            'message' => 'خطا در بروزرسانی دسته‌بندی'
-        ], 500);
+        return $this->json(
+            $result,
+            $result['code'] ?? 200
+        );
     }
 
     public function delete($id)
     {
-        $user_id = $this->session->userdata('user_id');
+        $result =
+            $this->category_service
+                ->delete(
 
-        if (!$user_id) {
-            return $this->json([
-                'status' => false,
-                'message' => 'ابتدا وارد حساب خود شوید'
-            ], 401);
-        }
+                    $this->user(),
 
-        $cat = $this->Category_model->get_by_id($id);
+                    $id
 
-        if (!$this->category_policy->can_delete($user_id, $cat)) {
-            return $this->json([
-                'status' => false,
-                'message' => 'اجازه حذف این دسته را ندارید'
-            ], 403);
-        }
+                );
 
-        if ($this->Category_model->delete($id, $user_id)) {
-            return $this->json([
-                'status' => true,
-                'message' => 'دسته حذف شد'
-            ]);
-        }
+        return $this->json(
+            $result,
+            $result['code'] ?? 200
+        );
 
-        return $this->json([
-            'status' => false,
-            'message' => 'خطا در حذف'
-        ], 500);
     }
 
     public function restore($id)
     {
-        $user_id = $this->session->userdata('user_id');
+        $result =
+            $this->category_service
+                ->restore(
 
-        if (!$user_id) {
-            return $this->json([
-                'status' => false,
-                'message' => 'ابتدا وارد حساب خود شوید'
-            ], 401);
-        }
+                    $this->user(),
 
-        if ($this->Category_model->restore($id, $user_id)) {
-            return $this->json([
-                'status' => true,
-                'message' => 'دسته بازیابی شد'
-            ]);
-        }
+                    $id
 
-        return $this->json([
-            'status' => false,
-            'message' => 'خطا در بازیابی دسته'
-        ], 500);
+                );
+
+        return $this->json(
+            $result,
+            $result['code'] ?? 200
+        );
     }
 }
