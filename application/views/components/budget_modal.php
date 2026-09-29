@@ -271,6 +271,8 @@
                 if (typeof loadCategories === 'function') {
                     loadCategories();
                 }
+
+                loadDeletedCategories();
             })
             .catch(function (error) {
                 console.error(error);
@@ -291,6 +293,8 @@
                 if (typeof loadCategories === 'function') {
                     loadCategories();
                 }
+
+                loadDeletedCategories();
             })
             .catch(function (error) {
                 console.error(error);
@@ -413,7 +417,13 @@
     document.getElementById('confirmDeleteTxBtn').addEventListener('click', deleteTransaction);
 
     var categoryManagerModal = document.getElementById('categoryManagerModal');
+
     if (categoryManagerModal) {
+
+        categoryManagerModal.addEventListener('show.bs.modal', function () {
+            loadDeletedCategories();
+        });
+
         categoryManagerModal.addEventListener('hidden.bs.modal', resetCategoryForm);
     }
 

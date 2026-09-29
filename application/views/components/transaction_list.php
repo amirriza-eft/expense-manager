@@ -25,7 +25,6 @@
         >
             <i class="bi bi-trash"></i>
             تراکنش‌های حذف‌شده
-            <span id="deletedTransactionCountBadge" class="badge bg-secondary ms-1">۰</span>
         </button>
     </div>
 </div>

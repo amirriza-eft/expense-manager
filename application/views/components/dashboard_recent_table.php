@@ -58,9 +58,6 @@
                 if (typeof renderCategories === 'function') {
                     renderCategories(data.categories);
                 }
-                if (typeof loadDeletedCategories === 'function') {
-                    loadDeletedCategories();
-                }
             })
             .catch(function (error) {
                 console.error(error);
@@ -162,7 +159,6 @@
     function loadDeletedTransactions() {
         var list = document.getElementById('deletedTransactionList');
         var countEl = document.getElementById('deletedTransactionCount');
-        var badgeEl = document.getElementById('deletedTransactionCountBadge');
 
         if (!list) {
             return;
@@ -182,9 +178,6 @@
 
                 if (countEl) {
                     countEl.textContent = countLabel;
-                }
-                if (badgeEl) {
-                    badgeEl.textContent = formatNumber(transactions.length);
                 }
 
                 renderTransactionList(list, transactions, {
@@ -218,7 +211,7 @@
                 }
 
                 loadTransactions(currentPage || 1);
-                loadDeletedTransactions();
+
                 if (typeof loadDashboardSummary === 'function') {
                     loadDashboardSummary();
                 }
@@ -277,7 +270,6 @@
     document.addEventListener('DOMContentLoaded', function () {
         loadCategories();
         loadTransactions(1);
-        loadDeletedTransactions();
 
         var deletedModal = document.getElementById('deletedTransactionsModal');
         if (deletedModal) {
