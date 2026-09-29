@@ -198,19 +198,24 @@
 
         fetch(TRANSACTION_RESTORE_API, {
             method: 'POST',
-            headers: {'Content-Type': 'application/x-www-form-urlencoded'},
-            body: new URLSearchParams({id: id})
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded'
+            },
+            body: new URLSearchParams({
+                id: id
+            })
         })
             .then(function (res) {
                 return res.json();
             })
             .then(function (data) {
                 if (!data.status) {
-                    alert(data.message || 'خطا در بازیابی');
+                    alert(data.message || 'Restore failed');
                     return;
                 }
 
                 loadTransactions(currentPage || 1);
+                loadDeletedTransactions();
 
                 if (typeof loadDashboardSummary === 'function') {
                     loadDashboardSummary();

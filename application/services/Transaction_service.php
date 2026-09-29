@@ -207,11 +207,10 @@ class Transaction_service
 
     public function restore($user_id,$id)
     {
-        if($this->model->restore($id,$user_id)){
-
+        if ($this->model->restore($id, $user_id)) {
             return [
-                'status'=>true,
-                'message'=>'تراکنش بازیابی شد'
+                'status' => true,
+                'message' => 'تراکنش بازیابی شد'
             ];
         }
 

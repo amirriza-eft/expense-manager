@@ -170,7 +170,7 @@
         document.getElementById('tx_title').value = tx.title;
         document.getElementById('tx_type').value = tx.type;
         document.getElementById('tx_category').value = tx.category_id ?? '';
-        document.getElementById('tx_amount').value = tx.amount;
+        document.getElementById('tx_amount').value = formatAmountInput(tx.amount);
         document.getElementById('tx_description').value = tx.description || '';
         document.getElementById('txMessage').classList.add('d-none');
 
@@ -434,62 +434,103 @@
         });
     }
 
+
     document.getElementById('txForm').addEventListener('submit', function (e) {
         e.preventDefault();
 
         var form = this;
+        var formData = new FormData(form);
+
+        // Convert Persian amount digits + remove commas
+        formData.set(
+            'amount',
+            getAmountInputValue(document.getElementById('tx_amount').value)
+        );
+
         var displayDate = document.getElementById('tx_date_display');
         var hiddenDate = document.getElementById('tx_date');
 
+        // Convert Persian date to Gregorian
         if (displayDate && displayDate.value) {
             hiddenDate.value = convertPersianToGregorian(displayDate.value);
         }
 
+        // Make sure the converted date is included in the FormData
+        formData.set('transaction_date', hiddenDate.value);
+
+        // Validate date before sending
         if (!hiddenDate.value) {
             var messageEarly = document.getElementById('txMessage');
+
             messageEarly.classList.remove('d-none');
             messageEarly.className = 'alert alert-danger py-2 px-3 small';
             messageEarly.textContent = 'لطفاً تاریخ تراکنش را انتخاب کنید';
+
             return;
         }
 
         var id = document.getElementById('tx_id').value;
+
         var url = id
             ? "<?= site_url('api/transaction/update/') ?>" + id
             : "<?= site_url('api/transaction/create') ?>";
+
         var message = document.getElementById('txMessage');
         var button = form.querySelector('button[type="submit"]');
 
         button.disabled = true;
         button.textContent = 'در حال ذخیره...';
 
-        fetch(url, {method: 'POST', body: new FormData(form)})
+        fetch(url, {
+            method: 'POST',
+            body: formData
+        })
             .then(function (res) {
-                return res.json();
+                return res.text();
             })
-            .then(function (data) {
+            .then(function (text) {
+                console.log('SERVER RESPONSE:', text);
+
+                var data;
+
+                try {
+                    data = JSON.parse(text);
+                } catch (error) {
+                    console.error('INVALID JSON:', error);
+                    throw new Error('Server did not return valid JSON');
+                }
+
                 message.classList.remove('d-none');
-                message.textContent = data.message;
+                message.textContent = data.message || '';
                 message.className = data.status
                     ? 'alert alert-success py-2 px-3 small'
                     : 'alert alert-danger py-2 px-3 small';
 
-                if (data.status) {
+                if (!data.status) {
+                    return;
+                }
 
-                    var modalElement = document.getElementById('transactionModal');
-                    var modal = bootstrap.Modal.getInstance(modalElement);
+                var modalElement = document.getElementById('transactionModal');
+                var modal = bootstrap.Modal.getInstance(modalElement);
 
-                    if (modal) {
-                        modal.hide();
-                    }
+                if (modal) {
+                    modal.hide();
+                }
 
-                    modalElement.addEventListener('hidden.bs.modal', function handleModalHidden() {
+                modalElement.addEventListener(
+                    'hidden.bs.modal',
+                    function handleModalHidden() {
 
-                        modalElement.removeEventListener('hidden.bs.modal', handleModalHidden);
+                        modalElement.removeEventListener(
+                            'hidden.bs.modal',
+                            handleModalHidden
+                        );
 
-                        document.querySelectorAll('.modal-backdrop').forEach(function (backdrop) {
-                            backdrop.remove();
-                        });
+                        document.querySelectorAll('.modal-backdrop').forEach(
+                            function (backdrop) {
+                                backdrop.remove();
+                            }
+                        );
 
                         document.body.classList.remove('modal-open');
                         document.body.style.removeProperty('overflow');
@@ -501,20 +542,25 @@
                             loadTransactions(
                                 isCreate
                                     ? 1
-                                    : (typeof currentPage !== 'undefined' ? currentPage : 1)
+                                    : (typeof currentPage !== 'undefined'
+                                        ? currentPage
+                                        : 1)
                             );
                         }
 
                         if (typeof loadDashboardSummary === 'function') {
                             loadDashboardSummary();
                         }
-                    });
+                    }
+                );
 
-                    form.reset();
-                    document.getElementById('tx_id').value = '';
-                }
+                form.reset();
+                document.getElementById('tx_id').value = '';
             })
-            .catch(function () {
+            .catch(function (error) {
+                console.error('TRANSACTION ERROR:', error);
+
+                message.classList.remove('d-none');
                 message.className = 'alert alert-danger py-2 px-3 small';
                 message.textContent = 'خطا در ارتباط با سرور';
             })
@@ -523,6 +569,28 @@
                 button.textContent = 'ذخیره تراکنش';
             });
     });
+
+
+
+
+    let amountInput = document.getElementById('tx_amount');
+
+    if (amountInput) {
+        amountInput.addEventListener('input', function () {
+            var cursorPosition = this.selectionStart;
+            var oldValue = this.value;
+
+            this.value = formatAmountInput(this.value);
+
+            var lengthDifference = this.value.length - oldValue.length;
+
+            this.setSelectionRange(
+                cursorPosition + lengthDifference,
+                cursorPosition + lengthDifference
+            );
+        });
+    }
+
 
     categoryForm.addEventListener('submit', function (event) {
         event.preventDefault();

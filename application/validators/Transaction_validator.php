@@ -50,10 +50,9 @@ class Transaction_validator
         $this->CI->form_validation->set_rules(
             'amount',
             'مبلغ',
-            'required|numeric',
+            'required',
             [
                 'required'=>'مبلغ الزامی است',
-                'numeric'=>'مبلغ باید عدد باشد'
             ]
         );
 

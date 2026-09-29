@@ -25,89 +25,110 @@
         return type === 'income' ? 'bi-arrow-down-left' : 'bi-arrow-up-right';
     }
 
+
     function buildTransactionCard(tx, options) {
         options = options || {};
+
         var isDeleted = !!options.deleted;
-        var expirationHtml = "";
         var isIncome = tx.type === 'income';
         var typeClass = isIncome ? 'income' : 'expense';
         var category = tx.category_name || 'بدون دسته';
         var description = (tx.description || '').trim();
+
         var amountHtml = typeof formatAmount === 'function'
             ? formatAmount(tx.amount, tx.type)
-            : ((isIncome ? '+' : '-') + Number(tx.amount).toLocaleString('fa-IR'));
+            : `${isIncome ? '+' : '-'}${Number(tx.amount).toLocaleString('fa-IR')}`;
 
         var payload = encodeURIComponent(JSON.stringify(tx));
-        var cardClass = 'transaction-card' + (isDeleted ? ' transaction-card--deleted' : '');
+        var cardClass = `transaction-card${isDeleted ? ' transaction-card--deleted' : ''}`;
+        var expirationHtml = '';
 
         if (isDeleted && tx.days_left !== undefined) {
-            expirationHtml =
-                '<span class="badge badge-expiration">' +
-                '<i class="bi bi-clock-history ms-1"></i>' +
-                "حذف دائمی تا " +
-                tx.days_left +
-                " روز دیگر" +
-                "</span>";
+            expirationHtml = `
+                <span class="badge badge-expiration">
+                    <i class="bi bi-clock-history ms-1"></i>
+                    حذف دائمی تا ${tx.days_left} روز دیگر
+                </span>`;
         }
 
         var actionsHtml = isDeleted
-            ? (
-                '<button type="button" class="btn btn-sm btn-orange-outline" ' +
-                    'data-action="restore-transaction" data-transaction-id="' + escapeHtml(tx.id) + '" title="بازیابی">' +
-                    '<i class="bi bi-arrow-counterclockwise"></i> بازیابی' +
-                '</button>'
-            )
-            : (
-                '<button type="button" class="btn btn-sm btn-outline-secondary" ' +
-                    'data-action="edit-transaction" data-transaction="' + payload + '" title="ویرایش">' +
-                    '<i class="bi bi-pencil"></i>' +
-                '</button>' +
-                '<button type="button" class="btn btn-sm btn-outline-danger" ' +
-                    'data-action="delete-transaction" data-transaction-id="' + escapeHtml(tx.id) + '" title="حذف">' +
-                    '<i class="bi bi-trash"></i>' +
-                '</button>'
-            );
+            ? `
+                <button type="button"
+                    class="btn btn-sm btn-orange-outline"
+                    data-action="restore-transaction"
+                    data-transaction-id="${escapeHtml(tx.id)}"
+                    title="بازیابی">
+                    <i class="bi bi-arrow-counterclockwise"></i> بازیابی
+                </button>`
+                            : `
+                <button type="button"
+                    class="btn btn-sm btn-outline-secondary"
+                    data-action="edit-transaction"
+                    data-transaction="${payload}"
+                    title="ویرایش">
+                    <i class="bi bi-pencil"></i>
+                </button>
+                <button type="button"
+                    class="btn btn-sm btn-outline-danger"
+                    data-action="delete-transaction"
+                    data-transaction-id="${escapeHtml(tx.id)}"
+                    title="حذف">
+                    <i class="bi bi-trash"></i>
+                </button>`
+        ;
 
-        return '' +
-            '<article class="' + cardClass + '" data-transaction-id="' + escapeHtml(tx.id) + '">' +
-                '<div class="transaction-card__left">' +
-                    '<div class="transaction-card__actions">' + actionsHtml + '</div>' +
-                '</div>' +
-                '<div class="transaction-card__middle">' +
-                    '<div class="transaction-card__section-title">توضیحات</div>' +
-                    (description
-                        ? '<p class="transaction-card__description">' + escapeHtml(description) + '</p>' +
-                          '<button type="button" class="transaction-card__toggle-desc" data-action="toggle-description">بیشتر</button>'
-                        : '') +
-                '</div>' +
-                '<div class="transaction-card__right">' +
-                    '<div class="transaction-card__right-top">' +
-                        '<div class="transaction-card__icon transaction-card__icon--' + typeClass + '" aria-hidden="true">' +
-                            '<i class="bi ' + (isDeleted ? 'bi-trash' : typeIcon(tx.type)) + '"></i>' +
-                        '</div>' +
-                        '<div class="transaction-card__info">' +
-                            '<h6 class="transaction-card__title">' + escapeHtml(tx.title) + '</h6>' +
-                            '<div class="transaction-card__meta">' +
-                                '<span class="badge ' + typeBadgeClass(tx.type) + '">' + typeLabel(tx.type) + '</span>' +
-                                '<span class="badge bg-secondary">' + escapeHtml(category) + '</span>' +
-                                (isDeleted
-                                        ? '<span class="badge badge-deleted">حذف‌شده</span>' + expirationHtml
-                                        : ''
-                                ) +
-                            '</div>' +
-                            '<div class="transaction-card__date">' +
-                                '<i class="bi bi-calendar3 ms-1"></i>' +
-                                escapeHtml(typeof formatPersianDate === 'function'
-                                    ? formatPersianDate(tx.transaction_date)
-                                    : (tx.transaction_date || '')) +
-                            '</div>' +
-                        '</div>' +
-                    '</div>' +
-                    '<div class="transaction-card__amount transaction-card__amount--' + typeClass + '">' +
-                        amountHtml +
-                    '</div>' +
-                '</div>' +
-            '</article>';
+        return `
+            <article class="${cardClass}" data-transaction-id="${escapeHtml(tx.id)}">
+                <div class="transaction-card__left">
+                    <div class="transaction-card__actions">
+                        ${actionsHtml}
+                    </div>
+                </div>
+            
+                <div class="transaction-card__middle">
+                    <div class="transaction-card__section-title">توضیحات</div>
+                    ${description ? `
+                    <p class="transaction-card__description">${escapeHtml(description)}</p>
+                    <button type="button"
+                        class="transaction-card__toggle-desc"
+                        data-action="toggle-description">
+                        بیشتر
+                    </button>` : ''}
+                </div>
+            
+                <div class="transaction-card__right">
+                    <div class="transaction-card__right-top">
+                        <div class="transaction-card__icon transaction-card__icon--${typeClass}" aria-hidden="true">
+                            <i class="bi ${isDeleted ? 'bi-trash' : typeIcon(tx.type)}"></i>
+                        </div>
+            
+                        <div class="transaction-card__info">
+                            <h6 class="transaction-card__title">${escapeHtml(tx.title)}</h6>
+            
+                            <div class="transaction-card__meta">
+                                <span class="badge ${typeBadgeClass(tx.type)}">${typeLabel(tx.type)}</span>
+                                <span class="badge bg-secondary">${escapeHtml(category)}</span>
+                                ${isDeleted ? `
+                                <span class="badge badge-deleted">حذف‌شده</span>
+                                ${expirationHtml}` : ''}
+                            </div>
+            
+                            <div class="transaction-card__date">
+                                <i class="bi bi-calendar3 ms-1"></i>
+                                ${escapeHtml(
+                        typeof formatPersianDate === 'function'
+                            ? formatPersianDate(tx.transaction_date)
+                            : (tx.transaction_date || '')
+                    )}
+                            </div>
+                        </div>
+                    </div>
+            
+                    <div class="transaction-card__amount transaction-card__amount--${typeClass}">
+                        ${amountHtml}
+                    </div>
+                </div>
+            </article>`;
     }
 
     function bindDescriptionToggles(container) {
