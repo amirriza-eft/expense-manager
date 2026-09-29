@@ -246,7 +246,6 @@
             $('#tx_date_display').pDatepicker($.extend({}, pickerOptions, {
                 initialValue: true,
                 onSelect: function () {
-                    // Keep hidden Gregorian field in sync for the API
                     var shamsi = document.getElementById('tx_date_display').value;
                     document.getElementById('tx_date').value = convertPersianToGregorian(shamsi);
                 }

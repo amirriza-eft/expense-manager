@@ -1,15 +1,17 @@
 <?php defined('BASEPATH') or exit('No direct script access allowed'); ?>
 
 <?php
-$label = $label ?? '';
-$icon = $icon ?? 'bi-circle';
-$icon_style = $icon_style ?? '';
-$amount = $amount ?? 0;
-$amount_id = $amount_id ?? '';
-$prefix = $prefix ?? '';
-$amount_class = $amount_class ?? 'text-white';
-$amount_style = $amount_style ?? '';
-$subtitle = $subtitle ?? '';
+
+    $label = $label ?? '';
+    $icon = $icon ?? 'bi-circle';
+    $icon_style = $icon_style ?? '';
+    $amount = $amount ?? 0;
+    $amount_id = $amount_id ?? '';
+    $prefix = $prefix ?? '';
+    $amount_class = $amount_class ?? 'text-white';
+    $amount_style = $amount_style ?? '';
+    $subtitle = $subtitle ?? '';
+
 ?>
 
 <div class="col-12 col-sm-6 col-lg-3">
