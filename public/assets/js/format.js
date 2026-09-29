@@ -39,6 +39,28 @@
         return sign + formatNumber(value);
     }
 
+    function formatAmountInput(value) {
+        var english = toEnglishDigits(value);
+
+        english = english.replace(/[^\d]/g, '');
+
+        if (!english) {
+            return '';
+        }
+
+        var formatted = Number(english).toLocaleString('en-US');
+
+        return toPersianDigits(formatted);
+    }
+
+    function getAmountInputValue(value) {
+        var english = toEnglishDigits(value);
+
+        english = english.replace(/[^\d]/g, '');
+
+        return english;
+    }
+
     /**
      * Convert Shamsi date from picker (YYYY/MM/DD) to Gregorian YYYY-MM-DD for APIs.
      * Same logic as the search filters.
@@ -119,6 +141,8 @@
     global.toEnglishDigits = toEnglishDigits;
     global.formatNumber = formatNumber;
     global.formatAmount = formatAmount;
+    global.formatAmountInput = formatAmountInput;
+    global.getAmountInputValue = getAmountInputValue;
     global.convertPersianToGregorian = convertPersianToGregorian;
     global.formatPersianDate = formatPersianDate;
     global.todayGregorianDate = todayGregorianDate;
