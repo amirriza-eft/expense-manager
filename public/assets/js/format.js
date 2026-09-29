@@ -42,14 +42,19 @@
     function formatAmountInput(value) {
         var english = toEnglishDigits(value);
 
-        english = english.replace(/[^\d]/g, '');
+        english = String(english).replace(/,/g, '');
 
         if (!english) {
             return '';
         }
 
-        var formatted = Number(english).toLocaleString('en-US');
+        var number = Number(english);
 
+        if (Number.isNaN(number)) {
+            return '';
+        }
+
+        var formatted = Math.floor(number).toLocaleString('en-US');
         return toPersianDigits(formatted);
     }
 

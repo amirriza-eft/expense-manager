@@ -180,7 +180,9 @@
             document.getElementById('tx_date').value = tx.transaction_date;
         }
 
-        bootstrap.Modal.getOrCreateInstance(document.getElementById('transactionModal')).show();
+        bootstrap.Modal
+            .getOrCreateInstance(document.getElementById('transactionModal'))
+            .show();
     }
 
     function confirmDeleteTransaction(id) {
