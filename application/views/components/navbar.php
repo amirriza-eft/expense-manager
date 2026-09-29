@@ -7,6 +7,7 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title><?= isset($page_title) ? html_escape($page_title) . ' | حساب‌یار' : 'حساب‌یار - مدیریت هوشمند مالی' ?></title>
 
+    <link rel="stylesheet" href="<?= base_url('assets/css/star-background.css') ?>">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;700;900&display=swap"
@@ -27,6 +28,8 @@
     <script src="<?= base_url('assets/js/avatar.js') ?>"></script>
 </head>
 <body>
+
+<?php $this->load->view('components/star_background'); ?>
 
 <nav class="navbar navbar-dark navbar-custom sticky-top">
     <div class="container d-flex align-items-center justify-content-between">
