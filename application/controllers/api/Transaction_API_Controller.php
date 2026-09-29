@@ -6,19 +6,17 @@ require_once(APPPATH.'controllers/api/Base_API_Controller.php');
 
 class Transaction_API_Controller extends Base_API_Controller
 {
-    protected $service;
+    protected $transaction_service;
     protected $validator;
 
     public function __construct()
     {
         parent::__construct();
 
-        $this->load->library('session');
-
         require_once APPPATH.'services/Transaction_service.php';
         require_once APPPATH.'validators/Transaction_validator.php';
 
-        $this->service = new Transaction_service();
+        $this->transaction_service = new Transaction_service();
         $this->validator = new Transaction_validator();
     }
 
@@ -28,7 +26,7 @@ class Transaction_API_Controller extends Base_API_Controller
         $user_id = $this->auth_user();
 
         return $this->json(
-            $this->service->index(
+            $this->transaction_service->index(
                 $user_id,
                 $this->input->get()
             )
@@ -48,7 +46,7 @@ class Transaction_API_Controller extends Base_API_Controller
             ],400);
         }
 
-        $result = $this->service->create($user_id);
+        $result = $this->transaction_service->create($user_id);
 
         return $this->json(
             $result,
@@ -71,7 +69,7 @@ class Transaction_API_Controller extends Base_API_Controller
 
         $id = $this->input->post('id',true);
 
-        $result = $this->service->update(
+        $result = $this->transaction_service->update(
             $user_id,
             $id
         );
@@ -89,7 +87,7 @@ class Transaction_API_Controller extends Base_API_Controller
 
         $id = $this->input->post('id',true);
 
-        $result = $this->service->delete(
+        $result = $this->transaction_service->delete(
             $user_id,
             $id
         );
@@ -106,7 +104,7 @@ class Transaction_API_Controller extends Base_API_Controller
         $user_id = $this->auth_user();
 
         return $this->json(
-            $this->service->deleted($user_id)
+            $this->transaction_service->deleted($user_id)
         );
     }
 
@@ -117,7 +115,7 @@ class Transaction_API_Controller extends Base_API_Controller
 
         $id = $this->input->post('id',true);
 
-        $result = $this->service->restore(
+        $result = $this->transaction_service->restore(
             $user_id,
             $id
         );
