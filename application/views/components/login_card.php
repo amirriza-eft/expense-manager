@@ -42,15 +42,14 @@
         </div>
 
         <div class="d-flex justify-content-between align-items-center mb-4 mt-2">
-            <div class="form-check">
+            <div class="form-check remember-wrapper">
                 <input
-                        class="form-check-input"
                         type="checkbox"
                         value="1"
                         id="rememberMe"
                         name="remember_me"
                 >
-                <label class="form-check-label small text-muted" for="rememberMe">
+                <label for="rememberMe">
                     مرا به خاطر بسپار
                 </label>
             </div>
