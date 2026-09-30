@@ -68,11 +68,12 @@ class Category_model extends CI_Model
 
     public function restore($id, $user_id)
     {
-        $this->db->set('deleted_at', null);
-        $this->db->where('id', $id);
-        $this->db->where('user_id', $user_id);
-        $this->db->where('deleted_at IS NOT NULL', null, false);
-
-        return $this->db->update($this->table);
+        return $this->db
+            ->where('id', $id)
+            ->where('user_id', $user_id)
+            ->where('deleted_at IS NOT NULL', null, false)
+            ->update($this->table, [
+                'deleted_at' => null
+            ]);
     }
 }
