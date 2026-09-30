@@ -44,18 +44,6 @@ class Category_API_Controller extends Base_API_Controller
         );
     }
 
-    public function deleted()
-    {
-        $user_id = $this->auth_user();
-
-        return $this->json(
-
-            $this->category_service
-                ->deleted($user_id)
-        );
-    }
-
-
     public function create()
     {
         $user_id=$this->user();
@@ -102,6 +90,17 @@ class Category_API_Controller extends Base_API_Controller
         return $this->json(
             $result,
             $result['code'] ?? 200
+        );
+    }
+
+    public function deleted()
+    {
+        $user_id = $this->auth_user();
+
+        return $this->json(
+
+            $this->category_service
+                ->deleted($user_id)
         );
     }
 
