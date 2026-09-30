@@ -139,21 +139,78 @@
 
                 </form>
 
-                <div class="mb-2 d-flex justify-content-between align-items-center">
-                    <h6 class="fw-bold text-white mb-0">دسته‌های فعال</h6>
-                    <span id="categoryCount" class="text-muted small">تعداد: ۰</span>
-                </div>
-                <ul id="categoryList" class="list-group list-group-flush p-0 mb-4"></ul>
+                <div class="mb-4">
 
-                <div class="pt-3 border-top" style="border-color: var(--border-subtle) !important;">
-                    <div class="mb-2 d-flex justify-content-between align-items-center">
-                        <div>
-                            <h6 class="fw-bold text-white mb-0">دسته‌های حذف‌شده</h6>
-                            <small class="text-muted">دسته‌های حذف‌شده را می‌توانید بازیابی کنید</small>
-                        </div>
-                        <span id="deletedCategoryCount" class="text-muted small">تعداد: ۰</span>
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h6 class="fw-bold text-white mb-0">
+                            دسته‌های فعال
+                        </h6>
+
+                        <span id="categoryCount" class="text-muted small">
+                            تعداد: ۰
+                        </span>
                     </div>
-                    <ul id="deletedCategoryList" class="list-group list-group-flush p-0"></ul>
+
+                    <div class="mb-3">
+                        <div class="small fw-semibold mb-2"
+                             style="color: var(--accent-orange);">
+                            هزینه
+                        </div>
+
+                        <ul id="expenseCategoryList"
+                            class="list-group list-group-flush p-0"></ul>
+                    </div>
+
+                    <div>
+                        <div class="small fw-semibold mb-2"
+                             style="color: var(--accent-orange);">
+                            درآمد
+                        </div>
+
+                        <ul id="incomeCategoryList"
+                            class="list-group list-group-flush p-0"></ul>
+                    </div>
+
+                </div>
+
+
+                <div class="pt-3 border-top"
+                     style="border-color: var(--border-subtle) !important;">
+
+                    <div class="d-flex justify-content-between align-items-center mb-1">
+                        <h6 class="fw-bold text-white mb-0">
+                            دسته‌های حذف‌شده
+                        </h6>
+
+                        <span id="deletedCategoryCount" class="text-muted small">
+                            تعداد: ۰
+                        </span>
+                    </div>
+
+                    <div class="small text-muted mb-3">
+                        دسته‌های حذف‌شده را می‌توانید بازیابی کنید
+                    </div>
+
+                    <div class="mb-3">
+                        <div class="small fw-semibold mb-2"
+                             style="color: var(--accent-orange);">
+                            هزینه
+                        </div>
+
+                        <ul id="deletedExpenseCategoryList"
+                            class="list-group list-group-flush p-0"></ul>
+                    </div>
+
+                    <div>
+                        <div class="small fw-semibold mb-2"
+                             style="color: var(--accent-orange);">
+                            درآمد
+                        </div>
+
+                        <ul id="deletedIncomeCategoryList"
+                            class="list-group list-group-flush p-0"></ul>
+                    </div>
+
                 </div>
             </div>
         </div>
@@ -165,8 +222,16 @@
 
     var categoryForm = document.getElementById('categoryForm');
     var categoryType = document.getElementById('cat_type');
-    var categoryList = document.getElementById('categoryList');
-    var deletedCategoryList = document.getElementById('deletedCategoryList');
+
+    var expenseCategoryList = document.getElementById('expenseCategoryList');
+    var incomeCategoryList = document.getElementById('incomeCategoryList');
+
+    var deletedExpenseCategoryList =
+        document.getElementById('deletedExpenseCategoryList');
+
+    var deletedIncomeCategoryList =
+        document.getElementById('deletedIncomeCategoryList');
+
     var categoryId = document.getElementById('cat_id');
     var categoryTitle = document.getElementById('cat_title');
     var categorySubmitBtn = document.getElementById('catSubmitBtn');
@@ -174,13 +239,23 @@
 
     function openCreateTransactionModal() {
         document.getElementById('txModalTitle').innerText = 'ثبت تراکنش جدید';
+
         document.getElementById('txForm').reset();
         document.getElementById('tx_id').value = '';
         document.getElementById('txMessage').classList.add('d-none');
 
+        fillCategorySelect(
+            document.getElementById('tx_category'),
+            allCategories,
+            'بدون دسته',
+            document.getElementById('tx_type').value
+        );
+
         if (typeof setTransactionDateDisplay === 'function') {
             setTransactionDateDisplay(
-                typeof todayGregorianDate === 'function' ? todayGregorianDate() : ''
+                typeof todayGregorianDate === 'function'
+                    ? todayGregorianDate()
+                    : ''
             );
         } else {
             document.getElementById('tx_date').value =
@@ -192,12 +267,26 @@
 
     function openEditTransactionModal(tx) {
         document.getElementById('txModalTitle').innerText = 'ویرایش تراکنش';
+
         document.getElementById('tx_id').value = tx.id;
         document.getElementById('tx_title').value = tx.title;
+
         document.getElementById('tx_type').value = tx.type;
-        document.getElementById('tx_category').value = tx.category_id ?? '';
-        document.getElementById('tx_amount').value = formatAmountInput(tx.amount);
-        document.getElementById('tx_description').value = tx.description || '';
+
+        fillCategorySelect(
+            document.getElementById('tx_category'),
+            allCategories,
+            'بدون دسته',
+            tx.type,
+            tx.category_id
+        );
+
+        document.getElementById('tx_amount').value =
+            formatAmountInput(tx.amount);
+
+        document.getElementById('tx_description').value =
+            tx.description || '';
+
         document.getElementById('txMessage').classList.add('d-none');
 
         if (typeof setTransactionDateDisplay === 'function') {
@@ -207,7 +296,9 @@
         }
 
         bootstrap.Modal
-            .getOrCreateInstance(document.getElementById('transactionModal'))
+            .getOrCreateInstance(
+                document.getElementById('transactionModal')
+            )
             .show();
     }
 
@@ -272,12 +363,14 @@
     function resetCategoryForm() {
         categoryId.value = '';
         categoryTitle.value = '';
+        categoryType.value = 'expense';
         categorySubmitBtn.textContent = 'افزودن دسته';
     }
 
     function editCategory(category) {
         categoryId.value = category.id;
         categoryTitle.value = category.title;
+        categoryType.value = category.type;
         categorySubmitBtn.textContent = 'به‌روزرسانی دسته';
         categoryTitle.focus();
     }
@@ -331,80 +424,166 @@
     }
 
     function renderCategories(categories) {
-        categoryList.innerHTML = '';
+        var expenseCategories = (categories || []).filter(function (category) {
+            return category.type === 'expense';
+        });
+
+        var incomeCategories = (categories || []).filter(function (category) {
+            return category.type === 'income';
+        });
+
+        renderActiveCategoryList(
+            expenseCategoryList,
+            expenseCategories,
+            'دسته هزینه‌ای وجود ندارد'
+        );
+
+        renderActiveCategoryList(
+            incomeCategoryList,
+            incomeCategories,
+            'دسته درآمدی وجود ندارد'
+        );
 
         var countEl = document.getElementById('categoryCount');
+
         if (countEl) {
-            countEl.textContent = 'تعداد: ' + formatNumber((categories && categories.length) || 0);
+            countEl.textContent =
+                'تعداد: ' + formatNumber((categories || []).length);
+        }
+    }
+
+
+    function renderActiveCategoryList(list, categories, emptyText) {
+        if (!list) {
+            return;
         }
 
-        if (!categories || !categories.length) {
-            categoryList.innerHTML =
-                '<li class="list-group-item bg-transparent text-muted text-center py-4">دسته‌ای وجود ندارد</li>';
+        list.innerHTML = '';
+
+        if (!categories.length) {
+            list.innerHTML =
+                '<li class="list-group-item bg-transparent text-muted text-center py-3">' +
+                emptyText +
+                '</li>';
+
             return;
         }
 
         categories.forEach(function (category) {
             var li = document.createElement('li');
-            li.className = 'list-group-item bg-transparent text-white d-flex justify-content-between align-items-center py-2 px-1';
+
+            li.className =
+                'list-group-item bg-transparent text-white ' +
+                'd-flex justify-content-between align-items-center py-2 px-1';
 
             var title = document.createElement('span');
+
             title.className = 'small';
             title.textContent = category.title;
 
             var actions = document.createElement('div');
+
             actions.className = 'btn-group btn-group-sm';
+
             actions.innerHTML =
-                '<button type="button" class="btn btn-sm btn-outline-secondary edit-category-btn" title="ویرایش">' +
+                '<button type="button" ' +
+                'class="btn btn-sm btn-outline-secondary edit-category-btn" ' +
+                'title="ویرایش">' +
                 '<i class="bi bi-pencil"></i>' +
                 '</button>' +
-                '<button type="button" class="btn btn-sm btn-outline-danger delete-category-btn" title="حذف">' +
+
+                '<button type="button" ' +
+                'class="btn btn-sm btn-outline-danger delete-category-btn" ' +
+                'title="حذف">' +
                 '<i class="bi bi-trash"></i>' +
                 '</button>';
 
-            actions.querySelector('.edit-category-btn').addEventListener('click', function () {
-                editCategory(category);
-            });
-            actions.querySelector('.delete-category-btn').addEventListener('click', function () {
-                deleteCategory(category.id);
-            });
+            actions
+                .querySelector('.edit-category-btn')
+                .addEventListener('click', function () {
+                    editCategory(category);
+                });
+
+            actions
+                .querySelector('.delete-category-btn')
+                .addEventListener('click', function () {
+                    deleteCategory(category.id);
+                });
 
             li.appendChild(title);
             li.appendChild(actions);
-            categoryList.appendChild(li);
+
+            list.appendChild(li);
         });
     }
 
+
     function renderDeletedCategories(categories) {
-        if (!deletedCategoryList) {
+        var expenseCategories = (categories || []).filter(function (category) {
+            return category.type === 'expense';
+        });
+
+        var incomeCategories = (categories || []).filter(function (category) {
+            return category.type === 'income';
+        });
+
+        renderDeletedCategoryList(
+            deletedExpenseCategoryList,
+            expenseCategories,
+            'دسته هزینه‌ای حذف‌شده‌ای وجود ندارد'
+        );
+
+        renderDeletedCategoryList(
+            deletedIncomeCategoryList,
+            incomeCategories,
+            'دسته درآمدی حذف‌شده‌ای وجود ندارد'
+        );
+
+        var countEl = document.getElementById('deletedCategoryCount');
+
+        if (countEl) {
+            countEl.textContent =
+                'تعداد: ' + formatNumber((categories || []).length);
+        }
+    }
+
+
+    function renderDeletedCategoryList(list, categories, emptyText) {
+        if (!list) {
             return;
         }
 
-        deletedCategoryList.innerHTML = '';
+        list.innerHTML = '';
 
-        var countEl = document.getElementById('deletedCategoryCount');
-        if (countEl) {
-            countEl.textContent = 'تعداد: ' + formatNumber((categories && categories.length) || 0);
-        }
+        if (!categories.length) {
+            list.innerHTML =
+                '<li class="list-group-item bg-transparent text-muted text-center py-3">' +
+                emptyText +
+                '</li>';
 
-        if (!categories || !categories.length) {
-            deletedCategoryList.innerHTML =
-                '<li class="list-group-item bg-transparent text-muted text-center py-4">دسته حذف‌شده‌ای وجود ندارد</li>';
             return;
         }
 
         categories.forEach(function (category) {
             var li = document.createElement('li');
-            li.className = 'list-group-item bg-transparent text-white d-flex justify-content-between align-items-center py-2 px-1 deleted-category-item';
+
+            li.className =
+                'list-group-item bg-transparent text-white ' +
+                'd-flex justify-content-between align-items-center ' +
+                'py-2 px-1 deleted-category-item';
 
             var titleWrap = document.createElement('div');
-            titleWrap.className = 'd-flex align-items-center gap-2 min-w-0';
+
+            titleWrap.className =
+                'd-flex align-items-center gap-2 min-w-0';
 
             var title = document.createElement('span');
+
             title.className = 'small text-truncate';
             title.textContent = category.title;
 
             var badge = document.createElement('span');
+
             badge.className = 'badge badge-deleted';
             badge.textContent = 'حذف‌شده';
 
@@ -412,19 +591,25 @@
             titleWrap.appendChild(badge);
 
             var restoreBtn = document.createElement('button');
+
             restoreBtn.type = 'button';
             restoreBtn.className = 'btn btn-sm btn-orange-outline';
             restoreBtn.title = 'بازیابی';
-            restoreBtn.innerHTML = '<i class="bi bi-arrow-counterclockwise"></i> بازیابی';
+
+            restoreBtn.innerHTML =
+                '<i class="bi bi-arrow-counterclockwise"></i> بازیابی';
+
             restoreBtn.addEventListener('click', function () {
                 restoreCategory(category.id);
             });
 
             li.appendChild(titleWrap);
             li.appendChild(restoreBtn);
-            deletedCategoryList.appendChild(li);
+
+            list.appendChild(li);
         });
     }
+
 
     function loadDeletedCategories() {
         fetch(CATEGORIES_DELETED_API)

@@ -18,19 +18,39 @@
     var TRANSACTION_RESTORE_API = "<?= site_url('api/transaction/restore') ?>";
     var CATEGORIES_API = "<?= site_url('api/categories') ?>";
 
-    function fillCategorySelect(select, categories, emptyLabel) {
+    var allCategories = [];
+
+    function fillCategorySelect(select, categories, emptyLabel, type, selectedId) {
         if (!select) {
             return;
         }
 
         select.innerHTML = '<option value="">' + emptyLabel + '</option>';
 
-        categories.forEach(function (category) {
-            var option = document.createElement('option');
-            option.value = category.id;
-            option.textContent = category.title;
-            select.appendChild(option);
-        });
+        (categories || [])
+            .filter(function (category) {
+                if (!type) {
+                    return true;
+                }
+
+                return category.type === type;
+            })
+            .forEach(function (category) {
+                var option = document.createElement('option');
+
+                option.value = category.id;
+                option.textContent = category.title;
+
+                if (
+                    selectedId !== undefined &&
+                    selectedId !== null &&
+                    String(category.id) === String(selectedId)
+                ) {
+                    option.selected = true;
+                }
+
+                select.appendChild(option);
+            });
     }
 
     function loadCategories() {
@@ -43,20 +63,43 @@
                     return;
                 }
 
+                allCategories = data.categories || [];
+
+                var filterType = document.getElementById('filterType');
+
+                if (filterType) {
+                    filterType.addEventListener('change', function () {
+                        fillCategorySelect(
+                            document.getElementById('filterCategory'),
+                            allCategories,
+                            'همه دسته‌ها',
+                            this.value
+                        );
+
+                        document.getElementById('filterCategory').value = '';
+
+                        loadTransactions(1);
+                    });
+                }
+
+                var transactionType = document.getElementById('tx_type');
+
                 fillCategorySelect(
                     document.getElementById('filterCategory'),
-                    data.categories,
-                    'همه دسته‌ها'
+                    allCategories,
+                    'همه دسته‌ها',
+                    filterType ? filterType.value : ''
                 );
 
                 fillCategorySelect(
                     document.getElementById('tx_category'),
-                    data.categories,
-                    'بدون دسته'
+                    allCategories,
+                    'بدون دسته',
+                    transactionType ? transactionType.value : 'expense'
                 );
 
                 if (typeof renderCategories === 'function') {
-                    renderCategories(data.categories);
+                    renderCategories(allCategories);
                 }
             })
             .catch(function (error) {
@@ -274,6 +317,19 @@
     document.addEventListener('DOMContentLoaded', function () {
         loadCategories();
         loadTransactions(1);
+
+        var transactionType = document.getElementById('tx_type');
+
+        if (transactionType) {
+            transactionType.addEventListener('change', function () {
+                fillCategorySelect(
+                    document.getElementById('tx_category'),
+                    allCategories,
+                    'بدون دسته',
+                    this.value
+                );
+            });
+        }
 
         var deletedModal = document.getElementById('deletedTransactionsModal');
         if (deletedModal) {
