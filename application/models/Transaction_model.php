@@ -434,8 +434,8 @@ class Transaction_model extends CI_Model
             ->row()
             ->amount;
 
-        $income = (float)($income ?? 0);
-        $expense = (float)($expense ?? 0);
+        $income = ($income ?? 0);
+        $expense = ($expense ?? 0);
 
         $balance = $income - $expense;
 
