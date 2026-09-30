@@ -101,17 +101,42 @@
             <div class="modal-body">
                 <form id="categoryForm" class="row g-2 align-items-end mb-4 p-3 rounded"
                       style="background: rgba(255,255,255,0.03);">
+
                     <input type="hidden" id="cat_id" value="">
-                    <div class="col-12 col-md-8">
-                        <label class="form-label small text-muted" for="cat_title">نام دسته</label>
-                        <input type="text" class="form-control" id="cat_title"
-                               placeholder="مثلاً: غذا، ورزش، حقوق" required>
+
+                    <div class="col-12 col-md-5">
+                        <label class="form-label small text-muted" for="cat_title">
+                            نام دسته
+                        </label>
+
+                        <input
+                                type="text"
+                                class="form-control"
+                                id="cat_title"
+                                placeholder="مثلاً: غذا، ورزش، حقوق"
+                                required
+                        >
                     </div>
+
+                    <div class="col-12 col-md-3">
+                        <label class="form-label small text-muted" for="cat_type">
+                            نوع
+                        </label>
+
+                        <select class="form-select" id="cat_type" required>
+                            <option value="expense">هزینه</option>
+                            <option value="income">درآمد</option>
+                        </select>
+                    </div>
+
                     <div class="col-12 col-md-4">
-                        <button type="submit" class="btn btn-orange-glow w-100" id="catSubmitBtn">
+                        <button type="submit"
+                                class="btn btn-orange-glow w-100"
+                                id="catSubmitBtn">
                             افزودن دسته
                         </button>
                     </div>
+
                 </form>
 
                 <div class="mb-2 d-flex justify-content-between align-items-center">
@@ -139,6 +164,7 @@
     var deleteTransactionId = null;
 
     var categoryForm = document.getElementById('categoryForm');
+    var categoryType = document.getElementById('cat_type');
     var categoryList = document.getElementById('categoryList');
     var deletedCategoryList = document.getElementById('deletedCategoryList');
     var categoryId = document.getElementById('cat_id');
@@ -599,6 +625,8 @@
 
         var id = categoryId.value;
         var title = categoryTitle.value.trim();
+        var type = categoryType.value;
+
         if (!title) {
             return;
         }
@@ -610,7 +638,7 @@
         fetch(url, {
             method: 'POST',
             headers: {'Content-Type': 'application/x-www-form-urlencoded'},
-            body: new URLSearchParams({title: title})
+            body: new URLSearchParams({title: title, type: type})
         })
             .then(function (response) {
                 return response.json();
