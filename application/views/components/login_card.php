@@ -41,6 +41,21 @@
             </div>
         </div>
 
+        <div class="d-flex justify-content-between align-items-center mb-4 mt-2">
+            <div class="form-check">
+                <input
+                        class="form-check-input"
+                        type="checkbox"
+                        value="1"
+                        id="rememberMe"
+                        name="remember_me"
+                >
+                <label class="form-check-label small text-muted" for="rememberMe">
+                    مرا به خاطر بسپار
+                </label>
+            </div>
+        </div>
+
         <button type="submit" class="btn btn-orange-glow w-100" id="submitBtn">ورود به حساب</button>
     </form>
 

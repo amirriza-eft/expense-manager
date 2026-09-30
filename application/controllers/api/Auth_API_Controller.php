@@ -16,6 +16,7 @@ class Auth_API_Controller extends Base_API_Controller
         parent::__construct();
 
         $this->load->model('User_model');
+        $this->load->model('Remember_token_model');
 
         require_once APPPATH.'services/Auth_service.php';
         require_once APPPATH.'validators/Auth_validator.php';
@@ -23,7 +24,8 @@ class Auth_API_Controller extends Base_API_Controller
         $this->auth_service =
             new Auth_service(
                 $this->User_model,
-                $this->session
+                $this->session,
+                $this->Remember_token_model
             );
 
         $this->validator =
@@ -66,14 +68,13 @@ class Auth_API_Controller extends Base_API_Controller
 
     public function login()
     {
+        $remember_me = $this->input->post('remember_me', true) === '1';
+
         return $this->json(
-
             $this->auth_service->login(
-
-                $this->input->post('email',true),
-
-                $this->input->post('password')
-
+                $this->input->post('email', true),
+                $this->input->post('password'),
+                $remember_me
             )
         );
     }
@@ -94,11 +95,11 @@ class Auth_API_Controller extends Base_API_Controller
 
     public function logout()
     {
-        $this->session->sess_destroy();
+        $this->auth_service->logout();
 
         return $this->json([
-            'status'=>true,
-            'message'=>'خروج موفق'
+            'status' => true,
+            'message' => 'خروج موفق'
         ]);
     }
 
