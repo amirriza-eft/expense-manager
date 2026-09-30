@@ -41,80 +41,98 @@ class Category_service
     }
 
 
-    public function create($user_id,$title)
+    public function create($user_id, $title, $type)
     {
-        if( !$this->category_policy->can_create($user_id) )
-        {
+        if (!$this->category_policy->can_create($user_id)) {
             return [
-                'status'=>false,
-                'message'=>'ابتدا وارد حساب خود شوید',
-                'code'=>401
+                'status' => false,
+                'message' => 'ابتدا وارد حساب خود شوید',
+                'code' => 401
             ];
         }
 
-        $data=[
-            'user_id'=>$user_id,
-            'title'=>$title
+        if (!$title) {
+            return [
+                'status' => false,
+                'message' => 'نام دسته الزامی است',
+                'code' => 400
+            ];
+        }
+
+        if (!in_array($type, ['income', 'expense'], true)) {
+            return [
+                'status' => false,
+                'message' => 'نوع دسته نامعتبر است',
+                'code' => 400
+            ];
+        }
+
+        $data = [
+            'user_id' => $user_id,
+            'title' => $title,
+            'type' => $type
         ];
 
-        if( $this->category_model->create($data) )
-        {
+        if ($this->category_model->create($data)) {
             return [
-                'status'=>true,
-                'message'=>'دسته‌بندی با موفقیت ایجاد شد'
+                'status' => true,
+                'message' => 'دسته‌بندی با موفقیت ایجاد شد'
             ];
         }
 
         return [
-            'status'=>false,
-            'message'=>'خطا در ایجاد دسته‌بندی',
-            'code'=>500
+            'status' => false,
+            'message' => 'خطا در ایجاد دسته‌بندی',
+            'code' => 500
         ];
     }
 
-    public function update($user_id,$id,$title)
+    public function update($user_id, $id, $title, $type)
     {
-        $cat = $this->category_model->get_by_id($id,$user_id);
+        $cat = $this->category_model->get_by_id($id, $user_id);
 
-        if( !$this->category_policy->can_update($user_id,$cat) )
-        {
+        if (!$this->category_policy->can_update($user_id, $cat)) {
             return [
-                'status'=>false,
-                'message'=>'اجازه ویرایش این دسته را ندارید',
-                'code'=>403
+                'status' => false,
+                'message' => 'اجازه ویرایش این دسته را ندارید',
+                'code' => 403
             ];
         }
 
-        if(!$title){
+        if (!$title) {
             return [
-                'status'=>false,
-                'message'=>'نام دسته الزامی است',
-                'code'=>400
+                'status' => false,
+                'message' => 'نام دسته الزامی است',
+                'code' => 400
             ];
         }
 
-        if(
-            $this->category_model
-                ->update(
-                    $id,
-                    $user_id,
-                    [
-                        'title'=>$title
-                    ]
-                )
-        ){
-
+        if (!in_array($type, ['income', 'expense'], true)) {
             return [
-                'status'=>true,
-                'message'=>'دسته‌بندی با موفقیت بروزرسانی شد'
+                'status' => false,
+                'message' => 'نوع دسته نامعتبر است',
+                'code' => 400
             ];
+        }
 
+        if ($this->category_model->update(
+            $id,
+            $user_id,
+            [
+                'title' => $title,
+                'type' => $type
+            ]
+        )) {
+            return [
+                'status' => true,
+                'message' => 'دسته‌بندی با موفقیت بروزرسانی شد'
+            ];
         }
 
         return [
-            'status'=>false,
-            'message'=>'خطا در بروزرسانی دسته‌بندی',
-            'code'=>500
+            'status' => false,
+            'message' => 'خطا در بروزرسانی دسته‌بندی',
+            'code' => 500
         ];
     }
 

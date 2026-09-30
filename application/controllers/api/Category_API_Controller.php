@@ -52,7 +52,8 @@ class Category_API_Controller extends Base_API_Controller
             $this->category_service
                 ->create(
                     $user_id,
-                    $this->input->post('title',true)
+                    $this->input->post('title',true),
+                    $this->input->post('type', true)
                 );
 
         return $this->json(
@@ -69,7 +70,8 @@ class Category_API_Controller extends Base_API_Controller
                 ->update(
                     $this->user(),
                     $id,
-                    $this->input->post('title',true)
+                    $this->input->post('title',true),
+                    $this->input->post('type', true)
                 );
 
         return $this->json(
