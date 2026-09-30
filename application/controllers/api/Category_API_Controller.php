@@ -8,9 +8,7 @@ require_once(APPPATH.'controllers/api/Base_API_Controller.php');
 
 class Category_API_Controller extends Base_API_Controller
 {
-
     protected $category_service;
-
 
     public function __construct()
     {
@@ -105,7 +103,6 @@ class Category_API_Controller extends Base_API_Controller
             $result,
             $result['code'] ?? 200
         );
-
     }
 
     public function restore($id)

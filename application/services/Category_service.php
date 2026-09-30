@@ -43,7 +43,6 @@ class Category_service
 
     public function create($user_id,$title)
     {
-
         if( !$this->category_policy->can_create($user_id) )
         {
             return [
