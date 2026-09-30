@@ -20,26 +20,37 @@
     </div>
 
     <div class="d-flex justify-content-center align-items-center gap-3 mb-3">
-        <div class="d-inline-flex align-items-center">
-            <span class="me-2 rounded-1"
-                  style="width:10px;height:10px;background:#198754;">
-            </span>
+        <div class="d-flex justify-content-center align-items-center gap-3 mb-3">
+            <div class="d-inline-flex align-items-center">
+                <span class="me-2 rounded-1"
+                      style="width:10px;height:10px;background:#198754;">
+                </span>
 
-            <span class="small text-secondary">
-                درآمد
-            </span>
+                <span class="small text-secondary">
+                    درآمد
+                </span>
+            </div>
+
+            <div class="d-inline-flex align-items-center">
+                <span class="me-2 rounded-1"
+                      style="width:10px;height:10px;background:#dc3545;">
+                </span>
+
+                <span class="small text-secondary">
+                    هزینه
+                </span>
+            </div>
+
+            <div class="d-inline-flex align-items-center">
+                <span class="me-2 rounded-1"
+                      style="width:10px;height:10px;background:#065b8a;">
+                </span>
+
+                <span class="small text-secondary">
+                    موجودی
+                </span>
+            </div>
         </div>
-
-        <div class="d-inline-flex align-items-center">
-            <span class="me-2 rounded-1"
-                  style="width:10px;height:10px;background:#dc3545;">
-            </span>
-
-            <span class="small text-secondary">
-                هزینه
-            </span>
-        </div>
-
     </div>
 
     <div id="hs-curved-area-charts"></div>
@@ -79,6 +90,7 @@
                     let categories = [];
                     let incomes = [];
                     let expenses = [];
+                    let balances = [];
 
                     rows.forEach(function(item){
 
@@ -114,12 +126,17 @@
                             {
                                 name:'هزینه',
                                 data:expenses
+                            },
+                            {
+                                name:'موجودی',
+                                data:balances
                             }
                         ],
 
                         colors:[
                             '#198754',
-                            '#dc3545'
+                            '#dc3545',
+                            '#065b8a'
                         ],
 
                         dataLabels:{
@@ -238,6 +255,21 @@
                             }
                         ]
                     };
+
+                    rows.forEach(function(item){
+
+                        let date = new Date(item.day);
+
+                        let shamsi = date.toLocaleDateString('fa-IR');
+
+                        categories.push(shamsi);
+
+                        incomes.push(Number(item.income) || 0);
+
+                        expenses.push(Number(item.expense) || 0);
+
+                        balances.push(Number(item.balance) || 0);
+                    });
 
                     if(chart){
                         chart.destroy();
