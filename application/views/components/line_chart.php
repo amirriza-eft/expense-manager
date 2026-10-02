@@ -93,16 +93,12 @@
                     let balances = [];
 
                     rows.forEach(function(item){
-
                         let date = new Date(item.day);
 
-                        let shamsi = date.toLocaleDateString('fa-IR');
-
-                        categories.push(shamsi);
-
+                        categories.push(date.toLocaleDateString('fa-IR'));
                         incomes.push(Number(item.income) || 0);
-
                         expenses.push(Number(item.expense) || 0);
+                        balances.push(Number(item.balance) || 0);
                     });
 
                     let options = {
@@ -193,19 +189,15 @@
                                 },
 
                                 formatter:function(value){
+                                    let abs = Math.abs(value);
+                                    let sign = value < 0 ? '-' : '';
 
-                                    if(value >= 1000000){
-                                        return (
-                                                value / 1000000
-                                            ).toLocaleString('fa-IR')
-                                            + ' میلیون';
+                                    if(abs >= 1000000){
+                                        return sign + (abs / 1000000).toLocaleString('fa-IR') + ' میلیون';
                                     }
 
-                                    if(value >= 1000){
-                                        return (
-                                                value / 1000
-                                            ).toLocaleString('fa-IR')
-                                            + ' هزار';
+                                    if(abs >= 1000){
+                                        return sign + (abs / 1000).toLocaleString('fa-IR') + ' هزار';
                                     }
 
                                     return value.toLocaleString('fa-IR');
@@ -255,21 +247,6 @@
                             }
                         ]
                     };
-
-                    rows.forEach(function(item){
-
-                        let date = new Date(item.day);
-
-                        let shamsi = date.toLocaleDateString('fa-IR');
-
-                        categories.push(shamsi);
-
-                        incomes.push(Number(item.income) || 0);
-
-                        expenses.push(Number(item.expense) || 0);
-
-                        balances.push(Number(item.balance) || 0);
-                    });
 
                     if(chart){
                         chart.destroy();

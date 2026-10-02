@@ -363,22 +363,42 @@ class Transaction_model extends CI_Model
         return $this->db->trans_status();
     }
 
-    private function change_budget($user_id, $amount, $type, $add = true)
-    {
-        $value = $amount;
+    private function change_budget(
+        $user_id,
+        $amount,
+        $type,
+        $add = true
+    ) {
+        $value = (float) $amount;
 
         if ($type === 'income') {
-            $add
-                ?
-                $this->db->set('amount', 'amount + ' . $value, false)
-                :
-                $this->db->set('amount', 'amount - ' . $value, false);
+            if ($add) {
+                $this->db->set(
+                    'amount',
+                    'amount + ' . $value,
+                    false
+                );
+            } else {
+                $this->db->set(
+                    'amount',
+                    'amount - ' . $value,
+                    false
+                );
+            }
         } else {
-            $add
-                ?
-                $this->db->set('amount', 'amount - ' . $value, false)
-                :
-                $this->db->set('amount', 'amount + ' . $value, false);
+            if ($add) {
+                $this->db->set(
+                    'amount',
+                    'amount - ' . $value,
+                    false
+                );
+            } else {
+                $this->db->set(
+                    'amount',
+                    'amount + ' . $value,
+                    false
+                );
+            }
         }
 
         return $this->db
@@ -388,56 +408,69 @@ class Transaction_model extends CI_Model
 
     public function get_monthly_income($user_id)
     {
-        return $this->db
+        $from = date(
+            'Y-m-d 00:00:00',
+            strtotime('-29 days')
+        );
+
+        $to = date('Y-m-d 23:59:59');
+
+        $result = $this->db
             ->select_sum('amount')
             ->where('user_id', $user_id)
             ->where('type', 'income')
             ->where('deleted_at IS NULL', null, false)
-            ->where('MONTH(transaction_date)', date('m'))
-            ->where('YEAR(transaction_date)', date('Y'))
+            ->where('transaction_date >=', $from)
+            ->where('transaction_date <=', $to)
             ->get($this->table)
-            ->row()
-            ->amount ?? 0;
+            ->row();
+
+        return (float) ($result->amount ?? 0);
     }
 
     public function get_monthly_expense($user_id)
     {
-        return $this->db
+        $from = date(
+            'Y-m-d 00:00:00',
+            strtotime('-29 days')
+        );
+
+        $to = date('Y-m-d 23:59:59');
+
+        $result = $this->db
             ->select_sum('amount')
             ->where('user_id', $user_id)
             ->where('type', 'expense')
             ->where('deleted_at IS NULL', null, false)
-            ->where('MONTH(transaction_date)', date('m'))
-            ->where('YEAR(transaction_date)', date('Y'))
+            ->where('transaction_date >=', $from)
+            ->where('transaction_date <=', $to)
             ->get($this->table)
-            ->row()
-            ->amount ?? 0;
+            ->row();
+
+        return (float) ($result->amount ?? 0);
     }
 
     public function recalculate_budget($user_id)
     {
-        $income = $this->db
-            ->select_sum('amount')
+        $result = $this->db
+            ->select("
+            COALESCE(
+                SUM(
+                    CASE
+                        WHEN type = 'income' THEN amount
+                        WHEN type = 'expense' THEN -amount
+                        ELSE 0
+                    END
+                ),
+                0
+            ) AS balance
+        ", false)
             ->where('user_id', $user_id)
-            ->where('type', 'income')
             ->where('deleted_at IS NULL', null, false)
             ->get($this->table)
-            ->row()
-            ->amount;
+            ->row();
 
-        $expense = $this->db
-            ->select_sum('amount')
-            ->where('user_id', $user_id)
-            ->where('type', 'expense')
-            ->where('deleted_at IS NULL', null, false)
-            ->get($this->table)
-            ->row()
-            ->amount;
-
-        $income = ($income ?? 0);
-        $expense = ($expense ?? 0);
-
-        $balance = $income - $expense;
+        $balance = (float) ($result->balance ?? 0);
 
         return $this->db
             ->where('user_id', $user_id)

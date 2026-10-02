@@ -27,21 +27,32 @@ class Factory extends CI_Controller
             show_error('You must be logged in.');
         }
 
-        $transactions = [];
+        $count = max(1, (int) $count);
 
-        $start = Carbon::now()->startOfMonth();
-        $end = Carbon::now()->endOfMonth();
+        $start = Carbon::now()
+            ->subDays(29)
+            ->startOfDay();
+
+        $end = Carbon::now()
+            ->endOfDay();
+
+        $this->db
+            ->where('user_id', $user_id)
+            ->where('description', 'Random generated transaction')
+            ->delete('transactions');
+
+        $transactions = [];
 
         for ($i = 0; $i < $count; $i++) {
 
-            $type = rand(0, 1) === 0
+            $type = random_int(0, 1) === 0
                 ? 'income'
                 : 'expense';
 
-            $amount = rand(100000, 5000000);
+            $amount = random_int(100000, 5000000);
 
             $transaction_date = Carbon::createFromTimestamp(
-                rand(
+                random_int(
                     $start->timestamp,
                     $end->timestamp
                 )
@@ -54,19 +65,35 @@ class Factory extends CI_Controller
                 'amount' => $amount,
                 'type' => $type,
                 'category_id' => null,
-                'transaction_date' => $transaction_date->format('Y-m-d H:i:s'),
-                'created_at' => Carbon::now()->format('Y-m-d H:i:s'),
-                'updated_at' => Carbon::now()->format('Y-m-d H:i:s'),
+                'transaction_date' => $transaction_date->format(
+                    'Y-m-d H:i:s'
+                ),
+                'created_at' => Carbon::now()->format(
+                    'Y-m-d H:i:s'
+                ),
+                'updated_at' => Carbon::now()->format(
+                    'Y-m-d H:i:s'
+                ),
             ];
         }
+
+        $this->db->trans_start();
 
         $this->db->insert_batch(
             'transactions',
             $transactions
         );
 
-        $this->Transaction_model->recalculate_budget($user_id);
+        $this->db->trans_complete();
 
-        echo "Generated {$count} transactions successfully.";
+        if (!$this->db->trans_status()) {
+            show_error('Failed to generate transactions.');
+        }
+
+        if (!$this->Transaction_model->recalculate_budget($user_id)) {
+            show_error('Failed to recalculate budget.');
+        }
+
+        echo "Generated {$count} transactions for the last 30 days.";
     }
 }

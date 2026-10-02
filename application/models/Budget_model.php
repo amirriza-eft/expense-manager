@@ -21,107 +21,99 @@ class Budget_model extends CI_Model
 
     public function get_chart_data($user_id, $period = 'monthly')
     {
-        if ($period === 'weekly') {
-            $days = 6;
-        } else {
-            $days = 30;
-        }
+        $days = ($period === 'weekly') ? 7 : 30;
 
-        $from_date = date(
-            'Y-m-d',
-            strtotime("-{$days} days")
-        );
+        $from = date('Y-m-d', strtotime('-' . ($days - 1) . ' days'));
+        $to   = date('Y-m-d');
 
-        $to_date = date('Y-m-d');
+        // Current budget / current balance
+        $budget = $this->db
+            ->select('amount')
+            ->where('user_id', $user_id)
+            ->get('budgets')
+            ->row();
 
-        /*
-         * Get daily income and expense.
-         */
-        $rows = $this->db
-            ->select("
-            DATE(transactions.transaction_date) AS day,
-
-            SUM(
-                CASE
-                    WHEN transactions.type = 'income'
-                    THEN transactions.amount
-                    ELSE 0
-                END
-            ) AS income,
-
-            SUM(
-                CASE
-                    WHEN transactions.type = 'expense'
-                    THEN transactions.amount
-                    ELSE 0
-                END
-            ) AS expense
-        ")
-            ->from('transactions')
-            ->where('transactions.user_id', $user_id)
-            ->where(
-                'transactions.deleted_at IS NULL',
-                null,
-                false
-            )
-            ->where(
-                'transactions.transaction_date >=',
-                $from_date
-            )
-            ->where(
-                'transactions.transaction_date <=',
-                $to_date
-            )
-            ->group_by('DATE(transactions.transaction_date)')
-            ->order_by('day', 'ASC')
-            ->get()
-            ->result();
+        $current_balance = (float) ($budget->amount ?? 0);
 
         /*
-         * Calculate balance for each day.
+         * We assume budgets.amount is the current balance.
          *
-         * We need the balance BEFORE the chart period starts,
-         * then add each day's income/expense.
+         * To find the balance at the beginning of the chart,
+         * remove the net effect of transactions during the chart period.
          */
-        $starting = $this->db
+        $period_net = $this->db
             ->select("
             COALESCE(
                 SUM(
-                    CASE
-                        WHEN type = 'income'
-                        THEN amount
-                        ELSE -amount
-                    END
+                    IF(type = 'income', amount, -amount)
                 ),
                 0
-            ) AS balance
-        ")
-            ->from('transactions')
+            ) AS net
+        ", false)
             ->where('user_id', $user_id)
-            ->where(
-                'deleted_at IS NULL',
-                null,
-                false
-            )
-            ->where(
-                'transaction_date <',
-                $from_date
-            )
-            ->get()
+            ->where('deleted_at IS NULL', null, false)
+            ->where('transaction_date >=', $from)
+            ->where('transaction_date <=', $to . ' 23:59:59')
+            ->get('transactions')
             ->row();
 
-        $balance = (float) ($starting->balance ?? 0);
+        $balance = $current_balance - (float) ($period_net->net ?? 0);
 
-        foreach ($rows as $row) {
+        // Get transactions grouped by day
+        $query = $this->db
+            ->select("DATE(transaction_date) AS day", false)
+            ->select("
+            SUM(
+                IF(type = 'income', amount, 0)
+            ) AS income
+        ", false)
+            ->select("
+            SUM(
+                IF(type = 'expense', amount, 0)
+            ) AS expense
+        ", false)
+            ->where('user_id', $user_id)
+            ->where('deleted_at IS NULL', null, false)
+            ->where('transaction_date >=', $from)
+            ->where('transaction_date <=', $to . ' 23:59:59')
+            ->group_by('DATE(transaction_date)')
+            ->order_by('day', 'ASC')
+            ->get('transactions')
+            ->result();
 
-            $income = (float) $row->income;
-            $expense = (float) $row->expense;
+        // Index transactions by date
+        $totals = [];
+
+        foreach ($query as $row) {
+            $totals[$row->day] = [
+                'income'  => (float) $row->income,
+                'expense' => (float) $row->expense,
+            ];
+        }
+
+        // Build every day
+        $data = [];
+
+        for ($i = 0; $i < $days; $i++) {
+
+            $day = date(
+                'Y-m-d',
+                strtotime($from . ' +' . $i . ' days')
+            );
+
+            $income = $totals[$day]['income'] ?? 0;
+            $expense = $totals[$day]['expense'] ?? 0;
 
             $balance += $income - $expense;
 
-            $row->balance = $balance;
+            $data[] = [
+                'day'     => $day,
+                'income'  => $income,
+                'expense' => $expense,
+                'balance' => $balance,
+            ];
         }
 
-        return $rows;
+        return $data;
     }
 }
