@@ -3,7 +3,7 @@
 <div class="row g-3 mb-5 justify-content-center">
 
     <?php $this->load->view('components/statistics_card', [
-        'label' => 'مانده',
+        'label' => 'موجودی کل',
         'icon' => 'bi-cash-stack brand-icon',
         'amount' => 0,
         'amount_id' => 'dashboardBudgetAmount',
@@ -13,7 +13,7 @@
     ]); ?>
 
     <?php $this->load->view('components/statistics_card', [
-        'label' => 'درآمد ماه جاری',
+        'label' => 'درآمد یک ماه گذشته',
         'icon' => 'bi-arrow-down-left-circle',
         'icon_style' => 'color: var(--income-green);',
         'amount' => 0,
@@ -25,7 +25,7 @@
     ]); ?>
 
     <?php $this->load->view('components/statistics_card', [
-        'label' => 'هزینه ماه جاری',
+        'label' => 'هزینه یک ماه گذشته',
         'icon' => 'bi-arrow-up-right-circle',
         'icon_style' => 'color: var(--expense-red);',
         'amount' => 0,
@@ -39,7 +39,7 @@
 </div>
 
 <script>
-    var DASHBOARD_API = "<?= site_url('api/dashboard') ?>";
+    const DASHBOARD_API = "<?= site_url('api/dashboard') ?>";
 
     function setDashboardAmount(el, prefix, amount) {
         if (!el) {
