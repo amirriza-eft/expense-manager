@@ -57,6 +57,7 @@ $route['login'] = 'Auth/login';
 $route['signup'] = 'Auth/register';
 $route['profile'] = 'Auth/profile';
 
+$route['test'] = 'Home/test';
 
 //=== Auth ===//
 $route['api/auth/register']['POST'] =

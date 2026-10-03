@@ -21,4 +21,9 @@ class Home extends Base_Controller
         $data['page_title'] = 'خانه';
         $this->load->view('home', $data);
     }
+
+    public function test()
+    {
+        $this->load->view('vue.test.php');
+    }
 }
