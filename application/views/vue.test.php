@@ -14,6 +14,7 @@
 <body>
 
 <div id="app">
+
     <div v-if="isLoggedIn">
         <h1>Welcome back!</h1>
         <h2>{{ message }}</h2>
@@ -23,7 +24,21 @@
         <a :href="profileUrl">
             My Profile
         </a>
+
+        <div v-for="transaction in transactions" :key="transaction.id">
+
+            <h4>{{ transaction.title }}:</h4>
+            {{ transaction.amount }}T
+
+
+        </div>
+
     </div>
+
+    <div v-else>
+        <h1>Please login!</h1>
+    </div>
+
 </div>
 
 <script>
@@ -37,7 +52,25 @@
                 isLoggedIn: true,
                 message: 'Amir Eft',
                 age: 25,
-                profileUrl: 'http://localhost:8000/profile'
+                profileUrl: 'http://localhost:8000/profile',
+
+                transactions: [
+                    {
+                        id: 1,
+                        title: 'Salary',
+                        amount: 5000000
+                    },
+                    {
+                        id: 2,
+                        title: 'Food',
+                        amount: 500000
+                    },
+                    {
+                        id: 3,
+                        title: 'Internet',
+                        amount: 200000
+                    }
+                ]
             };
         }
 
