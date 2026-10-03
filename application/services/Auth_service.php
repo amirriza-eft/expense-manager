@@ -252,7 +252,7 @@ class Auth_service
             return false;
         }
 
-        $user = $this->user_model->find_by_id($token->user_id);
+        $user = $this->user_model->find($token->user_id);
 
         if (!$user) {
             $this->remember_token_model
