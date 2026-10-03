@@ -1,6 +1,5 @@
 <?php defined('BASEPATH') or exit('No direct script access allowed'); ?>
 
-<!-- Modal: Create / Edit Transaction -->
 <div class="modal fade" id="transactionModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content glass-panel text-white"
@@ -71,7 +70,6 @@
     </div>
 </div>
 
-<!-- Modal: Delete Transaction Confirmation -->
 <div class="modal fade" id="deleteTxConfirmModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-sm">
         <div class="modal-content glass-panel text-white"
@@ -89,7 +87,6 @@
     </div>
 </div>
 
-<!-- Modal: Category Manager -->
 <div class="modal fade" id="categoryManagerModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-lg">
         <div class="modal-content glass-panel text-white"
@@ -218,24 +215,24 @@
 </div>
 
 <script>
-    var deleteTransactionId = null;
+    let deleteTransactionId = null;
 
-    var categoryForm = document.getElementById('categoryForm');
-    var categoryType = document.getElementById('cat_type');
+    let categoryForm = document.getElementById('categoryForm');
+    let categoryType = document.getElementById('cat_type');
 
-    var expenseCategoryList = document.getElementById('expenseCategoryList');
-    var incomeCategoryList = document.getElementById('incomeCategoryList');
+    let expenseCategoryList = document.getElementById('expenseCategoryList');
+    let incomeCategoryList = document.getElementById('incomeCategoryList');
 
-    var deletedExpenseCategoryList =
+    let deletedExpenseCategoryList =
         document.getElementById('deletedExpenseCategoryList');
 
-    var deletedIncomeCategoryList =
+    let deletedIncomeCategoryList =
         document.getElementById('deletedIncomeCategoryList');
 
-    var categoryId = document.getElementById('cat_id');
-    var categoryTitle = document.getElementById('cat_title');
-    var categorySubmitBtn = document.getElementById('catSubmitBtn');
-    var CATEGORIES_DELETED_API = "<?= site_url('api/categories/deleted') ?>";
+    let categoryId = document.getElementById('cat_id');
+    let categoryTitle = document.getElementById('cat_title');
+    let categorySubmitBtn = document.getElementById('catSubmitBtn');
+    let CATEGORIES_DELETED_API = "<?= site_url('api/categories/deleted') ?>";
 
     function openCreateTransactionModal() {
         document.getElementById('txModalTitle').innerText = 'ثبت تراکنش جدید';
@@ -312,7 +309,7 @@
             return;
         }
 
-        var confirmBtn = document.getElementById('confirmDeleteTxBtn');
+        let confirmBtn = document.getElementById('confirmDeleteTxBtn');
         if (confirmBtn) {
             confirmBtn.disabled = true;
         }
@@ -331,7 +328,7 @@
                     return;
                 }
 
-                var deleteModal = bootstrap.Modal.getInstance(
+                let deleteModal = bootstrap.Modal.getInstance(
                     document.getElementById('deleteTxConfirmModal')
                 );
                 if (deleteModal) {
@@ -424,11 +421,11 @@
     }
 
     function renderCategories(categories) {
-        var expenseCategories = (categories || []).filter(function (category) {
+        let expenseCategories = (categories || []).filter(function (category) {
             return category.type === 'expense';
         });
 
-        var incomeCategories = (categories || []).filter(function (category) {
+        let incomeCategories = (categories || []).filter(function (category) {
             return category.type === 'income';
         });
 
@@ -444,7 +441,7 @@
             'دسته درآمدی وجود ندارد'
         );
 
-        var countEl = document.getElementById('categoryCount');
+        let countEl = document.getElementById('categoryCount');
 
         if (countEl) {
             countEl.textContent =
@@ -470,18 +467,18 @@
         }
 
         categories.forEach(function (category) {
-            var li = document.createElement('li');
+            let li = document.createElement('li');
 
             li.className =
                 'list-group-item bg-transparent text-white ' +
                 'd-flex justify-content-between align-items-center py-2 px-1';
 
-            var title = document.createElement('span');
+            let title = document.createElement('span');
 
             title.className = 'small';
             title.textContent = category.title;
 
-            var actions = document.createElement('div');
+            let actions = document.createElement('div');
 
             actions.className = 'btn-group btn-group-sm';
 
@@ -519,11 +516,11 @@
 
 
     function renderDeletedCategories(categories) {
-        var expenseCategories = (categories || []).filter(function (category) {
+        let expenseCategories = (categories || []).filter(function (category) {
             return category.type === 'expense';
         });
 
-        var incomeCategories = (categories || []).filter(function (category) {
+        let incomeCategories = (categories || []).filter(function (category) {
             return category.type === 'income';
         });
 
@@ -539,7 +536,7 @@
             'دسته درآمدی حذف‌شده‌ای وجود ندارد'
         );
 
-        var countEl = document.getElementById('deletedCategoryCount');
+        let countEl = document.getElementById('deletedCategoryCount');
 
         if (countEl) {
             countEl.textContent =
@@ -565,24 +562,24 @@
         }
 
         categories.forEach(function (category) {
-            var li = document.createElement('li');
+            let li = document.createElement('li');
 
             li.className =
                 'list-group-item bg-transparent text-white ' +
                 'd-flex justify-content-between align-items-center ' +
                 'py-2 px-1 deleted-category-item';
 
-            var titleWrap = document.createElement('div');
+            let titleWrap = document.createElement('div');
 
             titleWrap.className =
                 'd-flex align-items-center gap-2 min-w-0';
 
-            var title = document.createElement('span');
+            let title = document.createElement('span');
 
             title.className = 'small text-truncate';
             title.textContent = category.title;
 
-            var badge = document.createElement('span');
+            let badge = document.createElement('span');
 
             badge.className = 'badge badge-deleted';
             badge.textContent = 'حذف‌شده';
@@ -590,7 +587,7 @@
             titleWrap.appendChild(title);
             titleWrap.appendChild(badge);
 
-            var restoreBtn = document.createElement('button');
+            let restoreBtn = document.createElement('button');
 
             restoreBtn.type = 'button';
             restoreBtn.className = 'btn btn-sm btn-orange-outline';
@@ -629,7 +626,7 @@
 
     document.getElementById('confirmDeleteTxBtn').addEventListener('click', deleteTransaction);
 
-    var categoryManagerModal = document.getElementById('categoryManagerModal');
+    let categoryManagerModal = document.getElementById('categoryManagerModal');
 
     if (categoryManagerModal) {
 
@@ -640,7 +637,7 @@
         categoryManagerModal.addEventListener('hidden.bs.modal', resetCategoryForm);
     }
 
-    var deleteTxConfirmModal = document.getElementById('deleteTxConfirmModal');
+    let deleteTxConfirmModal = document.getElementById('deleteTxConfirmModal');
     if (deleteTxConfirmModal) {
         deleteTxConfirmModal.addEventListener('hidden.bs.modal', function () {
             deleteTransactionId = null;
@@ -651,8 +648,8 @@
     document.getElementById('txForm').addEventListener('submit', function (e) {
         e.preventDefault();
 
-        var form = this;
-        var formData = new FormData(form);
+        let form = this;
+        let formData = new FormData(form);
 
         // Convert Persian amount digits + remove commas
         formData.set(
@@ -660,8 +657,8 @@
             getAmountInputValue(document.getElementById('tx_amount').value)
         );
 
-        var displayDate = document.getElementById('tx_date_display');
-        var hiddenDate = document.getElementById('tx_date');
+        let displayDate = document.getElementById('tx_date_display');
+        let hiddenDate = document.getElementById('tx_date');
 
         // Convert Persian date to Gregorian
         if (displayDate && displayDate.value) {
@@ -673,7 +670,7 @@
 
         // Validate date before sending
         if (!hiddenDate.value) {
-            var messageEarly = document.getElementById('txMessage');
+            let messageEarly = document.getElementById('txMessage');
 
             messageEarly.classList.remove('d-none');
             messageEarly.className = 'alert alert-danger py-2 px-3 small';
@@ -682,14 +679,14 @@
             return;
         }
 
-        var id = document.getElementById('tx_id').value;
+        let id = document.getElementById('tx_id').value;
 
-        var url = id
+        let url = id
             ? "<?= site_url('api/transaction/update/') ?>" + id
             : "<?= site_url('api/transaction/create') ?>";
 
-        var message = document.getElementById('txMessage');
-        var button = form.querySelector('button[type="submit"]');
+        let message = document.getElementById('txMessage');
+        let button = form.querySelector('button[type="submit"]');
 
         button.disabled = true;
         button.textContent = 'در حال ذخیره...';
@@ -704,7 +701,7 @@
             .then(function (text) {
                 console.log('SERVER RESPONSE:', text);
 
-                var data;
+                let data;
 
                 try {
                     data = JSON.parse(text);
@@ -723,8 +720,8 @@
                     return;
                 }
 
-                var modalElement = document.getElementById('transactionModal');
-                var modal = bootstrap.Modal.getInstance(modalElement);
+                let modalElement = document.getElementById('transactionModal');
+                let modal = bootstrap.Modal.getInstance(modalElement);
 
                 if (modal) {
                     modal.hide();
@@ -749,7 +746,7 @@
                         document.body.style.removeProperty('overflow');
                         document.body.style.removeProperty('padding-right');
 
-                        var isCreate = !id;
+                        let isCreate = !id;
 
                         if (typeof loadTransactions === 'function') {
                             loadTransactions(
@@ -790,12 +787,12 @@
 
     if (amountInput) {
         amountInput.addEventListener('input', function () {
-            var cursorPosition = this.selectionStart;
-            var oldValue = this.value;
+            let cursorPosition = this.selectionStart;
+            let oldValue = this.value;
 
             this.value = formatAmountInput(this.value);
 
-            var lengthDifference = this.value.length - oldValue.length;
+            let lengthDifference = this.value.length - oldValue.length;
 
             this.setSelectionRange(
                 cursorPosition + lengthDifference,
@@ -808,15 +805,15 @@
     categoryForm.addEventListener('submit', function (event) {
         event.preventDefault();
 
-        var id = categoryId.value;
-        var title = categoryTitle.value.trim();
-        var type = categoryType.value;
+        let id = categoryId.value;
+        let title = categoryTitle.value.trim();
+        let type = categoryType.value;
 
         if (!title) {
             return;
         }
 
-        var url = id
+        let url = id
             ? "<?= site_url('api/categories/update/') ?>" + id
             : "<?= site_url('api/categories/create') ?>";
 

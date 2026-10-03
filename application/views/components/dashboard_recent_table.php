@@ -12,13 +12,13 @@
 <script src="<?= base_url('assets/js/transactions.js') ?>"></script>
 
 <script>
-    var currentPage = 1;
-    var TRANSACTION_API = "<?= site_url('api/transaction') ?>";
-    var TRANSACTION_DELETED_API = "<?= site_url('api/transaction/deleted') ?>";
-    var TRANSACTION_RESTORE_API = "<?= site_url('api/transaction/restore') ?>";
-    var CATEGORIES_API = "<?= site_url('api/categories') ?>";
+    let currentPage = 1;
+    let TRANSACTION_API = "<?= site_url('api/transaction') ?>";
+    let TRANSACTION_DELETED_API = "<?= site_url('api/transaction/deleted') ?>";
+    let TRANSACTION_RESTORE_API = "<?= site_url('api/transaction/restore') ?>";
+    let CATEGORIES_API = "<?= site_url('api/categories') ?>";
 
-    var allCategories = [];
+    let allCategories = [];
 
     function fillCategorySelect(select, categories, emptyLabel, type, selectedId) {
         if (!select) {
@@ -36,7 +36,7 @@
                 return category.type === type;
             })
             .forEach(function (category) {
-                var option = document.createElement('option');
+                let option = document.createElement('option');
 
                 option.value = category.id;
                 option.textContent = category.title;
@@ -65,7 +65,7 @@
 
                 allCategories = data.categories || [];
 
-                var filterType = document.getElementById('filterType');
+                let filterType = document.getElementById('filterType');
 
                 if (filterType) {
                     filterType.addEventListener('change', function () {
@@ -82,7 +82,7 @@
                     });
                 }
 
-                var transactionType = document.getElementById('tx_type');
+                let transactionType = document.getElementById('tx_type');
 
                 fillCategorySelect(
                     document.getElementById('filterCategory'),
@@ -109,17 +109,17 @@
 
     function renderPagination(pagination) {
 
-        var el = document.getElementById('pagination');
+        let el = document.getElementById('pagination');
 
-        var totalPages = Number(pagination.total_pages);
-        var current = Number(pagination.current_page);
+        let totalPages = Number(pagination.total_pages);
+        let current = Number(pagination.current_page);
 
         if (totalPages <= 1) {
             el.innerHTML = '';
             return;
         }
 
-        var html = '';
+        let html = '';
 
         html += `
             <button
@@ -129,8 +129,8 @@
             </button>
         `;
 
-        var start = Math.max(1, current - 2);
-        var end = Math.min(totalPages, current + 2);
+        let start = Math.max(1, current - 2);
+        let end = Math.min(totalPages, current + 2);
 
         for (let i = start; i <= end; i++) {
 
@@ -160,7 +160,7 @@
     function loadTransactions(page) {
         currentPage = page || 1;
 
-        var params = new URLSearchParams({
+        let params = new URLSearchParams({
             page: currentPage,
             search: document.getElementById('search').value,
             type: document.getElementById('filterType').value,
@@ -175,8 +175,8 @@
                 return res.json();
             })
             .then(function (data) {
-                var list = document.getElementById('transactionList');
-                var countEl = document.getElementById('transactionCount');
+                let list = document.getElementById('transactionList');
+                let countEl = document.getElementById('transactionCount');
 
                 if (!data.status || !data.transactions || !data.transactions.length) {
                     renderTransactionList(list, []);
@@ -185,7 +185,7 @@
                     return;
                 }
 
-                var total = (data.pagination && data.pagination.total != null)
+                let total = (data.pagination && data.pagination.total != null)
                     ? data.pagination.total
                     : data.transactions.length;
 
@@ -200,8 +200,8 @@
     }
 
     function loadDeletedTransactions() {
-        var list = document.getElementById('deletedTransactionList');
-        var countEl = document.getElementById('deletedTransactionCount');
+        let list = document.getElementById('deletedTransactionList');
+        let countEl = document.getElementById('deletedTransactionCount');
 
         if (!list) {
             return;
@@ -216,8 +216,8 @@
                     return;
                 }
 
-                var transactions = data.transactions || [];
-                var countLabel = 'تعداد: ' + formatNumber(transactions.length);
+                let transactions = data.transactions || [];
+                let countLabel = 'تعداد: ' + formatNumber(transactions.length);
 
                 if (countEl) {
                     countEl.textContent = countLabel;
@@ -271,7 +271,7 @@
     }
 
     function initPersianDatePickers() {
-        var pickerOptions = {
+        let pickerOptions = {
             format: 'YYYY/MM/DD',
             autoClose: true,
             initialValue: false,
@@ -289,7 +289,7 @@
             $('#tx_date_display').pDatepicker($.extend({}, pickerOptions, {
                 initialValue: true,
                 onSelect: function () {
-                    var shamsi = document.getElementById('tx_date_display').value;
+                    let shamsi = document.getElementById('tx_date_display').value;
                     document.getElementById('tx_date').value = convertPersianToGregorian(shamsi);
                 }
             }));
@@ -297,13 +297,13 @@
     }
 
     function setTransactionDateDisplay(gregorianDate) {
-        var display = document.getElementById('tx_date_display');
-        var hidden = document.getElementById('tx_date');
+        let display = document.getElementById('tx_date_display');
+        let hidden = document.getElementById('tx_date');
         if (!display || !hidden) {
             return;
         }
 
-        var g = gregorianDate || (typeof todayGregorianDate === 'function'
+        let g = gregorianDate || (typeof todayGregorianDate === 'function'
             ? todayGregorianDate()
             : new Date().toISOString().split('T')[0]);
         hidden.value = g;
@@ -318,7 +318,7 @@
         loadCategories();
         loadTransactions(1);
 
-        var transactionType = document.getElementById('tx_type');
+        let transactionType = document.getElementById('tx_type');
 
         if (transactionType) {
             transactionType.addEventListener('change', function () {
@@ -331,7 +331,7 @@
             });
         }
 
-        var deletedModal = document.getElementById('deletedTransactionsModal');
+        let deletedModal = document.getElementById('deletedTransactionsModal');
         if (deletedModal) {
             deletedModal.addEventListener('show.bs.modal', function () {
                 loadDeletedTransactions();

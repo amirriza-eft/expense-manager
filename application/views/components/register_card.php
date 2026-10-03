@@ -66,8 +66,8 @@
     document.addEventListener('DOMContentLoaded', function () {
         document.querySelectorAll('.toggle-password').forEach(function (btn) {
             btn.addEventListener('click', function () {
-                var input = document.getElementById(this.dataset.target);
-                var icon = this.querySelector('i');
+                let input = document.getElementById(this.dataset.target);
+                let icon = this.querySelector('i');
 
                 if (input.type === 'password') {
                     input.type = 'text';
@@ -82,11 +82,11 @@
         document.getElementById('registerForm').addEventListener('submit', function (e) {
             e.preventDefault();
 
-            var errorBox = document.getElementById('registerError');
-            var successBox = document.getElementById('registerSuccess');
-            var btn = document.getElementById('regSubmitBtn');
-            var password = document.getElementById('password').value;
-            var confirmPassword = document.getElementById('password_confirm').value;
+            let errorBox = document.getElementById('registerError');
+            let successBox = document.getElementById('registerSuccess');
+            let btn = document.getElementById('regSubmitBtn');
+            let password = document.getElementById('password').value;
+            let confirmPassword = document.getElementById('password_confirm').value;
 
             errorBox.classList.add('d-none');
             successBox.classList.add('d-none');

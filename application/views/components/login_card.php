@@ -70,23 +70,23 @@
 
 <script>
     document.addEventListener('DOMContentLoaded', function () {
-        var loginPanel = document.getElementById('loginPanel');
-        var recoveryPanel = document.getElementById('recoveryPanel');
-        var passwordInput = document.getElementById('password');
-        var loginForm = document.getElementById('loginForm');
-        var errorBox = document.getElementById('loginError');
-        var successBox = document.getElementById('loginSuccess');
-        var deletedNotice = document.getElementById('deletedAccountNotice');
-        var deletedMessage = document.getElementById('deletedAccountMessage');
-        var submitBtn = document.getElementById('submitBtn');
-        var showRecoveryBtn = document.getElementById('showRecoveryBtn');
-        var recoveryEmail = document.getElementById('recovery_email');
-        var recoveryPassword = document.getElementById('recovery_password');
+        let loginPanel = document.getElementById('loginPanel');
+        let recoveryPanel = document.getElementById('recoveryPanel');
+        let passwordInput = document.getElementById('password');
+        let loginForm = document.getElementById('loginForm');
+        let errorBox = document.getElementById('loginError');
+        let successBox = document.getElementById('loginSuccess');
+        let deletedNotice = document.getElementById('deletedAccountNotice');
+        let deletedMessage = document.getElementById('deletedAccountMessage');
+        let submitBtn = document.getElementById('submitBtn');
+        let showRecoveryBtn = document.getElementById('showRecoveryBtn');
+        let recoveryEmail = document.getElementById('recovery_email');
+        let recoveryPassword = document.getElementById('recovery_password');
 
         function bindPasswordToggle(button) {
             button.addEventListener('click', function () {
-                var input = document.getElementById(this.dataset.target);
-                var icon = this.querySelector('i');
+                let input = document.getElementById(this.dataset.target);
+                let icon = this.querySelector('i');
                 if (!input) {
                     return;
                 }

@@ -63,11 +63,11 @@
 
 <script>
     document.addEventListener('DOMContentLoaded', function () {
-        var preview = document.getElementById('avatarPreview');
-        var loading = document.getElementById('avatarLoading');
-        var messageBox = document.getElementById('profileMessage');
-        var submitBtn = document.getElementById('profileSubmitBtn');
-        var avatarBase = "<?= base_url('uploads/avatars/') ?>";
+        let preview = document.getElementById('avatarPreview');
+        let loading = document.getElementById('avatarLoading');
+        let messageBox = document.getElementById('profileMessage');
+        let submitBtn = document.getElementById('profileSubmitBtn');
+        let avatarBase = "<?= base_url('uploads/avatars/') ?>";
 
         function showMessage(ok, text) {
             messageBox.classList.remove('d-none');
@@ -91,7 +91,7 @@
                         return;
                     }
 
-                    var user = data.user;
+                    let user = data.user;
                     document.getElementById('full_name').value = user.full_name || '';
                     document.getElementById('email').value = user.email || '';
 
@@ -101,7 +101,7 @@
                         preview.src = avatarBase + user.avatar;
                     }
 
-                    var navbarAvatar = document.getElementById('navbarAvatar');
+                    let navbarAvatar = document.getElementById('navbarAvatar');
                     if (navbarAvatar && typeof setAvatar === 'function') {
                         setAvatar(navbarAvatar, user.avatar, user.full_name, 38);
                     }
@@ -115,12 +115,12 @@
         }
 
         document.getElementById('avatarInput').addEventListener('change', function (e) {
-            var file = e.target.files && e.target.files[0];
+            let file = e.target.files && e.target.files[0];
             if (!file) {
                 return;
             }
 
-            var reader = new FileReader();
+            let reader = new FileReader();
             reader.onload = function (event) {
                 preview.src = event.target.result;
             };
@@ -145,13 +145,13 @@
                         return;
                     }
 
-                    var user = data.user;
+                    let user = data.user;
 
                     if (typeof setAvatar === 'function') {
                         setAvatar(preview, user.avatar, user.full_name, 100);
                     }
 
-                    var navbarAvatar = document.getElementById('navbarAvatar');
+                    let navbarAvatar = document.getElementById('navbarAvatar');
                     if (navbarAvatar && typeof setAvatar === 'function') {
                         setAvatar(navbarAvatar, user.avatar, user.full_name, 38);
                     }

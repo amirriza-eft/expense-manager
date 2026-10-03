@@ -82,7 +82,7 @@
     document.getElementById('passwordForm').addEventListener('submit', function (e) {
         e.preventDefault();
 
-        var box = document.getElementById('passwordMessage');
+        let box = document.getElementById('passwordMessage');
 
         fetch("<?= site_url('api/profile/password') ?>", {
             method: 'POST',
@@ -108,8 +108,8 @@
     });
 
     document.getElementById('deleteAccountBtn').addEventListener('click', function () {
-        var password = document.getElementById('deleteAccountPassword').value;
-        var message = document.getElementById('deleteAccountMessage');
+        let password = document.getElementById('deleteAccountPassword').value;
+        let message = document.getElementById('deleteAccountMessage');
 
         if (!password) {
             message.classList.remove('d-none');
