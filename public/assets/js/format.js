@@ -7,14 +7,14 @@
 (function (global) {
     'use strict';
 
-    var PERSIAN_DIGITS = '۰۱۲۳۴۵۶۷۸۹';
-    var ENGLISH_DIGITS = '0123456789';
+    let PERSIAN_DIGITS = '۰۱۲۳۴۵۶۷۸۹';
+    let ENGLISH_DIGITS = '0123456789';
 
     function toNumber(value) {
         if (value === null || value === undefined || value === '') {
             return 0;
         }
-        var n = Number(value);
+        let n = Number(value);
         return Number.isFinite(n) ? n : 0;
     }
 
@@ -35,12 +35,12 @@
     }
 
     function formatAmount(value, type) {
-        var sign = type === 'income' ? '+' : type === 'expense' ? '-' : '';
+        let sign = type === 'income' ? '+' : type === 'expense' ? '-' : '';
         return sign + formatNumber(value);
     }
 
     function formatAmountInput(value) {
-        var english = toEnglishDigits(value);
+        let english = toEnglishDigits(value);
 
         english = String(english).replace(/,/g, '');
 
@@ -48,18 +48,18 @@
             return '';
         }
 
-        var number = Number(english);
+        let number = Number(english);
 
         if (Number.isNaN(number)) {
             return '';
         }
 
-        var formatted = Math.floor(number).toLocaleString('en-US');
+        let formatted = Math.floor(number).toLocaleString('en-US');
         return toPersianDigits(formatted);
     }
 
     function getAmountInputValue(value) {
-        var english = toEnglishDigits(value);
+        let english = toEnglishDigits(value);
 
         english = english.replace(/[^\d]/g, '');
 
@@ -81,12 +81,12 @@
 
         date = toEnglishDigits(String(date).trim());
 
-        var parts = date.split(/[\/\-]/);
+        let parts = date.split(/[\/\-]/);
         if (parts.length < 3) {
             return '';
         }
 
-        var pDate = new persianDate([
+        let pDate = new persianDate([
             Number(parts[0]),
             Number(parts[1]),
             Number(parts[2])
@@ -104,16 +104,16 @@
             return '';
         }
 
-        var raw = toEnglishDigits(String(date).trim()).substring(0, 10);
-        var parts = raw.split(/[\/\-]/);
+        let raw = toEnglishDigits(String(date).trim()).substring(0, 10);
+        let parts = raw.split(/[\/\-]/);
 
         if (parts.length < 3) {
             return toPersianDigits(date);
         }
 
-        var year = Number(parts[0]);
-        var month = Number(parts[1]);
-        var day = Number(parts[2]);
+        let year = Number(parts[0]);
+        let month = Number(parts[1]);
+        let day = Number(parts[2]);
 
         if (!year || !month || !day) {
             return toPersianDigits(date);
@@ -124,15 +124,15 @@
         }
 
         // Build from Gregorian Date — same library family as search filters
-        var formatted = new persianDate(new Date(year, month - 1, day)).format('YYYY/MM/DD');
+        let formatted = new persianDate(new Date(year, month - 1, day)).format('YYYY/MM/DD');
         return toPersianDigits(toEnglishDigits(formatted));
     }
 
     /** Local calendar YYYY-MM-DD (not UTC) for form defaults. */
     function todayGregorianDate() {
-        var d = new Date();
-        var month = String(d.getMonth() + 1);
-        var day = String(d.getDate());
+        let d = new Date();
+        let month = String(d.getMonth() + 1);
+        let day = String(d.getDate());
         if (month.length < 2) {
             month = '0' + month;
         }

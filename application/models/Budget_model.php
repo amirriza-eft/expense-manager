@@ -26,7 +26,6 @@ class Budget_model extends CI_Model
         $from = date('Y-m-d', strtotime('-' . ($days - 1) . ' days'));
         $to   = date('Y-m-d');
 
-        // Current budget / current balance
         $budget = $this->db
             ->select('amount')
             ->where('user_id', $user_id)
@@ -35,12 +34,6 @@ class Budget_model extends CI_Model
 
         $current_balance = (float) ($budget->amount ?? 0);
 
-        /*
-         * We assume budgets.amount is the current balance.
-         *
-         * To find the balance at the beginning of the chart,
-         * remove the net effect of transactions during the chart period.
-         */
         $period_net = $this->db
             ->select("
             COALESCE(
@@ -59,7 +52,6 @@ class Budget_model extends CI_Model
 
         $balance = $current_balance - (float) ($period_net->net ?? 0);
 
-        // Get transactions grouped by day
         $query = $this->db
             ->select("DATE(transaction_date) AS day", false)
             ->select("
@@ -81,7 +73,6 @@ class Budget_model extends CI_Model
             ->get('transactions')
             ->result();
 
-        // Index transactions by date
         $totals = [];
 
         foreach ($query as $row) {
@@ -91,7 +82,6 @@ class Budget_model extends CI_Model
             ];
         }
 
-        // Build every day
         $data = [];
 
         for ($i = 0; $i < $days; $i++) {

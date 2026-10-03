@@ -1,14 +1,11 @@
-/**
- * Shared avatar URL helpers and graceful fallbacks.
- */
 (function (global) {
     'use strict';
 
-    var AVATAR_BASE = global.APP_AVATAR_BASE || '/uploads/avatars/';
+    let AVATAR_BASE = global.APP_AVATAR_BASE || '/uploads/avatars/';
 
     function fallbackAvatarUrl(name, size) {
         size = size || 100;
-        var initial = (name || 'ک').trim().charAt(0) || 'ک';
+        let initial = (name || 'ک').trim().charAt(0) || 'ک';
         return 'https://placehold.co/' + size + 'x' + size + '/1e1e24/ff6b00?text=' + encodeURIComponent(initial);
     }
 

@@ -1,6 +1,3 @@
-/**
- * Transaction list / card rendering (presentation only).
- */
 (function (global) {
     'use strict';
 
@@ -29,19 +26,19 @@
     function buildTransactionCard(tx, options) {
         options = options || {};
 
-        var isDeleted = !!options.deleted;
-        var isIncome = tx.type === 'income';
-        var typeClass = isIncome ? 'income' : 'expense';
-        var category = tx.category_name || 'بدون دسته';
-        var description = (tx.description || '').trim();
+        let isDeleted = !!options.deleted;
+        let isIncome = tx.type === 'income';
+        let typeClass = isIncome ? 'income' : 'expense';
+        let category = tx.category_name || 'بدون دسته';
+        let description = (tx.description || '').trim();
 
-        var amountHtml = typeof formatAmount === 'function'
+        let amountHtml = typeof formatAmount === 'function'
             ? formatAmount(tx.amount, tx.type)
             : `${isIncome ? '+' : '-'}${Number(tx.amount).toLocaleString('fa-IR')}`;
 
-        var payload = encodeURIComponent(JSON.stringify(tx));
-        var cardClass = `transaction-card${isDeleted ? ' transaction-card--deleted' : ''}`;
-        var expirationHtml = '';
+        let payload = encodeURIComponent(JSON.stringify(tx));
+        let cardClass = `transaction-card${isDeleted ? ' transaction-card--deleted' : ''}`;
+        let expirationHtml = '';
 
         if (isDeleted && tx.days_left !== undefined) {
             expirationHtml = `
@@ -51,7 +48,7 @@
                 </span>`;
         }
 
-        var actionsHtml = isDeleted
+        let actionsHtml = isDeleted
             ? `
                 <button type="button"
                     class="btn btn-sm btn-orange-outline"
@@ -133,8 +130,8 @@
 
     function bindDescriptionToggles(container) {
         container.querySelectorAll('.transaction-card').forEach(function (card) {
-            var desc = card.querySelector('.transaction-card__description');
-            var toggle = card.querySelector('[data-action="toggle-description"]');
+            let desc = card.querySelector('.transaction-card__description');
+            let toggle = card.querySelector('[data-action="toggle-description"]');
             if (!desc || !toggle) {
                 return;
             }
@@ -144,7 +141,7 @@
             }
 
             toggle.addEventListener('click', function () {
-                var expanded = desc.classList.toggle('is-expanded');
+                let expanded = desc.classList.toggle('is-expanded');
                 toggle.textContent = expanded ? 'کمتر' : 'بیشتر';
             });
         });
@@ -157,7 +154,7 @@
             return;
         }
 
-        var emptyText = options.emptyText || 'تراکنشی وجود ندارد';
+        let emptyText = options.emptyText || 'تراکنشی وجود ندارد';
 
         if (!transactions || !transactions.length) {
             container.innerHTML =
@@ -182,10 +179,10 @@
         container.dataset.actionsBound = '1';
 
         container.addEventListener('click', function (event) {
-            var editBtn = event.target.closest('[data-action="edit-transaction"]');
+            let editBtn = event.target.closest('[data-action="edit-transaction"]');
             if (editBtn) {
                 try {
-                    var tx = JSON.parse(decodeURIComponent(editBtn.getAttribute('data-transaction')));
+                    let tx = JSON.parse(decodeURIComponent(editBtn.getAttribute('data-transaction')));
                     if (typeof openEditTransactionModal === 'function') {
                         openEditTransactionModal(tx);
                     }
@@ -195,13 +192,13 @@
                 return;
             }
 
-            var deleteBtn = event.target.closest('[data-action="delete-transaction"]');
+            let deleteBtn = event.target.closest('[data-action="delete-transaction"]');
             if (deleteBtn && typeof confirmDeleteTransaction === 'function') {
                 confirmDeleteTransaction(Number(deleteBtn.getAttribute('data-transaction-id')));
                 return;
             }
 
-            var restoreBtn = event.target.closest('[data-action="restore-transaction"]');
+            let restoreBtn = event.target.closest('[data-action="restore-transaction"]');
             if (restoreBtn && typeof restoreTransaction === 'function') {
                 restoreTransaction(Number(restoreBtn.getAttribute('data-transaction-id')));
             }
