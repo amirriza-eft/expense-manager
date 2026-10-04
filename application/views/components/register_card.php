@@ -1,6 +1,6 @@
 <?php defined('BASEPATH') or exit('No direct script access allowed'); ?>
 
-<div class="glass-panel p-4 p-sm-5 shadow-lg border" style="border-color:var(--border-subtle)!important;">
+<div id="register-app" class="glass-panel p-4 p-sm-5 shadow-lg border" style="border-color:var(--border-subtle)!important;">
     <div class="text-center mb-4">
         <a href="<?= site_url('home') ?>" class="d-inline-block mb-3">
             <i class="bi bi-wallet2 brand-icon" style="font-size:2.75rem;"></i>
@@ -9,15 +9,15 @@
         <p class="text-muted small">مدیریت هوشمند درآمدها و هزینه‌های خود را آغاز کنید</p>
     </div>
 
-    <div id="registerError" class="alert alert-danger py-2 px-3 small border-0 d-none"></div>
-    <div id="registerSuccess" class="alert alert-success py-2 px-3 small border-0 d-none"></div>
+    <div v-if="error" class="alert alert-danger py-2 px-3 small border-0">{{ error }}</div>
+    <div v-if="success" class="alert alert-success py-2 px-3 small border-0">{{ success }}</div>
 
-    <form id="registerForm">
+    <form @submit.prevent="register">
         <div class="mb-3">
             <label class="form-label text-light small fw-medium">نام و نام خانوادگی</label>
             <div class="input-group">
                 <span class="input-group-text"><i class="bi bi-person"></i></span>
-                <input type="text" class="form-control" name="full_name" placeholder="مثل: بابک زنجانی" required>
+                <input type="text" class="form-control" name="full_name" placeholder="مثل: بابک زنجانی" v-model="full_name" required>
             </div>
         </div>
 
@@ -25,7 +25,7 @@
             <label class="form-label text-light small fw-medium">ایمیل</label>
             <div class="input-group">
                 <span class="input-group-text"><i class="bi bi-envelope"></i></span>
-                <input type="email" class="form-control" name="email" placeholder="name@example.com" required>
+                <input type="email" class="form-control" name="email" placeholder="name@example.com" v-model="email" required>
             </div>
         </div>
 
@@ -33,10 +33,9 @@
             <label class="form-label text-light small fw-medium">رمز عبور</label>
             <div class="input-group">
                 <span class="input-group-text"><i class="bi bi-shield-lock"></i></span>
-                <input type="password" class="form-control" id="password" name="password"
-                       placeholder="حداقل ۸ کاراکتر" required>
-                <button type="button" class="input-group-text toggle-password" data-target="password">
-                    <i class="bi bi-eye"></i>
+                <input :type="showPassword ? 'text' : 'password'" class="form-control" name="password" placeholder="حداقل ۸ کاراکتر" v-model="password" required>
+                <button type="button" class="input-group-text toggle-password" @click="showPassword = !showPassword">
+                    <i :class="showPassword ? 'bi bi-eye-slash' : 'bi bi-eye'"></i>
                 </button>
             </div>
         </div>
@@ -45,15 +44,16 @@
             <label class="form-label text-light small fw-medium">تکرار رمز عبور</label>
             <div class="input-group">
                 <span class="input-group-text"><i class="bi bi-shield-check"></i></span>
-                <input type="password" class="form-control" id="password_confirm" name="password_confirm"
-                       placeholder="تکرار رمز عبور" required>
-                <button type="button" class="input-group-text toggle-password" data-target="password_confirm">
-                    <i class="bi bi-eye"></i>
+                <input :type="showPasswordConfirm ? 'text' : 'password'" class="form-control" name="password_confirm" placeholder="تکرار رمز عبور" v-model="password_confirm" required>
+                <button type="button" class="input-group-text toggle-password" @click="showPasswordConfirm = !showPasswordConfirm">
+                    <i :class="showPasswordConfirm ? 'bi bi-eye-slash' : 'bi bi-eye'"></i>
                 </button>
             </div>
         </div>
 
-        <button type="submit" class="btn btn-orange-glow w-100" id="regSubmitBtn">ایجاد حساب کاربری</button>
+        <button type="submit" class="btn btn-orange-glow w-100" :disabled="loading">
+            {{ loading ? 'در حال ثبت نام...' : 'ایجاد حساب کاربری' }}
+        </button>
     </form>
 
     <div class="text-center mt-4 pt-3 border-top" style="border-color:var(--border-subtle)!important;">
@@ -62,69 +62,69 @@
     </div>
 </div>
 
+<script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+
 <script>
-    document.addEventListener('DOMContentLoaded', function () {
-        document.querySelectorAll('.toggle-password').forEach(function (btn) {
-            btn.addEventListener('click', function () {
-                let input = document.getElementById(this.dataset.target);
-                let icon = this.querySelector('i');
+    const { createApp } = Vue;
 
-                if (input.type === 'password') {
-                    input.type = 'text';
-                    icon.classList.replace('bi-eye', 'bi-eye-slash');
-                } else {
-                    input.type = 'password';
-                    icon.classList.replace('bi-eye-slash', 'bi-eye');
+    createApp({
+        data() {
+            return {
+                full_name: '',
+                email: '',
+                password: '',
+                password_confirm: '',
+                showPassword: false,
+                showPasswordConfirm: false,
+                loading: false,
+                error: '',
+                success: ''
+            };
+        },
+
+        methods: {
+            async register() {
+                this.error = '';
+                this.success = '';
+
+                if (this.password !== this.password_confirm) {
+                    this.error = 'رمز عبور و تکرار آن یکسان نیست';
+                    return;
                 }
-            });
-        });
 
-        document.getElementById('registerForm').addEventListener('submit', function (e) {
-            e.preventDefault();
+                this.loading = true;
 
-            let errorBox = document.getElementById('registerError');
-            let successBox = document.getElementById('registerSuccess');
-            let btn = document.getElementById('regSubmitBtn');
-            let password = document.getElementById('password').value;
-            let confirmPassword = document.getElementById('password_confirm').value;
+                try {
+                    const formData = new FormData();
 
-            errorBox.classList.add('d-none');
-            successBox.classList.add('d-none');
+                    formData.append('full_name', this.full_name);
+                    formData.append('email', this.email);
+                    formData.append('password', this.password);
+                    formData.append('password_confirm', this.password_confirm);
 
-            if (password !== confirmPassword) {
-                errorBox.textContent = 'رمز عبور و تکرار آن یکسان نیست';
-                errorBox.classList.remove('d-none');
-                return;
-            }
+                    const response = await axios.post(
+                        "<?= site_url('api/auth/register') ?>",
+                        formData
+                    );
 
-            btn.disabled = true;
-            btn.textContent = 'در حال ثبت نام...';
+                    const data = response.data;
 
-            fetch("<?= site_url('api/auth/register') ?>", {
-                method: 'POST',
-                body: new FormData(this)
-            })
-                .then(function (response) { return response.json(); })
-                .then(function (data) {
                     if (data.status) {
-                        successBox.innerHTML = data.message;
-                        successBox.classList.remove('d-none');
-                        setTimeout(function () {
+                        this.success = data.message;
+
+                        setTimeout(() => {
                             window.location.href = "<?= site_url('login') ?>";
                         }, 1000);
                     } else {
-                        errorBox.innerHTML = data.message;
-                        errorBox.classList.remove('d-none');
+                        this.error = data.message;
                     }
-                })
-                .catch(function () {
-                    errorBox.textContent = 'خطا در ارتباط با سرور';
-                    errorBox.classList.remove('d-none');
-                })
-                .finally(function () {
-                    btn.disabled = false;
-                    btn.textContent = 'ایجاد حساب کاربری';
-                });
-        });
-    });
+                } catch (error) {
+                    this.error = 'خطا در ارتباط با سرور';
+                } finally {
+                    this.loading = false;
+                }
+            }
+        }
+    }).mount('#register-app');
 </script>
