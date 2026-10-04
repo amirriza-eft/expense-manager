@@ -281,13 +281,15 @@ class Auth_service
             'remember_me',
             '',
             [
-                'expires' => time() - 3600,
+                'expires' => 1,
                 'path' => '/',
                 'secure' => !empty($_SERVER['HTTPS']),
                 'httponly' => true,
                 'samesite' => 'Lax'
             ]
         );
+
+        unset($_COOKIE['remember_me']);
     }
 
 
@@ -303,17 +305,7 @@ class Auth_service
             }
         }
 
-        setcookie(
-            'remember_me',
-            '',
-            [
-                'expires' => time() - 3600,
-                'path' => '/',
-                'secure' => !empty($_SERVER['HTTPS']),
-                'httponly' => true,
-                'samesite' => 'Lax'
-            ]
-        );
+        $this->forget_remember_cookie();
 
         $this->session->sess_destroy();
     }

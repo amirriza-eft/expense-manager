@@ -31,7 +31,7 @@ class Migration_Create_transactions extends CI_Migration
 
             'amount' => [
                 'type' => 'DECIMAL',
-                'constraint' => '12,2'
+                'constraint' => '18, 2'
             ],
 
             'type' => [
