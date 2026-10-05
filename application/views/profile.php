@@ -10,9 +10,9 @@
                     پروفایل کاربری
                 </h3>
 
-                <?php $this->load->view('components/profile_info_card'); ?>
+                <?php $this->load->view('profile/info_card'); ?>
 
-                <?php $this->load->view('components/profile_password_card'); ?>
+                <?php $this->load->view('profile/password_card'); ?>
 
             </div>
         </div>

@@ -50,7 +50,7 @@
                     <span class="d-none d-sm-inline">خروج</span>
                 </a>
                 <a href="<?= site_url('profile') ?>" class="text-decoration-none" title="پروفایل">
-                    <?php $this->load->view('components/profile_avatar', [
+                    <?php $this->load->view('profile/avatar', [
                             'avatar_filename' => $avatar,
                             'user_name' => $user_name,
                             'size' => 38,

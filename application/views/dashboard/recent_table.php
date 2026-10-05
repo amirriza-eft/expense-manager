@@ -2,10 +2,10 @@
 
 <link rel="stylesheet" href="<?= base_url('assets/css/transactions.css') ?>">
 
-<?php $this->load->view('components/transaction_filters'); ?>
-<?php $this->load->view('components/transaction_toolbar'); ?>
-<?php $this->load->view('components/transaction_list'); ?>
-<?php $this->load->view('components/deleted_transactions_modal'); ?>
+<?php $this->load->view('transactions/filters'); ?>
+<?php $this->load->view('transactions/toolbar'); ?>
+<?php $this->load->view('transactions/list'); ?>
+<?php $this->load->view('transactions/deleted_modal'); ?>
 
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/persian-datepicker@1.2.0/dist/js/persian-datepicker.min.js"></script>

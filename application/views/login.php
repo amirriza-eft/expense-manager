@@ -8,7 +8,7 @@
         <div class="container position-relative">
             <div class="row justify-content-center">
                 <div class="col-md-8 col-lg-5 col-xl-4">
-                    <?php $this->load->view('components/login_card'); ?>
+                    <?php $this->load->view('auth/login_card'); ?>
                 </div>
             </div>
         </div>

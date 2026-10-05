@@ -60,7 +60,7 @@
 
     </div>
 
-    <?php $this->load->view('components/account_recovery_card'); ?>
+    <?php $this->load->view('auth/account_recovery_card'); ?>
 
 </div>
 

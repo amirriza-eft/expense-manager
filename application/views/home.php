@@ -28,11 +28,11 @@
         </div>
     </div>
 
-    <?php $this->load->view('components/dashboard_summary'); ?>
+    <?php $this->load->view('dashboard/summary'); ?>
     <br>
-    <?php $this->load->view('components/dashboard_recent_table'); ?>
+    <?php $this->load->view('dashboard/recent_table'); ?>
 </div>
 
 <?php $this->load->view('components/budget_modals'); ?>
-<?php $this->load->view('components/line_chart.php'); ?>
+<?php $this->load->view('dashboard/line_chart.php'); ?>
 <?php $this->load->view('components/footer'); ?>

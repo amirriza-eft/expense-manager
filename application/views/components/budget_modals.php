@@ -1,8 +1,8 @@
 <?php defined('BASEPATH') or exit('No direct script access allowed'); ?>
 
 <?php
-$this->load->view('components/transaction_modal');
-$this->load->view('components/delete_transaction_modal');
+$this->load->view('transactions/modal');
+$this->load->view('transactions/delete_modal');
 $this->load->view('components/category_manager_modal');
 ?>
 
