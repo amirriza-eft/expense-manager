@@ -30,9 +30,9 @@
 
     <?php $this->load->view('dashboard/summary'); ?>
     <br>
-    <?php $this->load->view('dashboard/recent_table'); ?>
+    <?php $this->load->view('transactions/recent_table'); ?>
 </div>
 
-<?php $this->load->view('components/budget_modals'); ?>
-<?php $this->load->view('dashboard/line_chart.php'); ?>
+<?php $this->load->view('transactions/budget_modals'); ?>
+<?php $this->load->view('dashboard/line_chart'); ?>
 <?php $this->load->view('components/footer'); ?>

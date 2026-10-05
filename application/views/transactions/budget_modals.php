@@ -3,7 +3,7 @@
 <?php
 $this->load->view('transactions/modal');
 $this->load->view('transactions/delete_modal');
-$this->load->view('components/category_manager_modal');
+$this->load->view('transactions/category_manager_modal');
 ?>
 
 <script>
