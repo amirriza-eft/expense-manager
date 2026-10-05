@@ -8,7 +8,6 @@
     <div class="container position-relative">
         <div class="row justify-content-center">
             <div class="col-md-9 col-lg-6 col-xl-5">
-                <!-- Component: Register Card -->
                 <?php $this->load->view('components/register_card'); ?>
             </div>
         </div>
