@@ -11,9 +11,6 @@
                 </h3>
 
                 <?php $this->load->view('profile/info_card'); ?>
-
-                <?php $this->load->view('profile/password_card'); ?>
-
             </div>
         </div>
     </div>

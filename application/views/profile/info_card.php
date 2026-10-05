@@ -1,170 +1,245 @@
 <?php defined('BASEPATH') or exit('No direct script access allowed'); ?>
 
-<div class="glass-panel p-4 mb-4">
-    <h5 class="fw-bold text-white mb-4 border-bottom pb-2"
-        style="border-color:var(--border-subtle)!important;">
-        اطلاعات کاربری و تصویر پروفایل
-    </h5>
+<div id="profile-app">
+    <div class="glass-panel p-4 mb-4">
+        <h5 class="fw-bold text-white mb-4 border-bottom pb-2"
+            style="border-color:var(--border-subtle)!important;">
+            اطلاعات کاربری و تصویر پروفایل
+        </h5>
 
-    <div id="profileMessage" class="alert d-none py-2 px-3 small"></div>
+        <div v-if="profileMessage"
+             :class="profileMessageSuccess ? 'alert alert-success py-2 px-3 small' : 'alert alert-danger py-2 px-3 small'">
+            {{ profileMessage }}
+        </div>
 
-    <form id="profileForm" enctype="multipart/form-data">
-        <div class="d-flex flex-column flex-sm-row align-items-center gap-4 mb-4">
-            <div class="profile-avatar-wrap position-relative">
-                <?php
-                $session_name = $this->session->userdata('user_name')
-                    ?: ($this->session->userdata('full_name') ?: 'کاربر');
-                $this->load->view('profile/avatar', [
-                    'avatar_filename' => $this->session->userdata('user_avatar'),
-                    'user_name' => $session_name,
-                    'size' => 100,
-                    'css_class' => 'rounded-circle border profile-avatar-preview',
-                    'element_id' => 'avatarPreview',
-                    'alt' => 'آواتار پروفایل',
-                ]);
-                ?>
-                <div id="avatarLoading"
-                     class="profile-avatar-loading d-none"
-                     aria-hidden="true">
-                    <div class="spinner-border spinner-border-sm text-warning" role="status"></div>
+        <form @submit.prevent="updateProfile" enctype="multipart/form-data">
+            <div class="d-flex flex-column flex-sm-row align-items-center gap-4 mb-4">
+                <div class="profile-avatar-wrap position-relative">
+                    <?php
+                    $session_name = $this->session->userdata('user_name')
+                            ?: ($this->session->userdata('full_name') ?: 'کاربر');
+                    $this->load->view('profile/avatar', [
+                            'avatar_filename' => $this->session->userdata('user_avatar'),
+                            'user_name' => $session_name,
+                            'size' => 100,
+                            'css_class' => 'rounded-circle border profile-avatar-preview',
+                            'element_id' => 'avatarPreview',
+                            'alt' => 'آواتار پروفایل',
+                    ]);
+                    ?>
+
+                    <div v-if="profileLoading"
+                         class="profile-avatar-loading"
+                         aria-hidden="true">
+                        <div class="spinner-border spinner-border-sm text-warning" role="status"></div>
+                    </div>
+                </div>
+
+                <div class="flex-grow-1 w-100">
+                    <label class="form-label small text-muted" for="avatarInput">تصویر پروفایل</label>
+                    <input
+                            type="file"
+                            name="avatar"
+                            id="avatarInput"
+                            class="form-control"
+                            accept="image/png,image/jpeg,image/webp"
+                            @change="previewAvatar"
+                            ref="avatarInput"
+                    >
+                    <small class="text-muted">JPG PNG WEBP - حداکثر ۲ مگابایت</small>
                 </div>
             </div>
 
-            <div class="flex-grow-1 w-100">
-                <label class="form-label small text-muted" for="avatarInput">
-                    تصویر پروفایل
-                </label>
+            <div class="mb-3">
+                <label class="form-label text-light small">نام و نام خانوادگی</label>
                 <input
-                    type="file"
-                    name="avatar"
-                    id="avatarInput"
-                    class="form-control"
-                    accept="image/png,image/jpeg,image/webp"
+                        type="text"
+                        class="form-control"
+                        name="full_name"
+                        v-model="fullName"
+                        required
                 >
-                <small class="text-muted">JPG PNG WEBP - حداکثر ۲ مگابایت</small>
             </div>
-        </div>
 
-        <div class="mb-3">
-            <label class="form-label text-light small" for="full_name">نام و نام خانوادگی</label>
-            <input type="text" class="form-control" name="full_name" id="full_name" required>
-        </div>
+            <div class="mb-4">
+                <label class="form-label text-light small">ایمیل</label>
+                <input
+                        type="email"
+                        class="form-control"
+                        name="email"
+                        v-model="email"
+                        required
+                >
+            </div>
 
-        <div class="mb-4">
-            <label class="form-label text-light small" for="email">ایمیل</label>
-            <input type="email" class="form-control" name="email" id="email" required>
-        </div>
+            <button type="submit" class="btn btn-orange-glow" :disabled="profileLoading">
+                <span v-if="profileLoading" class="spinner-border spinner-border-sm me-1"></span>
+                {{ profileLoading ? 'در حال ذخیره...' : 'ذخیره اطلاعات' }}
+            </button>
+        </form>
+    </div>
 
-        <button type="submit" class="btn btn-orange-glow" id="profileSubmitBtn">
-            ذخیره اطلاعات
-        </button>
-    </form>
+    <?php $this->load->view('profile/password_card'); ?>
 </div>
 
 <script>
-    document.addEventListener('DOMContentLoaded', function () {
-        let preview = document.getElementById('avatarPreview');
-        let loading = document.getElementById('avatarLoading');
-        let messageBox = document.getElementById('profileMessage');
-        let submitBtn = document.getElementById('profileSubmitBtn');
-        let avatarBase = "<?= base_url('uploads/avatars/') ?>";
-
-        function showMessage(ok, text) {
-            messageBox.classList.remove('d-none');
-            messageBox.className = ok
-                ? 'alert alert-success py-2 px-3 small'
-                : 'alert alert-danger py-2 px-3 small';
-            messageBox.textContent = text;
-        }
-
-        function setLoading(isLoading) {
-            loading.classList.toggle('d-none', !isLoading);
-        }
-
-        function loadProfile() {
-            setLoading(true);
-
-            fetch("<?= site_url('api/profile') ?>")
-                .then(function (res) { return res.json(); })
-                .then(function (data) {
-                    if (!data.status || !data.user) {
-                        return;
-                    }
-
-                    let user = data.user;
-                    document.getElementById('full_name').value = user.full_name || '';
-                    document.getElementById('email').value = user.email || '';
-
-                    if (typeof setAvatar === 'function') {
-                        setAvatar(preview, user.avatar, user.full_name, 100);
-                    } else if (user.avatar) {
-                        preview.src = avatarBase + user.avatar;
-                    }
-
-                    let navbarAvatar = document.getElementById('navbarAvatar');
-                    if (navbarAvatar && typeof setAvatar === 'function') {
-                        setAvatar(navbarAvatar, user.avatar, user.full_name, 38);
-                    }
-                })
-                .catch(function (error) {
-                    console.error(error);
-                })
-                .finally(function () {
-                    setLoading(false);
-                });
-        }
-
-        document.getElementById('avatarInput').addEventListener('change', function (e) {
-            let file = e.target.files && e.target.files[0];
-            if (!file) {
-                return;
-            }
-
-            let reader = new FileReader();
-            reader.onload = function (event) {
-                preview.src = event.target.result;
+    Vue.createApp({
+        data() {
+            return {
+                fullName: '',
+                email: '',
+                profileLoading: false,
+                profileMessage: '',
+                profileMessageSuccess: false,
+                currentPassword: '',
+                newPassword: '',
+                newPasswordConfirm: '',
+                passwordLoading: false,
+                passwordMessage: '',
+                passwordMessageSuccess: false,
+                deletePassword: '',
+                deleteLoading: false,
+                deleteMessage: '',
+                deleteMessageSuccess: false
             };
-            reader.readAsDataURL(file);
-        });
+        },
 
-        document.getElementById('profileForm').addEventListener('submit', function (e) {
-            e.preventDefault();
+        mounted() {
+            this.loadProfile();
+        },
 
-            submitBtn.disabled = true;
-            setLoading(true);
+        methods: {
+            async loadProfile() {
+                try {
+                    const { data } = await axios.get("<?= site_url('api/profile') ?>");
 
-            fetch("<?= site_url('api/profile/update') ?>", {
-                method: 'POST',
-                body: new FormData(this)
-            })
-                .then(function (res) { return res.json(); })
-                .then(function (data) {
-                    showMessage(!!data.status, data.message || '');
+                    if (!data.status || !data.user) return;
 
-                    if (!data.status || !data.user) {
-                        return;
-                    }
-
-                    let user = data.user;
+                    this.fullName = data.user.full_name || '';
+                    this.email = data.user.email || '';
 
                     if (typeof setAvatar === 'function') {
-                        setAvatar(preview, user.avatar, user.full_name, 100);
+                        setAvatar(this.$refs.avatarPreview, data.user.avatar, data.user.full_name, 100);
+                        setAvatar(document.getElementById('navbarAvatar'), data.user.avatar, data.user.full_name, 38);
                     }
+                } catch (error) {
+                    console.error(error);
+                }
+            },
 
-                    let navbarAvatar = document.getElementById('navbarAvatar');
-                    if (navbarAvatar && typeof setAvatar === 'function') {
-                        setAvatar(navbarAvatar, user.avatar, user.full_name, 38);
+            previewAvatar(event) {
+                const file = event.target.files[0];
+                if (!file) return;
+
+                const reader = new FileReader();
+
+                reader.onload = event => {
+                    this.$refs.avatarPreview.src = event.target.result;
+                };
+
+                reader.readAsDataURL(file);
+            },
+
+            async updateProfile() {
+                this.profileLoading = true;
+                this.profileMessage = '';
+
+                try {
+                    const formData = new FormData();
+
+                    formData.append('full_name', this.fullName);
+                    formData.append('email', this.email);
+
+                    const file = this.$refs.avatarInput.files[0];
+                    if (file) formData.append('avatar', file);
+
+                    const { data } = await axios.post(
+                        "<?= site_url('api/profile/update') ?>",
+                        formData
+                    );
+
+                    this.profileMessage = data.message || '';
+                    this.profileMessageSuccess = !!data.status;
+
+                    if (data.status && data.user && typeof setAvatar === 'function') {
+                        setAvatar(this.$refs.avatarPreview, data.user.avatar, data.user.full_name, 100);
+                        setAvatar(document.getElementById('navbarAvatar'), data.user.avatar, data.user.full_name, 38);
                     }
-                })
-                .catch(function () {
-                    showMessage(false, 'خطا در ارتباط با سرور');
-                })
-                .finally(function () {
-                    submitBtn.disabled = false;
-                    setLoading(false);
-                });
-        });
+                } catch (error) {
+                    this.profileMessage = 'خطا در ارتباط با سرور';
+                    this.profileMessageSuccess = false;
+                } finally {
+                    this.profileLoading = false;
+                }
+            },
 
-        loadProfile();
-    });
+            async changePassword() {
+                this.passwordLoading = true;
+                this.passwordMessage = '';
+
+                try {
+                    const formData = new FormData();
+
+                    formData.append('current_password', this.currentPassword);
+                    formData.append('new_password', this.newPassword);
+                    formData.append('new_password_confirm', this.newPasswordConfirm);
+
+                    const { data } = await axios.post(
+                        "<?= site_url('api/profile/password') ?>",
+                        formData
+                    );
+
+                    this.passwordMessage = data.message || '';
+                    this.passwordMessageSuccess = !!data.status;
+
+                    if (data.status) {
+                        this.currentPassword = '';
+                        this.newPassword = '';
+                        this.newPasswordConfirm = '';
+                    }
+                } catch (error) {
+                    this.passwordMessage = 'خطا در ارتباط با سرور';
+                    this.passwordMessageSuccess = false;
+                } finally {
+                    this.passwordLoading = false;
+                }
+            },
+
+            async deleteAccount() {
+                if (!this.deletePassword) {
+                    this.deleteMessage = 'لطفاً رمز عبور خود را وارد کنید';
+                    this.deleteMessageSuccess = false;
+                    return;
+                }
+
+                this.deleteLoading = true;
+                this.deleteMessage = '';
+
+                try {
+                    const formData = new URLSearchParams({
+                        password: this.deletePassword
+                    });
+
+                    const { data } = await axios.post(
+                        "<?= site_url('api/user/delete') ?>",
+                        formData
+                    );
+
+                    this.deleteMessage = data.message || '';
+                    this.deleteMessageSuccess = !!data.status;
+
+                    if (data.status) {
+                        setTimeout(() => {
+                            window.location.href = "<?= site_url('login') ?>";
+                        }, 1500);
+                    }
+                } catch (error) {
+                    this.deleteMessage = 'خطا در ارتباط با سرور';
+                    this.deleteMessageSuccess = false;
+                } finally {
+                    this.deleteLoading = false;
+                }
+            }
+        }
+    }).mount('#profile-app');
 </script>
