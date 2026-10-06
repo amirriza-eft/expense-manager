@@ -109,6 +109,7 @@
         },
 
         methods: {
+
             async loadProfile() {
                 try {
                     const { data } = await axios.get("<?= site_url('api/profile') ?>");
@@ -118,13 +119,41 @@
                     this.fullName = data.user.full_name || '';
                     this.email = data.user.email || '';
 
-                    if (typeof setAvatar === 'function') {
-                        setAvatar(this.$refs.avatarPreview, data.user.avatar, data.user.full_name, 100);
-                        setAvatar(document.getElementById('navbarAvatar'), data.user.avatar, data.user.full_name, 38);
-                    }
+                    this.updateAvatar(
+                        this.$refs.avatarPreview,
+                        data.user.avatar,
+                        data.user.full_name,
+                        100
+                    );
+
+                    this.updateAvatar(
+                        document.getElementById('navbarAvatar'),
+                        data.user.avatar,
+                        data.user.full_name,
+                        38
+                    );
                 } catch (error) {
                     console.error(error);
                 }
+            },
+
+            updateAvatar(element, avatar, name, size) {
+                if (!element) return;
+
+                if (avatar) {
+                    element.src = "<?= base_url('uploads/avatars/') ?>" + avatar;
+                    return;
+                }
+
+                const initial = (name || 'کاربر').trim().charAt(0);
+
+                const fallbackUrl =
+                    'https://placehold.co/' +
+                    size + 'x' + size +
+                    '/1e1e24/ff6b00?text=' +
+                    encodeURIComponent(initial || 'ک');
+
+                element.src = fallbackUrl;
             },
 
             previewAvatar(event) {
@@ -161,9 +190,20 @@
                     this.profileMessage = data.message || '';
                     this.profileMessageSuccess = !!data.status;
 
-                    if (data.status && data.user && typeof setAvatar === 'function') {
-                        setAvatar(this.$refs.avatarPreview, data.user.avatar, data.user.full_name, 100);
-                        setAvatar(document.getElementById('navbarAvatar'), data.user.avatar, data.user.full_name, 38);
+                    if (data.status && data.user) {
+                        this.updateAvatar(
+                            this.$refs.avatarPreview,
+                            data.user.avatar,
+                            data.user.full_name,
+                            100
+                        );
+
+                        this.updateAvatar(
+                            document.getElementById('navbarAvatar'),
+                            data.user.avatar,
+                            data.user.full_name,
+                            38
+                        );
                     }
                 } catch (error) {
                     this.profileMessage = 'خطا در ارتباط با سرور';

@@ -16,10 +16,8 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/persian-datepicker@1.2.0/dist/css/persian-datepicker.min.css">
     <link rel="stylesheet" href="<?= base_url('assets/css/app.css') ?>">
 
-    <script>window.APP_AVATAR_BASE = "<?= base_url('uploads/avatars/') ?>";</script>
     <script src="https://cdn.jsdelivr.net/npm/persian-date@1.1.0/dist/persian-date.min.js"></script>
     <script src="<?= base_url('assets/js/format.js') ?>"></script>
-    <script src="<?= base_url('assets/js/avatar.js') ?>"></script>
     <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 </head>
