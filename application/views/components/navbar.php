@@ -116,7 +116,11 @@
                     const response = await axios.post("<?= site_url('api/auth/logout') ?>");
 
                     if (response.data.status) {
-                        window.location.href = "<?= site_url('login') ?>";
+
+                        setTimeout(() => {
+                            window.location.href = "<?= site_url('login') ?>";
+                        }, 800);
+
                         return;
                     }
 
