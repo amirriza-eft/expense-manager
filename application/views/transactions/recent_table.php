@@ -23,37 +23,30 @@
 const transactionsApp = Vue.createApp({
     data() {
         return {
-            // lists shown on the page
             transactions: [],
             deletedTransactions: [],
             categoryOptions: [],
 
-            // search / filter / sort values
             filters: {search: '', type: '', category_id: '', from_date: '', to_date: '', sort: 'newest'},
 
-            // the add / edit form
             transactionForm: {id: '', title: '', type: 'expense', category_id: '', amount: '', description: '', transaction_date: '', date_display: ''},
             transactionLoading: true,
             transactionMessage: '',
             transactionMessageSuccess: false,
 
-            // pagination
             currentPage: 1,
             totalPages: 1,
             pageNumbers: [],
             totalCount: null,
 
-            // delete confirmation
             deleteTransactionId: null,
 
-            // "more / less" buttons of long descriptions (key = transaction id)
             expanded: {},
             overflowing: {}
         };
     },
 
     methods: {
-        // ---------- small helpers used by the templates ----------
         fmtNumber(value) {
             return formatNumber(value);
         },
@@ -74,11 +67,9 @@ const transactionsApp = Vue.createApp({
         },
 
         refreshDashboard() {
-            // the dashboard may not exist on every page
             if (typeof loadDashboardSummary === 'function') loadDashboardSummary();
         },
 
-        // ---------- bootstrap modals ----------
         showModal(ref) {
             bootstrap.Modal.getOrCreateInstance(this.$refs[ref]).show();
         },
@@ -88,7 +79,6 @@ const transactionsApp = Vue.createApp({
             if (modal) modal.hide();
         },
 
-        // removes a leftover dark backdrop after the modal closed
         cleanupModal() {
             document.querySelectorAll('.modal-backdrop').forEach(el => el.remove());
             document.body.classList.remove('modal-open');
@@ -96,12 +86,10 @@ const transactionsApp = Vue.createApp({
             document.body.style.removeProperty('padding-right');
         },
 
-        // ---------- long descriptions ("more" / "less") ----------
         toggleDescription(id) {
             this.expanded[id] = !this.expanded[id];
         },
 
-        // shows the "more" button only for descriptions that are really cut off
         checkDescriptions() {
             this.checkList(this.$refs.transactionList);
             this.checkList(this.$refs.deletedList);
@@ -118,7 +106,6 @@ const transactionsApp = Vue.createApp({
             }
         },
 
-        // ---------- date pickers ----------
         initDatePickers() {
             $(this.$refs.filterFromDate).pDatepicker({
                 format: 'YYYY/MM/DD', autoClose: true, initialValue: false, calendar: {persian: {locale: 'fa'}},
@@ -140,7 +127,6 @@ const transactionsApp = Vue.createApp({
             });
         },
 
-        // ---------- categories (only for the dropdowns; managed in category_manager.php) ----------
         async loadCategoryOptions() {
             try {
                 const response = await axios.get("<?= site_url('api/categories') ?>");
@@ -151,7 +137,6 @@ const transactionsApp = Vue.createApp({
             }
         },
 
-        // ---------- load the transaction list ----------
         async loadTransactions(page) {
             this.currentPage = page || 1;
             this.transactionLoading = true;
@@ -179,7 +164,6 @@ const transactionsApp = Vue.createApp({
                     this.currentPage = Number(pagination.current_page) || this.currentPage;
                     this.expanded = {};
 
-                    // page buttons: 2 pages before and 2 pages after the current page
                     this.pageNumbers = [];
                     const start = Math.max(1, this.currentPage - 2);
                     const end = Math.min(this.totalPages, this.currentPage + 2);
@@ -206,7 +190,6 @@ const transactionsApp = Vue.createApp({
             this.loadTransactions(1);
         },
 
-        // ---------- deleted transactions ----------
         async loadDeletedTransactions() {
             try {
                 const response = await axios.get("<?= site_url('api/transaction/deleted') ?>");
@@ -239,8 +222,6 @@ const transactionsApp = Vue.createApp({
             }
         },
 
-        // ---------- add / edit form ----------
-        // sets both the real (gregorian) date and the shown (persian) date
         setTransactionDate(gregorian) {
             const date = gregorian || todayGregorianDate();
             this.transactionForm.transaction_date = date;
@@ -254,7 +235,6 @@ const transactionsApp = Vue.createApp({
         },
 
         openEditTransactionModal(tx) {
-            // use the saved category only if it still exists
             let categoryId = '';
             for (const category of this.categoryOptions) {
                 if (category.type === tx.type && String(category.id) === String(tx.category_id)) {
@@ -277,7 +257,6 @@ const transactionsApp = Vue.createApp({
             this.showModal('transactionModal');
         },
 
-        // adds commas to the amount while typing and keeps the cursor in place
         onAmountInput(event) {
             const input = event.target;
             const oldLength = input.value.length;
@@ -320,7 +299,6 @@ const transactionsApp = Vue.createApp({
                 const response = await axios.post(url, formData);
                 const data = response.data;
 
-                // the server must answer with JSON
                 if (typeof data !== 'object') throw new Error('Invalid JSON');
 
                 this.transactionMessage = data.message || '';
@@ -342,7 +320,6 @@ const transactionsApp = Vue.createApp({
             this.transactionLoading = false;
         },
 
-        // ---------- delete ----------
         confirmDeleteTransaction(id) {
             this.deleteTransactionId = id;
             this.showModal('deleteModal');
@@ -379,23 +356,17 @@ const transactionsApp = Vue.createApp({
         }
     },
 
-    // runs once when the page is ready
     mounted() {
-        // lets the category manager refresh our dropdowns after it changes a category
         window.reloadCategoryOptions = this.loadCategoryOptions;
 
         this.loadCategoryOptions();
         this.loadTransactions(1);
         this.initDatePickers();
 
-        // Bootstrap fires modal events as native DOM events
         this.$refs.deletedModal.addEventListener('shown.bs.modal', this.checkDescriptions);
     }
 });
 
-// keep the exact same spacing between inline elements as the old HTML
-transactionsApp.config.compilerOptions.whitespace = 'preserve';
-
-// mount after the page (and its helper scripts) finished loading
 document.addEventListener('DOMContentLoaded', () => transactionsApp.mount('#transactions-app'));
+
 </script>
