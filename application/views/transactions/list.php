@@ -38,8 +38,8 @@
 
             <div class="transaction-card__right">
                 <div class="transaction-card__right-top">
-                    <div class="transaction-card__icon" :class="'transaction-card__icon--' + typeClass(tx.type)" aria-hidden="true">
-                        <i class="bi" :class="typeIcon(tx.type)"></i>
+                    <div class="transaction-card__icon" :class="'transaction-card__icon--' + tx.type" aria-hidden="true">
+                        <i class="bi" :class="tx.type === 'income' ? 'bi-arrow-down-left' : 'bi-arrow-up-right'"></i>
                     </div>
 
                     <div class="transaction-card__info">
@@ -57,7 +57,7 @@
                     </div>
                 </div>
 
-                <div class="transaction-card__amount" :class="'transaction-card__amount--' + typeClass(tx.type)" v-html="amountHtml(tx)"></div>
+                <div class="transaction-card__amount" :class="'transaction-card__amount--' + tx.type" v-html="amountHtml(tx)"></div>
             </div>
         </article>
     </div>

@@ -143,8 +143,15 @@
 const categoriesApp = Vue.createApp({
     data() {
         return {
+            // all lists (the expense / income lists are filled when the data loads)
             categories: [],
+            expenseCategories: [],
+            incomeCategories: [],
             deletedCategories: [],
+            deletedExpenseCategories: [],
+            deletedIncomeCategories: [],
+
+            // the add / edit form
             categoryForm: {id: '', title: '', type: 'expense'},
             categoryLoading: false,
             categoryMessage: '',
@@ -152,54 +159,42 @@ const categoriesApp = Vue.createApp({
         };
     },
 
-    computed: {
-        expenseCategories() {
-            return this.categories.filter(c => c.type === 'expense');
-        },
-        incomeCategories() {
-            return this.categories.filter(c => c.type === 'income');
-        },
-        deletedExpenseCategories() {
-            return this.deletedCategories.filter(c => c.type === 'expense');
-        },
-        deletedIncomeCategories() {
-            return this.deletedCategories.filter(c => c.type === 'income');
-        }
-    },
-
     methods: {
+        // ---------- small helpers ----------
         fmtNumber(value) {
             return formatNumber(value);
         },
 
         errorText(error) {
-            return (error.response && error.response.data && error.response.data.message) || 'خطا در ارتباط با سرور';
+            if (error.response && error.response.data && error.response.data.message) {
+                return error.response.data.message;
+            }
+            return 'خطا در ارتباط با سرور';
         },
 
-        setCategoryMessage(text, success) {
-            this.categoryMessage = text;
-            this.categoryMessageSuccess = !!success;
-        },
-
+        // tells the transactions page to reload its category dropdowns
         notifyTransactions() {
             if (typeof reloadCategoryOptions === 'function') reloadCategoryOptions();
         },
 
-        resetCategoryForm() {
-            this.categoryForm = {id: '', title: '', type: 'expense'};
-        },
-
+        // runs every time the modal opens
         openCategoryManager() {
             this.categoryMessage = '';
-            this.resetCategoryForm();
+            this.categoryForm = {id: '', title: '', type: 'expense'};
             this.loadDeletedCategories();
         },
 
+        // ---------- load lists ----------
         async loadCategories() {
             try {
                 const response = await axios.get("<?= site_url('api/categories') ?>");
                 const data = response.data;
-                if (data.status) this.categories = data.categories || [];
+
+                if (data.status) {
+                    this.categories = data.categories || [];
+                    this.expenseCategories = this.categories.filter(c => c.type === 'expense');
+                    this.incomeCategories = this.categories.filter(c => c.type === 'income');
+                }
             } catch (error) {
                 console.error(error);
             }
@@ -209,12 +204,18 @@ const categoriesApp = Vue.createApp({
             try {
                 const response = await axios.get("<?= site_url('api/categories/deleted') ?>");
                 const data = response.data;
-                if (data.status) this.deletedCategories = data.categories || [];
+
+                if (data.status) {
+                    this.deletedCategories = data.categories || [];
+                    this.deletedExpenseCategories = this.deletedCategories.filter(c => c.type === 'expense');
+                    this.deletedIncomeCategories = this.deletedCategories.filter(c => c.type === 'income');
+                }
             } catch (error) {
                 console.error(error);
             }
         },
 
+        // ---------- add / edit ----------
         editCategory(category) {
             this.categoryMessage = '';
             this.categoryForm = {id: category.id, title: category.title, type: category.type};
@@ -225,29 +226,32 @@ const categoriesApp = Vue.createApp({
             const title = this.categoryForm.title.trim();
             if (!title) return;
 
-            const url = this.categoryForm.id
-                ? "<?= site_url('api/categories/update/') ?>" + this.categoryForm.id
-                : "<?= site_url('api/categories/create') ?>";
+            let url = "<?= site_url('api/categories/create') ?>";
+            if (this.categoryForm.id) url = "<?= site_url('api/categories/update/') ?>" + this.categoryForm.id;
 
             this.categoryLoading = true;
 
             try {
                 const response = await axios.post(url, new URLSearchParams({title: title, type: this.categoryForm.type}));
                 const data = response.data;
-                this.setCategoryMessage(data.message || (data.status ? 'دسته‌بندی ذخیره شد' : 'خطا در ذخیره دسته‌بندی'), data.status);
+
+                this.categoryMessage = data.message || (data.status ? 'دسته‌بندی ذخیره شد' : 'خطا در ذخیره دسته‌بندی');
+                this.categoryMessageSuccess = data.status ? true : false;
 
                 if (data.status) {
-                    this.resetCategoryForm();
+                    this.categoryForm = {id: '', title: '', type: 'expense'};
                     await this.loadCategories();
                     this.notifyTransactions();
                 }
             } catch (error) {
-                this.setCategoryMessage(this.errorText(error), false);
-            } finally {
-                this.categoryLoading = false;
+                this.categoryMessage = this.errorText(error);
+                this.categoryMessageSuccess = false;
             }
+
+            this.categoryLoading = false;
         },
 
+        // ---------- delete / restore ----------
         async deleteCategory(id) {
             if (!confirm('آیا از حذف این دسته‌بندی اطمینان دارید؟')) return;
 
@@ -256,7 +260,9 @@ const categoriesApp = Vue.createApp({
             try {
                 const response = await axios.post("<?= site_url('api/categories/delete/') ?>" + id);
                 const data = response.data;
-                this.setCategoryMessage(data.message || (data.status ? 'دسته‌بندی حذف شد' : 'خطا در حذف دسته‌بندی'), data.status);
+
+                this.categoryMessage = data.message || (data.status ? 'دسته‌بندی حذف شد' : 'خطا در حذف دسته‌بندی');
+                this.categoryMessageSuccess = data.status ? true : false;
 
                 if (data.status) {
                     await this.loadCategories();
@@ -264,10 +270,11 @@ const categoriesApp = Vue.createApp({
                     this.notifyTransactions();
                 }
             } catch (error) {
-                this.setCategoryMessage(this.errorText(error), false);
-            } finally {
-                this.categoryLoading = false;
+                this.categoryMessage = this.errorText(error);
+                this.categoryMessageSuccess = false;
             }
+
+            this.categoryLoading = false;
         },
 
         async restoreCategory(id) {
@@ -276,7 +283,9 @@ const categoriesApp = Vue.createApp({
             try {
                 const response = await axios.post("<?= site_url('api/categories/restore/') ?>" + id);
                 const data = response.data;
-                this.setCategoryMessage(data.message || (data.status ? 'دسته‌بندی بازیابی شد' : 'خطا در بازیابی دسته‌بندی'), data.status);
+
+                this.categoryMessage = data.message || (data.status ? 'دسته‌بندی بازیابی شد' : 'خطا در بازیابی دسته‌بندی');
+                this.categoryMessageSuccess = data.status ? true : false;
 
                 if (data.status) {
                     await this.loadCategories();
@@ -284,13 +293,15 @@ const categoriesApp = Vue.createApp({
                     this.notifyTransactions();
                 }
             } catch (error) {
-                this.setCategoryMessage(this.errorText(error), false);
-            } finally {
-                this.categoryLoading = false;
+                this.categoryMessage = this.errorText(error);
+                this.categoryMessageSuccess = false;
             }
+
+            this.categoryLoading = false;
         }
     },
 
+    // runs once when the page is ready
     mounted() {
         this.loadCategories();
 

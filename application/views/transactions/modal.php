@@ -36,7 +36,9 @@
                             <label for="tx_category" class="form-label small text-muted">دسته‌بندی</label>
                             <select id="tx_category" class="form-select" v-model="transactionForm.category_id">
                                 <option value="">بدون دسته</option>
-                                <option v-for="category in formCategories" :key="category.id" :value="category.id">{{ category.title }}</option>
+                                <template v-for="category in categoryOptions" :key="category.id">
+                                    <option v-if="category.type === transactionForm.type" :value="category.id">{{ category.title }}</option>
+                                </template>
                             </select>
                         </div>
                     </div>

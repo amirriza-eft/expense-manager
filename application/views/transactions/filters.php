@@ -21,7 +21,9 @@
         <div class="col-6 col-md-2">
             <select id="filterCategory" class="form-select" v-model="filters.category_id">
                 <option value="">همه دسته‌ها</option>
-                <option v-for="category in filterCategories" :key="category.id" :value="category.id">{{ category.title }}</option>
+                <template v-for="category in categoryOptions" :key="category.id">
+                    <option v-if="!filters.type || category.type === filters.type" :value="category.id">{{ category.title }}</option>
+                </template>
             </select>
         </div>
 

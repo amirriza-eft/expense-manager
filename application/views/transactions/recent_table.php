@@ -20,74 +20,65 @@
 <?php $this->load->view('categories/category_manager'); ?>
 
 <script>
-function emptyTransactionForm() {
-    return {id: '', title: '', type: 'expense', category_id: '', amount: '', description: '', transaction_date: '', date_display: ''};
-}
-
 const transactionsApp = Vue.createApp({
     data() {
         return {
+            // lists shown on the page
             transactions: [],
             deletedTransactions: [],
             categoryOptions: [],
+
+            // search / filter / sort values
             filters: {search: '', type: '', category_id: '', from_date: '', to_date: '', sort: 'newest'},
-            transactionForm: emptyTransactionForm(),
+
+            // the add / edit form
+            transactionForm: {id: '', title: '', type: 'expense', category_id: '', amount: '', description: '', transaction_date: '', date_display: ''},
             transactionLoading: true,
             transactionMessage: '',
             transactionMessageSuccess: false,
+
+            // pagination
             currentPage: 1,
             totalPages: 1,
+            pageNumbers: [],
             totalCount: null,
+
+            // delete confirmation
             deleteTransactionId: null,
+
+            // "more / less" buttons of long descriptions (key = transaction id)
             expanded: {},
             overflowing: {}
         };
     },
 
-    computed: {
-        filterCategories() {
-            return this.categoryOptions.filter(c => !this.filters.type || c.type === this.filters.type);
-        },
-        formCategories() {
-            return this.categoryOptions.filter(c => c.type === this.transactionForm.type);
-        },
-        pageNumbers() {
-            const pages = [];
-            const start = Math.max(1, this.currentPage - 2);
-            const end = Math.min(this.totalPages, this.currentPage + 2);
-            for (let i = start; i <= end; i++) pages.push(i);
-            return pages;
-        }
-    },
-
     methods: {
-        // ---------- helpers ----------
+        // ---------- small helpers used by the templates ----------
         fmtNumber(value) {
             return formatNumber(value);
         },
 
         fmtDate(date) {
-            return typeof formatPersianDate === 'function' ? formatPersianDate(date) : (date || '');
+            return formatPersianDate(date);
         },
 
         amountHtml(tx) {
-            return typeof formatAmount === 'function'
-                ? formatAmount(tx.amount, tx.type)
-                : (tx.type === 'income' ? '+' : '-') + Number(tx.amount).toLocaleString('fa-IR');
-        },
-
-        typeClass(type) {
-            return type === 'income' ? 'income' : 'expense';
-        },
-
-        typeIcon(type) {
-            return type === 'income' ? 'bi-arrow-down-left' : 'bi-arrow-up-right';
+            return formatAmount(tx.amount, tx.type);
         },
 
         errorText(error) {
-            return (error.response && error.response.data && error.response.data.message) || 'خطا در ارتباط با سرور';
+            if (error.response && error.response.data && error.response.data.message) {
+                return error.response.data.message;
+            }
+            return 'خطا در ارتباط با سرور';
         },
 
+        refreshDashboard() {
+            // the dashboard may not exist on every page
+            if (typeof loadDashboardSummary === 'function') loadDashboardSummary();
+        },
+
+        // ---------- bootstrap modals ----------
         showModal(ref) {
             bootstrap.Modal.getOrCreateInstance(this.$refs[ref]).show();
         },
@@ -97,6 +88,7 @@ const transactionsApp = Vue.createApp({
             if (modal) modal.hide();
         },
 
+        // removes a leftover dark backdrop after the modal closed
         cleanupModal() {
             document.querySelectorAll('.modal-backdrop').forEach(el => el.remove());
             document.body.classList.remove('modal-open');
@@ -104,43 +96,42 @@ const transactionsApp = Vue.createApp({
             document.body.style.removeProperty('padding-right');
         },
 
-        refreshDashboard() {
-            if (typeof loadDashboardSummary === 'function') loadDashboardSummary();
-        },
-
+        // ---------- long descriptions ("more" / "less") ----------
         toggleDescription(id) {
             this.expanded[id] = !this.expanded[id];
         },
 
-        // shows the "more/less" button only for descriptions that are actually clamped
+        // shows the "more" button only for descriptions that are really cut off
         checkDescriptions() {
-            [this.$refs.transactionList, this.$refs.deletedList].forEach(list => {
-                if (!list) return;
-                list.querySelectorAll('.transaction-card').forEach(card => {
-                    const desc = card.querySelector('.transaction-card__description');
-                    if (desc && desc.scrollHeight > desc.clientHeight + 2) {
-                        this.overflowing[card.dataset.transactionId] = true;
-                    }
-                });
-            });
+            this.checkList(this.$refs.transactionList);
+            this.checkList(this.$refs.deletedList);
         },
 
-        initDatePickers() {
-            const options = {format: 'YYYY/MM/DD', autoClose: true, initialValue: false, calendar: {persian: {locale: 'fa'}}};
+        checkList(list) {
+            if (!list) return;
+            const cards = list.querySelectorAll('.transaction-card');
+            for (const card of cards) {
+                const desc = card.querySelector('.transaction-card__description');
+                if (desc && desc.scrollHeight > desc.clientHeight + 2) {
+                    this.overflowing[card.dataset.transactionId] = true;
+                }
+            }
+        },
 
+        // ---------- date pickers ----------
+        initDatePickers() {
             $(this.$refs.filterFromDate).pDatepicker({
-                ...options,
+                format: 'YYYY/MM/DD', autoClose: true, initialValue: false, calendar: {persian: {locale: 'fa'}},
                 onSelect: () => { this.filters.from_date = this.$refs.filterFromDate.value; }
             });
 
             $(this.$refs.filterToDate).pDatepicker({
-                ...options,
+                format: 'YYYY/MM/DD', autoClose: true, initialValue: false, calendar: {persian: {locale: 'fa'}},
                 onSelect: () => { this.filters.to_date = this.$refs.filterToDate.value; }
             });
 
             $(this.$refs.txDateDisplay).pDatepicker({
-                ...options,
-                initialValue: true,
+                format: 'YYYY/MM/DD', autoClose: true, initialValue: true, calendar: {persian: {locale: 'fa'}},
                 onSelect: () => {
                     const shamsi = this.$refs.txDateDisplay.value;
                     this.transactionForm.date_display = shamsi;
@@ -149,7 +140,7 @@ const transactionsApp = Vue.createApp({
             });
         },
 
-        // read-only category list for the filter and form dropdowns (managed in category_manager.php)
+        // ---------- categories (only for the dropdowns; managed in category_manager.php) ----------
         async loadCategoryOptions() {
             try {
                 const response = await axios.get("<?= site_url('api/categories') ?>");
@@ -160,52 +151,54 @@ const transactionsApp = Vue.createApp({
             }
         },
 
-        // ---------- transactions ----------
-        setTransactionMessage(text, success) {
-            this.transactionMessage = text;
-            this.transactionMessageSuccess = !!success;
-        },
-
+        // ---------- load the transaction list ----------
         async loadTransactions(page) {
             this.currentPage = page || 1;
             this.transactionLoading = true;
-
-            const f = this.filters;
 
             try {
                 const response = await axios.get("<?= site_url('api/transaction') ?>", {
                     params: {
                         page: this.currentPage,
-                        search: f.search,
-                        type: f.type,
-                        category_id: f.category_id,
-                        from_date: f.from_date ? convertPersianToGregorian(f.from_date) : '',
-                        to_date: f.to_date ? convertPersianToGregorian(f.to_date) : '',
-                        sort: f.sort || 'newest'
+                        search: this.filters.search,
+                        type: this.filters.type,
+                        category_id: this.filters.category_id,
+                        from_date: this.filters.from_date ? convertPersianToGregorian(this.filters.from_date) : '',
+                        to_date: this.filters.to_date ? convertPersianToGregorian(this.filters.to_date) : '',
+                        sort: this.filters.sort || 'newest'
                     }
                 });
                 const data = response.data;
 
-                if (!data.status || !data.transactions || !data.transactions.length) {
+                if (data.status && data.transactions && data.transactions.length) {
+                    const pagination = data.pagination || {};
+
+                    this.transactions = data.transactions;
+                    this.totalCount = pagination.total || data.transactions.length;
+                    this.totalPages = Number(pagination.total_pages) || 1;
+                    this.currentPage = Number(pagination.current_page) || this.currentPage;
+                    this.expanded = {};
+
+                    // page buttons: 2 pages before and 2 pages after the current page
+                    this.pageNumbers = [];
+                    const start = Math.max(1, this.currentPage - 2);
+                    const end = Math.min(this.totalPages, this.currentPage + 2);
+                    for (let i = start; i <= end; i++) {
+                        this.pageNumbers.push(i);
+                    }
+
+                    this.$nextTick(this.checkDescriptions);
+                } else {
                     this.transactions = [];
                     this.totalPages = 1;
                     this.totalCount = 0;
-                    return;
+                    this.pageNumbers = [];
                 }
-
-                const pagination = data.pagination || {};
-
-                this.transactions = data.transactions;
-                this.totalCount = pagination.total != null ? pagination.total : data.transactions.length;
-                this.totalPages = Number(pagination.total_pages) || 1;
-                this.currentPage = Number(pagination.current_page) || this.currentPage;
-                this.expanded = {};
-                this.$nextTick(this.checkDescriptions);
             } catch (error) {
                 console.error(error);
-            } finally {
-                this.transactionLoading = false;
             }
+
+            this.transactionLoading = false;
         },
 
         onFilterTypeChange() {
@@ -213,65 +206,68 @@ const transactionsApp = Vue.createApp({
             this.loadTransactions(1);
         },
 
+        // ---------- deleted transactions ----------
         async loadDeletedTransactions() {
             try {
                 const response = await axios.get("<?= site_url('api/transaction/deleted') ?>");
                 const data = response.data;
-                if (!data.status) return;
 
-                this.deletedTransactions = data.transactions || [];
-                this.$nextTick(this.checkDescriptions);
+                if (data.status) {
+                    this.deletedTransactions = data.transactions || [];
+                    this.$nextTick(this.checkDescriptions);
+                }
             } catch (error) {
                 console.error(error);
             }
         },
 
         async restoreTransaction(id) {
-            id = Number(id);
-            if (!id) return;
-
             try {
                 const response = await axios.post("<?= site_url('api/transaction/restore') ?>", new URLSearchParams({id: id}));
                 const data = response.data;
 
-                if (!data.status) {
+                if (data.status) {
+                    await this.loadTransactions(this.currentPage || 1);
+                    this.loadDeletedTransactions();
+                    this.refreshDashboard();
+                } else {
                     alert(data.message || 'بازیابی انجام نشد');
-                    return;
                 }
-
-                await this.loadTransactions(this.currentPage || 1);
-                this.loadDeletedTransactions();
-                this.refreshDashboard();
             } catch (error) {
                 console.error(error);
                 alert(this.errorText(error));
             }
         },
 
+        // ---------- add / edit form ----------
+        // sets both the real (gregorian) date and the shown (persian) date
         setTransactionDate(gregorian) {
-            const g = gregorian || (typeof todayGregorianDate === 'function'
-                ? todayGregorianDate()
-                : new Date().toISOString().split('T')[0]);
-
-            this.transactionForm.transaction_date = g;
-            this.transactionForm.date_display = typeof formatPersianDate === 'function' ? formatPersianDate(g) : g;
+            const date = gregorian || todayGregorianDate();
+            this.transactionForm.transaction_date = date;
+            this.transactionForm.date_display = formatPersianDate(date);
         },
 
         openCreateTransactionModal() {
-            this.transactionForm = emptyTransactionForm();
             this.transactionMessage = '';
+            this.transactionForm = {id: '', title: '', type: 'expense', category_id: '', amount: '', description: '', transaction_date: '', date_display: ''};
             this.setTransactionDate();
         },
 
         openEditTransactionModal(tx) {
-            const categoryExists = this.categoryOptions.some(c => c.type === tx.type && String(c.id) === String(tx.category_id));
+            // use the saved category only if it still exists
+            let categoryId = '';
+            for (const category of this.categoryOptions) {
+                if (category.type === tx.type && String(category.id) === String(tx.category_id)) {
+                    categoryId = tx.category_id;
+                }
+            }
 
             this.transactionMessage = '';
             this.transactionForm = {
                 id: tx.id,
                 title: tx.title,
                 type: tx.type,
-                category_id: categoryExists ? tx.category_id : '',
+                category_id: categoryId,
                 amount: formatAmountInput(tx.amount),
                 description: tx.description || '',
                 transaction_date: '',
@@ -281,6 +277,7 @@ const transactionsApp = Vue.createApp({
             this.showModal('transactionModal');
         },
 
+        // adds commas to the amount while typing and keeps the cursor in place
         onAmountInput(event) {
             const input = event.target;
             const oldLength = input.value.length;
@@ -294,28 +291,28 @@ const transactionsApp = Vue.createApp({
         },
 
         async saveTransaction() {
-            const f = this.transactionForm;
+            const form = this.transactionForm;
 
-            if (f.date_display) f.transaction_date = convertPersianToGregorian(f.date_display);
+            if (form.date_display) form.transaction_date = convertPersianToGregorian(form.date_display);
 
-            if (!f.transaction_date) {
-                this.setTransactionMessage('لطفاً تاریخ تراکنش را انتخاب کنید', false);
+            if (!form.transaction_date) {
+                this.transactionMessage = 'لطفاً تاریخ تراکنش را انتخاب کنید';
+                this.transactionMessageSuccess = false;
                 return;
             }
 
             const formData = new FormData();
-            formData.append('id', f.id);
-            formData.append('title', f.title);
-            formData.append('type', f.type);
-            formData.append('category_id', f.category_id);
-            formData.append('amount', getAmountInputValue(f.amount));
-            formData.append('description', f.description);
-            formData.append('transaction_date', f.transaction_date);
+            formData.append('id', form.id);
+            formData.append('title', form.title);
+            formData.append('type', form.type);
+            formData.append('category_id', form.category_id);
+            formData.append('amount', getAmountInputValue(form.amount));
+            formData.append('description', form.description);
+            formData.append('transaction_date', form.transaction_date);
 
-            const isCreate = !f.id;
-            const url = isCreate
-                ? "<?= site_url('api/transaction/create') ?>"
-                : "<?= site_url('api/transaction/update/') ?>" + f.id;
+            const isCreate = !form.id;
+            let url = "<?= site_url('api/transaction/create') ?>";
+            if (!isCreate) url = "<?= site_url('api/transaction/update/') ?>" + form.id;
 
             this.transactionLoading = true;
 
@@ -323,26 +320,31 @@ const transactionsApp = Vue.createApp({
                 const response = await axios.post(url, formData);
                 const data = response.data;
 
-                if (typeof data !== 'object' || data === null) throw new Error('Invalid JSON');
+                // the server must answer with JSON
+                if (typeof data !== 'object') throw new Error('Invalid JSON');
 
-                this.setTransactionMessage(data.message || '', data.status);
-                if (!data.status) return;
+                this.transactionMessage = data.message || '';
+                this.transactionMessageSuccess = data.status ? true : false;
 
-                this.$refs.transactionModal.addEventListener('hidden.bs.modal', this.cleanupModal, {once: true});
-                this.hideModal('transactionModal');
+                if (data.status) {
+                    this.$refs.transactionModal.addEventListener('hidden.bs.modal', this.cleanupModal, {once: true});
+                    this.hideModal('transactionModal');
 
-                await this.loadTransactions(isCreate ? 1 : this.currentPage);
-                this.refreshDashboard();
+                    await this.loadTransactions(isCreate ? 1 : this.currentPage);
+                    this.refreshDashboard();
+                }
             } catch (error) {
                 console.error(error);
-                this.setTransactionMessage(this.errorText(error), false);
-            } finally {
-                this.transactionLoading = false;
+                this.transactionMessage = this.errorText(error);
+                this.transactionMessageSuccess = false;
             }
+
+            this.transactionLoading = false;
         },
 
+        // ---------- delete ----------
         confirmDeleteTransaction(id) {
-            this.deleteTransactionId = Number(id);
+            this.deleteTransactionId = id;
             this.showModal('deleteModal');
         },
 
@@ -358,26 +360,26 @@ const transactionsApp = Vue.createApp({
                 );
                 const data = response.data;
 
-                if (!data.status) {
+                if (data.status) {
+                    this.hideModal('deleteModal');
+                    this.deleteTransactionId = null;
+
+                    await this.loadTransactions(this.currentPage || 1);
+                    this.loadDeletedTransactions();
+                    this.refreshDashboard();
+                } else {
                     alert(data.message);
-                    return;
                 }
-
-                this.hideModal('deleteModal');
-                this.deleteTransactionId = null;
-
-                await this.loadTransactions(this.currentPage || 1);
-                this.loadDeletedTransactions();
-                this.refreshDashboard();
             } catch (error) {
                 console.error(error);
                 alert(this.errorText(error));
-            } finally {
-                this.transactionLoading = false;
             }
+
+            this.transactionLoading = false;
         }
     },
 
+    // runs once when the page is ready
     mounted() {
         // lets the category manager refresh our dropdowns after it changes a category
         window.reloadCategoryOptions = this.loadCategoryOptions;
@@ -386,7 +388,7 @@ const transactionsApp = Vue.createApp({
         this.loadTransactions(1);
         this.initDatePickers();
 
-        // Bootstrap fires modal events as native DOM events (needed to measure descriptions once the modal is visible)
+        // Bootstrap fires modal events as native DOM events
         this.$refs.deletedModal.addEventListener('shown.bs.modal', this.checkDescriptions);
     }
 });
