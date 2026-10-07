@@ -9,7 +9,6 @@
             class="btn btn-orange-outline"
             data-bs-toggle="modal"
             data-bs-target="#categoryManagerModal"
-            @click="openCategoryManager"
         >
             <i class="bi bi-tags"></i>
             مدیریت دسته‌ها

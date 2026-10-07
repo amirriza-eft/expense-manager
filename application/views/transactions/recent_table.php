@@ -9,7 +9,6 @@
     <?php $this->load->view('transactions/deleted_modal'); ?>
     <?php $this->load->view('transactions/modal'); ?>
     <?php $this->load->view('transactions/delete_modal'); ?>
-    <?php $this->load->view('categories/category_manager'); ?>
 </div>
 
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
@@ -18,27 +17,19 @@
 <script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 
+<?php $this->load->view('categories/category_manager'); ?>
+
 <script>
 function emptyTransactionForm() {
     return {id: '', title: '', type: 'expense', category_id: '', amount: '', description: '', transaction_date: '', date_display: ''};
 }
 
-const {createApp} = Vue;
-
-const app = createApp({
+const transactionsApp = Vue.createApp({
     data() {
         return {
-            // categories
-            categories: [],
-            deletedCategories: [],
-            categoryForm: {id: '', title: '', type: 'expense'},
-            categoryLoading: false,
-            categoryMessage: '',
-            categoryMessageSuccess: false,
-
-            // transactions
             transactions: [],
             deletedTransactions: [],
+            categoryOptions: [],
             filters: {search: '', type: '', category_id: '', from_date: '', to_date: '', sort: 'newest'},
             transactionForm: emptyTransactionForm(),
             transactionLoading: true,
@@ -54,23 +45,11 @@ const app = createApp({
     },
 
     computed: {
-        expenseCategories() {
-            return this.categories.filter(c => c.type === 'expense');
-        },
-        incomeCategories() {
-            return this.categories.filter(c => c.type === 'income');
-        },
-        deletedExpenseCategories() {
-            return this.deletedCategories.filter(c => c.type === 'expense');
-        },
-        deletedIncomeCategories() {
-            return this.deletedCategories.filter(c => c.type === 'income');
-        },
         filterCategories() {
-            return this.categories.filter(c => !this.filters.type || c.type === this.filters.type);
+            return this.categoryOptions.filter(c => !this.filters.type || c.type === this.filters.type);
         },
         formCategories() {
-            return this.categories.filter(c => c.type === this.transactionForm.type);
+            return this.categoryOptions.filter(c => c.type === this.transactionForm.type);
         },
         pageNumbers() {
             const pages = [];
@@ -170,110 +149,14 @@ const app = createApp({
             });
         },
 
-        // ---------- categories ----------
-        setCategoryMessage(text, success) {
-            this.categoryMessage = text;
-            this.categoryMessageSuccess = !!success;
-        },
-
-        async loadCategories() {
+        // read-only category list for the filter and form dropdowns (managed in category_manager.php)
+        async loadCategoryOptions() {
             try {
                 const response = await axios.get("<?= site_url('api/categories') ?>");
                 const data = response.data;
-                if (data.status) this.categories = data.categories || [];
+                if (data.status) this.categoryOptions = data.categories || [];
             } catch (error) {
                 console.error(error);
-            }
-        },
-
-        async loadDeletedCategories() {
-            try {
-                const response = await axios.get("<?= site_url('api/categories/deleted') ?>");
-                const data = response.data;
-                if (data.status) this.deletedCategories = data.categories || [];
-            } catch (error) {
-                console.error(error);
-            }
-        },
-
-        openCategoryManager() {
-            this.categoryMessage = '';
-            this.loadDeletedCategories();
-        },
-
-        resetCategoryForm() {
-            this.categoryForm = {id: '', title: '', type: 'expense'};
-        },
-
-        editCategory(category) {
-            this.categoryMessage = '';
-            this.categoryForm = {id: category.id, title: category.title, type: category.type};
-            this.$refs.categoryTitle.focus();
-        },
-
-        async saveCategory() {
-            const title = this.categoryForm.title.trim();
-            if (!title) return;
-
-            const url = this.categoryForm.id
-                ? "<?= site_url('api/categories/update/') ?>" + this.categoryForm.id
-                : "<?= site_url('api/categories/create') ?>";
-
-            this.categoryLoading = true;
-
-            try {
-                const response = await axios.post(url, new URLSearchParams({title: title, type: this.categoryForm.type}));
-                const data = response.data;
-                this.setCategoryMessage(data.message || (data.status ? 'دسته‌بندی ذخیره شد' : 'خطا در ذخیره دسته‌بندی'), data.status);
-
-                if (data.status) {
-                    this.resetCategoryForm();
-                    await this.loadCategories();
-                }
-            } catch (error) {
-                this.setCategoryMessage(this.errorText(error), false);
-            } finally {
-                this.categoryLoading = false;
-            }
-        },
-
-        async deleteCategory(id) {
-            if (!confirm('آیا از حذف این دسته‌بندی اطمینان دارید؟')) return;
-
-            this.categoryLoading = true;
-
-            try {
-                const response = await axios.post("<?= site_url('api/categories/delete/') ?>" + id);
-                const data = response.data;
-                this.setCategoryMessage(data.message || (data.status ? 'دسته‌بندی حذف شد' : 'خطا در حذف دسته‌بندی'), data.status);
-
-                if (data.status) {
-                    await this.loadCategories();
-                    await this.loadDeletedCategories();
-                }
-            } catch (error) {
-                this.setCategoryMessage(this.errorText(error), false);
-            } finally {
-                this.categoryLoading = false;
-            }
-        },
-
-        async restoreCategory(id) {
-            this.categoryLoading = true;
-
-            try {
-                const response = await axios.post("<?= site_url('api/categories/restore/') ?>" + id);
-                const data = response.data;
-                this.setCategoryMessage(data.message || (data.status ? 'دسته‌بندی بازیابی شد' : 'خطا در بازیابی دسته‌بندی'), data.status);
-
-                if (data.status) {
-                    await this.loadCategories();
-                    await this.loadDeletedCategories();
-                }
-            } catch (error) {
-                this.setCategoryMessage(this.errorText(error), false);
-            } finally {
-                this.categoryLoading = false;
             }
         },
 
@@ -381,7 +264,7 @@ const app = createApp({
         },
 
         openEditTransactionModal(tx) {
-            const categoryExists = this.categories.some(c => c.type === tx.type && String(c.id) === String(tx.category_id));
+            const categoryExists = this.categoryOptions.some(c => c.type === tx.type && String(c.id) === String(tx.category_id));
 
             this.transactionMessage = '';
             this.transactionForm = {
@@ -496,19 +379,21 @@ const app = createApp({
     },
 
     mounted() {
-        this.loadCategories();
+        // lets the category manager refresh our dropdowns after it changes a category
+        window.reloadCategoryOptions = this.loadCategoryOptions;
+
+        this.loadCategoryOptions();
         this.loadTransactions(1);
         this.initDatePickers();
 
-        this.$refs.categoryModal.addEventListener('hidden.bs.modal', this.resetCategoryForm);
-        this.$refs.deleteModal.addEventListener('hidden.bs.modal', () => { this.deleteTransactionId = null; });
+        // Bootstrap fires modal events as native DOM events (needed to measure descriptions once the modal is visible)
         this.$refs.deletedModal.addEventListener('shown.bs.modal', this.checkDescriptions);
     }
 });
 
 // keep the exact same spacing between inline elements as the old HTML
-app.config.compilerOptions.whitespace = 'preserve';
+transactionsApp.config.compilerOptions.whitespace = 'preserve';
 
 // mount after the page (and its helper scripts) finished loading
-document.addEventListener('DOMContentLoaded', () => app.mount('#transactions-app'));
+document.addEventListener('DOMContentLoaded', () => transactionsApp.mount('#transactions-app'));
 </script>
