@@ -143,7 +143,6 @@
 const categoriesApp = Vue.createApp({
     data() {
         return {
-            // all lists (the expense / income lists are filled when the data loads)
             categories: [],
             expenseCategories: [],
             incomeCategories: [],
@@ -151,7 +150,6 @@ const categoriesApp = Vue.createApp({
             deletedExpenseCategories: [],
             deletedIncomeCategories: [],
 
-            // the add / edit form
             categoryForm: {id: '', title: '', type: 'expense'},
             categoryLoading: false,
             categoryMessage: '',
@@ -160,7 +158,6 @@ const categoriesApp = Vue.createApp({
     },
 
     methods: {
-        // ---------- small helpers ----------
         fmtNumber(value) {
             return formatNumber(value);
         },
@@ -172,19 +169,16 @@ const categoriesApp = Vue.createApp({
             return 'خطا در ارتباط با سرور';
         },
 
-        // tells the transactions page to reload its category dropdowns
         notifyTransactions() {
             if (typeof reloadCategoryOptions === 'function') reloadCategoryOptions();
         },
 
-        // runs every time the modal opens
         openCategoryManager() {
             this.categoryMessage = '';
             this.categoryForm = {id: '', title: '', type: 'expense'};
             this.loadDeletedCategories();
         },
 
-        // ---------- load lists ----------
         async loadCategories() {
             try {
                 const response = await axios.get("<?= site_url('api/categories') ?>");
@@ -215,7 +209,6 @@ const categoriesApp = Vue.createApp({
             }
         },
 
-        // ---------- add / edit ----------
         editCategory(category) {
             this.categoryMessage = '';
             this.categoryForm = {id: category.id, title: category.title, type: category.type};
@@ -251,7 +244,6 @@ const categoriesApp = Vue.createApp({
             this.categoryLoading = false;
         },
 
-        // ---------- delete / restore ----------
         async deleteCategory(id) {
             if (!confirm('آیا از حذف این دسته‌بندی اطمینان دارید؟')) return;
 
@@ -301,18 +293,15 @@ const categoriesApp = Vue.createApp({
         }
     },
 
-    // runs once when the page is ready
     mounted() {
         this.loadCategories();
 
-        // Bootstrap fires modal events as native DOM events (resets the form and reloads deleted categories on open)
         this.$refs.categoryModal.addEventListener('show.bs.modal', this.openCategoryManager);
     }
 });
 
-// keep the exact same spacing between inline elements as the old HTML
 categoriesApp.config.compilerOptions.whitespace = 'preserve';
 
-// mount after the page (and its helper scripts) finished loading
 document.addEventListener('DOMContentLoaded', () => categoriesApp.mount('#categories-app'));
+
 </script>
