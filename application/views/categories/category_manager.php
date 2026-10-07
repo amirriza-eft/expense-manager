@@ -169,7 +169,7 @@ const categoriesApp = Vue.createApp({
             return 'خطا در ارتباط با سرور';
         },
 
-        notifyTransactions() {
+        refreshTransactionCategories() {
             if (typeof reloadCategoryOptions === 'function') reloadCategoryOptions();
         },
 
@@ -234,7 +234,7 @@ const categoriesApp = Vue.createApp({
                 if (data.status) {
                     this.categoryForm = {id: '', title: '', type: 'expense'};
                     await this.loadCategories();
-                    this.notifyTransactions();
+                    this.refreshTransactionCategories();
                 }
             } catch (error) {
                 this.categoryMessage = this.errorText(error);
@@ -259,7 +259,7 @@ const categoriesApp = Vue.createApp({
                 if (data.status) {
                     await this.loadCategories();
                     await this.loadDeletedCategories();
-                    this.notifyTransactions();
+                    this.refreshTransactionCategories();
                 }
             } catch (error) {
                 this.categoryMessage = this.errorText(error);
@@ -282,7 +282,7 @@ const categoriesApp = Vue.createApp({
                 if (data.status) {
                     await this.loadCategories();
                     await this.loadDeletedCategories();
-                    this.notifyTransactions();
+                    this.refreshTransactionCategories();
                 }
             } catch (error) {
                 this.categoryMessage = this.errorText(error);
@@ -299,8 +299,6 @@ const categoriesApp = Vue.createApp({
         this.$refs.categoryModal.addEventListener('show.bs.modal', this.openCategoryManager);
     }
 });
-
-categoriesApp.config.compilerOptions.whitespace = 'preserve';
 
 document.addEventListener('DOMContentLoaded', () => categoriesApp.mount('#categories-app'));
 
