@@ -63,28 +63,31 @@
                 monthlyExpense: 0
             };
         },
-        mounted() {
-            this.loadSummary();
-        },
+
         methods: {
             formatAmount(amount) {
                 return Number(amount || 0).toLocaleString('fa-IR');
             },
-            async loadSummary() {
+
+            async loadDashboardSummary() {
                 try {
-                    const { data } = await axios.get("<?= site_url('api/dashboard') ?>");
+                    const response = await axios.get("<?= site_url('api/dashboard') ?>");
+                    const data = response.data;
 
-                    if (!data.status) {
-                        return;
+                    if (data.status) {
+                        this.budgetAmount = data.budget_amount;
+                        this.monthlyIncome = data.monthly_income;
+                        this.monthlyExpense = data.monthly_expense;
                     }
-
-                    this.budgetAmount = data.budget_amount;
-                    this.monthlyIncome = data.monthly_income;
-                    this.monthlyExpense = data.monthly_expense;
                 } catch (error) {
                     console.error('Dashboard error:', error);
                 }
             }
+        },
+
+        mounted() {
+            window.loadDashboardSummary = this.loadDashboardSummary;
+            this.loadDashboardSummary();
         }
     }).mount('#dashboard-summary');
 </script>
