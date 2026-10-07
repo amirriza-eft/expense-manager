@@ -33,6 +33,5 @@
     <?php $this->load->view('transactions/recent_table'); ?>
 </div>
 
-<?php $this->load->view('transactions/budget_modals'); ?>
 <?php $this->load->view('dashboard/line_chart'); ?>
 <?php $this->load->view('components/footer'); ?>

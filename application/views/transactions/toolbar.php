@@ -9,6 +9,7 @@
             class="btn btn-orange-outline"
             data-bs-toggle="modal"
             data-bs-target="#categoryManagerModal"
+            @click="openCategoryManager"
         >
             <i class="bi bi-tags"></i>
             مدیریت دسته‌ها
@@ -19,7 +20,7 @@
             class="btn btn-orange-glow"
             data-bs-toggle="modal"
             data-bs-target="#transactionModal"
-            onclick="openCreateTransactionModal()"
+            @click="openCreateTransactionModal"
         >
             <i class="bi bi-plus-circle"></i>
             ثبت تراکنش
@@ -28,7 +29,7 @@
 
     <div class="d-flex align-items-center gap-2">
         <label for="sort" class="mb-0">مرتب‌سازی:</label>
-        <select id="sort" class="form-select" style="width: 150px;">
+        <select id="sort" class="form-select" style="width: 150px;" v-model="filters.sort" @change="loadTransactions(1)">
             <option value="newest">جدیدترین</option>
             <option value="oldest">قدیمی‌ترین</option>
         </select>
