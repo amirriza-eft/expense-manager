@@ -86,6 +86,7 @@
         },
 
         mounted() {
+            window.loadDashboardSummary = this.loadDashboardSummary;
             this.loadDashboardSummary();
         }
     }).mount('#dashboard-summary');
