@@ -196,9 +196,7 @@ const categoriesApp = Vue.createApp({
                 const data = response.data;
 
                 if (data.status) {
-
                     this.deletedCategories = data.categories;
-
                     this.deletedExpenseCategories = this.deletedCategories.filter(category => category.type === 'expense');
                     this.deletedIncomeCategories = this.deletedCategories.filter(category => category.type === 'income');
                 }
@@ -222,7 +220,6 @@ const categoriesApp = Vue.createApp({
         },
 
         async saveCategory() {
-
             const title = this.categoryForm.title.trim();
 
             if (!title) {
@@ -232,8 +229,7 @@ const categoriesApp = Vue.createApp({
             let url;
 
             if (this.categoryForm.id) {
-                url = "<?= site_url('api/categories/update/') ?>"
-                    + this.categoryForm.id;
+                url = "<?= site_url('api/categories/update/') ?>" + this.categoryForm.id;
             } else {
                 url = "<?= site_url('api/categories/create') ?>";
             }
@@ -252,10 +248,7 @@ const categoriesApp = Vue.createApp({
                 const data = response.data;
 
                 if (data.status) {
-
-                    this.categoryMessage =
-                        data.message || 'دسته‌بندی ذخیره شد';
-
+                    this.categoryMessage = data.message || 'دسته‌بندی ذخیره شد';
                     this.categoryMessageSuccess = true;
 
                     this.categoryForm = {
