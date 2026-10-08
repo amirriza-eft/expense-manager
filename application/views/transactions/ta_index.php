@@ -1,4 +1,3 @@
-```php
 <?php defined('BASEPATH') or exit('No direct script access allowed'); ?>
 
 <link rel="stylesheet" href="<?= base_url('assets/css/transactions.css') ?>">
@@ -77,15 +76,11 @@
             },
 
             showModal(ref) {
-                bootstrap.Modal
-                    .getOrCreateInstance(this.$refs[ref])
-                    .show();
+                bootstrap.Modal.getOrCreateInstance(this.$refs[ref]).show();
             },
 
             hideModal(ref) {
-                bootstrap.Modal
-                    .getInstance(this.$refs[ref])
-                    ?.hide();
+                bootstrap.Modal.getInstance(this.$refs[ref])?.hide();
             },
 
             cleanupModal() {
@@ -182,12 +177,8 @@
                                 search: this.filters.search,
                                 type: this.filters.type,
                                 category_id: this.filters.category_id,
-                                from_date: this.filters.from_date
-                                    ? convertPersianToGregorian(this.filters.from_date)
-                                    : '',
-                                to_date: this.filters.to_date
-                                    ? convertPersianToGregorian(this.filters.to_date)
-                                    : '',
+                                from_date: this.filters.from_date ? convertPersianToGregorian(this.filters.from_date) : '',
+                                to_date: this.filters.to_date ? convertPersianToGregorian(this.filters.to_date) : '',
                                 sort: this.filters.sort
                             }
                         }
