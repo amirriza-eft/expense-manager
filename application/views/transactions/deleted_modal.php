@@ -1,6 +1,6 @@
 <?php defined('BASEPATH') or exit('No direct script access allowed'); ?>
 
-<div class="modal fade" id="deletedTransactionsModal" tabindex="-1" aria-hidden="true" ref="deletedModal">
+<div class="modal fade" id="deletedTransactionsModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-lg modal-dialog-scrollable">
         <div class="modal-content glass-panel text-white"
              style="background: #1e1e24; border: 1px solid var(--border-subtle);">
@@ -16,7 +16,7 @@
                     <span id="deletedTransactionCount" class="text-muted small">{{ 'تعداد: ' + fmtNumber(deletedTransactions.length) }}</span>
                 </div>
 
-                <div id="deletedTransactionList" class="transaction-list" aria-live="polite" ref="deletedList">
+                <div id="deletedTransactionList" class="transaction-list" aria-live="polite">
                     <div v-if="!deletedTransactions.length" class="transaction-empty">
                         <i class="bi bi-inbox"></i>تراکنش حذف‌شده‌ای وجود ندارد
                     </div>
@@ -33,13 +33,7 @@
 
                         <div class="transaction-card__middle">
                             <div class="transaction-card__section-title">توضیحات</div>
-                            <template v-if="(tx.description || '').trim()">
-                                <p class="transaction-card__description" :class="{'is-expanded': expanded[tx.id]}">{{ tx.description.trim() }}</p>
-                                <button type="button" class="transaction-card__toggle-desc"
-                                        :class="{'is-visible': overflowing[tx.id]}" @click="toggleDescription(tx.id)">
-                                    {{ expanded[tx.id] ? 'کمتر' : 'بیشتر' }}
-                                </button>
-                            </template>
+                            <p v-if="tx.description" class="transaction-card__description">{{ tx.description }}</p>
                         </div>
 
                         <div class="transaction-card__right">

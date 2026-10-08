@@ -25,25 +25,9 @@
                 deletedTransactions: [],
                 categoryOptions: [],
 
-                filters: {
-                    search: '',
-                    type: '',
-                    category_id: '',
-                    from_date: '',
-                    to_date: '',
-                    sort: 'newest'
-                },
+                filters: {search: '', type: '', category_id: '', from_date: '', to_date: '', sort: 'newest'},
 
-                transactionForm: {
-                    id: '',
-                    title: '',
-                    type: 'expense',
-                    category_id: '',
-                    amount: '',
-                    description: '',
-                    transaction_date: '',
-                    date_display: ''
-                },
+                transactionForm: {id: '', title: '', type: 'expense', category_id: '', amount: '', description: '', date_display: ''},
 
                 transactionLoading: false,
                 transactionMessage: '',
@@ -55,33 +39,14 @@
                 totalCount: 0,
 
                 deleteTransactionId: null,
-
-                expanded: {},
-                overflowing: {}
             };
         },
 
         methods: {
 
-            fmtNumber(value) {
-                return formatNumber(value);
-            },
-
-            fmtDate(date) {
-                return formatPersianDate(date);
-            },
-
-            amountHtml(tx) {
-                return formatAmount(tx.amount, tx.type);
-            },
-
-            showModal(ref) {
-                bootstrap.Modal.getOrCreateInstance(this.$refs[ref]).show();
-            },
-
-            hideModal(ref) {
-                bootstrap.Modal.getInstance(this.$refs[ref])?.hide();
-            },
+            fmtNumber(value) { return formatNumber(value); },
+            fmtDate(date) { return formatPersianDate(date); },
+            amountHtml(tx) { return formatAmount(tx.amount, tx.type); },
 
             cleanupModal() {
                 document.querySelectorAll('.modal-backdrop').forEach(el => el.remove());
@@ -90,31 +55,7 @@
                 document.body.style.removeProperty('padding-right');
             },
 
-            toggleDescription(id) {
-                this.expanded[id] = !this.expanded[id];
-            },
-
-            checkDescriptions() {
-                this.checkList(this.$refs.transactionList);
-                this.checkList(this.$refs.deletedList);
-            },
-
-            checkList(list) {
-                if (!list) return;
-
-                const cards = list.querySelectorAll('.transaction-card');
-
-                for (const card of cards) {
-                    const desc = card.querySelector('.transaction-card__description');
-
-                    if (desc && desc.scrollHeight > desc.clientHeight + 2) {
-                        this.overflowing[card.dataset.transactionId] = true;
-                    }
-                }
-            },
-
             initDatePickers() {
-
                 $(this.$refs.filterFromDate).pDatepicker({
                     format: 'YYYY/MM/DD',
                     autoClose: true,
@@ -141,26 +82,16 @@
                     initialValue: true,
                     calendar: {persian: {locale: 'fa'}},
                     onSelect: () => {
-                        const date = this.$refs.txDateDisplay.value;
-
-                        this.transactionForm.date_display = date;
-                        this.transactionForm.transaction_date =
-                            convertPersianToGregorian(date);
+                        this.transactionForm.date_display = this.$refs.txDateDisplay.value;
                     }
                 });
             },
 
             async loadCategoryOptions() {
-                try {
-                    const response = await axios.get(
-                        "<?= site_url('api/categories') ?>"
-                    );
+                const response = await axios.get("<?= site_url('api/categories') ?>");
 
-                    if (response.data.status) {
-                        this.categoryOptions = response.data.categories;
-                    }
-                } catch (error) {
-                    console.error(error);
+                if (response.data.status) {
+                    this.categoryOptions = response.data.categories;
                 }
             },
 
@@ -169,34 +100,27 @@
                 this.transactionLoading = true;
 
                 try {
-                    const response = await axios.get(
-                        "<?= site_url('api/transaction') ?>",
-                        {
-                            params: {
-                                page: this.currentPage,
-                                search: this.filters.search,
-                                type: this.filters.type,
-                                category_id: this.filters.category_id,
-                                from_date: this.filters.from_date ? convertPersianToGregorian(this.filters.from_date) : '',
-                                to_date: this.filters.to_date ? convertPersianToGregorian(this.filters.to_date) : '',
-                                sort: this.filters.sort
-                            }
+                    const response = await axios.get("<?= site_url('api/transaction') ?>", {
+                        params: {
+                            page: page,
+                            search: this.filters.search,
+                            type: this.filters.type,
+                            category_id: this.filters.category_id,
+                            from_date: this.filters.from_date ? convertPersianToGregorian(this.filters.from_date) : '',
+                            to_date: this.filters.to_date ? convertPersianToGregorian(this.filters.to_date) : '',
+                            sort: this.filters.sort
                         }
-                    );
+                    });
 
                     const data = response.data;
 
                     if (data.status && data.transactions.length) {
-
                         this.transactions = data.transactions;
-
                         this.totalCount = data.pagination.total;
                         this.totalPages = Number(data.pagination.total_pages);
                         this.currentPage = Number(data.pagination.current_page);
 
-                        this.expanded = {};
                         this.pageNumbers = [];
-
                         const start = Math.max(1, this.currentPage - 2);
                         const end = Math.min(this.totalPages, this.currentPage + 2);
 
@@ -204,15 +128,12 @@
                             this.pageNumbers.push(i);
                         }
 
-                        this.$nextTick(this.checkDescriptions);
-
                     } else {
                         this.transactions = [];
                         this.totalCount = 0;
                         this.totalPages = 1;
                         this.pageNumbers = [];
                     }
-
                 } catch (error) {
                     console.error(error);
                 }
@@ -226,18 +147,10 @@
             },
 
             async loadDeletedTransactions() {
-                try {
-                    const response = await axios.get(
-                        "<?= site_url('api/transaction/deleted') ?>"
-                    );
+                const response = await axios.get("<?= site_url('api/transaction/deleted') ?>");
 
-                    if (response.data.status) {
-                        this.deletedTransactions = response.data.transactions;
-                        this.$nextTick(this.checkDescriptions);
-                    }
-
-                } catch (error) {
-                    console.error(error);
+                if (response.data.status) {
+                    this.deletedTransactions = response.data.transactions;
                 }
             },
 
@@ -255,16 +168,10 @@
                     } else {
                         alert(response.data.message);
                     }
-
                 } catch (error) {
                     console.error(error);
                     alert('خطا در ارتباط با سرور');
                 }
-            },
-
-            setTransactionDate(date = todayGregorianDate()) {
-                this.transactionForm.transaction_date = date;
-                this.transactionForm.date_display = formatPersianDate(date);
             },
 
             openCreateTransactionModal() {
@@ -277,22 +184,15 @@
                     category_id: '',
                     amount: '',
                     description: '',
-                    transaction_date: '',
-                    date_display: ''
+                    date_display: formatPersianDate(todayGregorianDate())
                 };
-
-                this.setTransactionDate();
             },
 
             openEditTransactionModal(tx) {
-
                 let categoryId = '';
 
                 for (const category of this.categoryOptions) {
-                    if (
-                        category.type === tx.type &&
-                        String(category.id) === String(tx.category_id)
-                    ) {
+                    if (category.type === tx.type && String(category.id) === String(tx.category_id)) {
                         categoryId = tx.category_id;
                     }
                 }
@@ -306,12 +206,10 @@
                     category_id: categoryId,
                     amount: formatAmountInput(tx.amount),
                     description: tx.description || '',
-                    transaction_date: '',
-                    date_display: ''
+                    date_display: formatPersianDate(tx.transaction_date)
                 };
 
-                this.setTransactionDate(tx.transaction_date);
-                this.showModal('transactionModal');
+                bootstrap.Modal.getOrCreateInstance(this.$refs.transactionModal).show();
             },
 
             onAmountInput(event) {
@@ -321,44 +219,34 @@
 
                 input.value = formatAmountInput(input.value);
 
-                const newPosition =
-                    position + input.value.length - oldLength;
-
+                const newPosition = position + input.value.length - oldLength;
                 input.setSelectionRange(newPosition, newPosition);
 
                 this.transactionForm.amount = input.value;
             },
 
             async saveTransaction() {
-
                 const form = this.transactionForm;
+                const date = convertPersianToGregorian(form.date_display);
 
-                if (form.date_display) {
-                    form.transaction_date =
-                        convertPersianToGregorian(form.date_display);
-                }
-
-                if (!form.transaction_date) {
+                if (!date) {
                     this.transactionMessage = 'لطفاً تاریخ تراکنش را انتخاب کنید';
                     this.transactionMessageSuccess = false;
                     return;
                 }
 
                 const formData = new FormData();
-
                 formData.append('id', form.id);
                 formData.append('title', form.title);
                 formData.append('type', form.type);
                 formData.append('category_id', form.category_id);
                 formData.append('amount', getAmountInputValue(form.amount));
                 formData.append('description', form.description);
-                formData.append('transaction_date', form.transaction_date);
-
-                const isCreate = !form.id;
+                formData.append('transaction_date', date);
 
                 let url = "<?= site_url('api/transaction/create') ?>";
 
-                if (!isCreate) {
+                if (form.id) {
                     url = "<?= site_url('api/transaction/update/') ?>" + form.id;
                 }
 
@@ -366,28 +254,16 @@
 
                 try {
                     const response = await axios.post(url, formData);
-                    const data = response.data;
 
-                    this.transactionMessage = data.message;
-                    this.transactionMessageSuccess = data.status;
+                    this.transactionMessage = response.data.message;
+                    this.transactionMessageSuccess = response.data.status;
 
-                    if (data.status) {
+                    if (response.data.status) {
+                        bootstrap.Modal.getInstance(this.$refs.transactionModal).hide();
 
-                        this.$refs.transactionModal.addEventListener(
-                            'hidden.bs.modal',
-                            this.cleanupModal,
-                            {once: true}
-                        );
-
-                        this.hideModal('transactionModal');
-
-                        await this.loadTransactions(
-                            isCreate ? 1 : this.currentPage
-                        );
-
+                        await this.loadTransactions(form.id ? this.currentPage : 1);
                         loadDashboardSummary();
                     }
-
                 } catch (error) {
                     console.error(error);
                     this.transactionMessage = 'خطا در ارتباط با سرور';
@@ -399,44 +275,27 @@
 
             confirmDeleteTransaction(id) {
                 this.deleteTransactionId = id;
-                this.showModal('deleteModal');
+                bootstrap.Modal.getOrCreateInstance(this.$refs.deleteModal).show();
             },
 
             async deleteTransaction() {
-
-                if (!this.deleteTransactionId) return;
-
                 this.transactionLoading = true;
 
                 try {
                     const response = await axios.post(
-                        "<?= site_url('api/transaction/delete/') ?>" +
-                        this.deleteTransactionId,
-
-                        new URLSearchParams({
-                            id: this.deleteTransactionId
-                        })
+                        "<?= site_url('api/transaction/delete/') ?>" + this.deleteTransactionId,
+                        new URLSearchParams({id: this.deleteTransactionId})
                     );
 
-                    const data = response.data;
-
-                    if (data.status) {
-                        this.$refs.deleteModal.addEventListener(
-                            'hidden.bs.modal',
-                            this.cleanupModal,
-                            {once: true}
-                        );
-
-                        this.hideModal('deleteModal');
+                    if (response.data.status) {
+                        bootstrap.Modal.getInstance(this.$refs.deleteModal).hide();
 
                         await this.loadTransactions(this.currentPage);
-
                         this.loadDeletedTransactions();
                         loadDashboardSummary();
                     } else {
-                        alert(data.message);
+                        alert(response.data.message);
                     }
-
                 } catch (error) {
                     console.error(error);
                     alert('خطا در ارتباط با سرور');
@@ -447,17 +306,14 @@
         },
 
         mounted() {
-
             window.reloadCategoryOptions = this.loadCategoryOptions;
 
             this.loadCategoryOptions();
             this.loadTransactions();
             this.initDatePickers();
 
-            this.$refs.deletedModal.addEventListener(
-                'shown.bs.modal',
-                this.checkDescriptions
-            );
+            this.$refs.transactionModal.addEventListener('hidden.bs.modal', this.cleanupModal);
+            this.$refs.deleteModal.addEventListener('hidden.bs.modal', this.cleanupModal);
         }
     });
 

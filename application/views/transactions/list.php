@@ -6,7 +6,7 @@
         <span id="transactionCount" class="text-muted small">{{ totalCount === null ? '' : 'تعداد: ' + fmtNumber(totalCount) }}</span>
     </div>
 
-    <div id="transactionList" class="transaction-list" aria-live="polite" ref="transactionList">
+    <div id="transactionList" class="transaction-list" aria-live="polite">
         <div v-if="!transactionLoading && !transactions.length" class="transaction-empty">
             <i class="bi bi-inbox"></i>تراکنشی وجود ندارد
         </div>
@@ -27,13 +27,7 @@
 
             <div class="transaction-card__middle">
                 <div class="transaction-card__section-title">توضیحات</div>
-                <template v-if="(tx.description || '').trim()">
-                    <p class="transaction-card__description" :class="{'is-expanded': expanded[tx.id]}">{{ tx.description.trim() }}</p>
-                    <button type="button" class="transaction-card__toggle-desc"
-                            :class="{'is-visible': overflowing[tx.id]}" @click="toggleDescription(tx.id)">
-                        {{ expanded[tx.id] ? 'کمتر' : 'بیشتر' }}
-                    </button>
-                </template>
+                <p v-if="tx.description" class="transaction-card__description">{{ tx.description }}</p>
             </div>
 
             <div class="transaction-card__right">
@@ -78,12 +72,12 @@
     <div class="d-flex justify-content-center mt-4 pt-3 border-top"
          style="border-color: var(--border-subtle) !important;">
         <button
-            type="button"
-            class="btn btn-orange-outline"
-            id="openDeletedTransactionsBtn"
-            data-bs-toggle="modal"
-            data-bs-target="#deletedTransactionsModal"
-            @click="loadDeletedTransactions"
+                type="button"
+                class="btn btn-orange-outline"
+                id="openDeletedTransactionsBtn"
+                data-bs-toggle="modal"
+                data-bs-target="#deletedTransactionsModal"
+                @click="loadDeletedTransactions"
         >
             <i class="bi bi-trash"></i>
             تراکنش‌های حذف‌شده
