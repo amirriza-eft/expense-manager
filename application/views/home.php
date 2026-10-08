@@ -3,19 +3,6 @@
 <?php $this->load->view('components/navbar'); ?>
 
 <div class="container py-4">
-    <?php if ($this->session->flashdata('success')): ?>
-        <div class="alert alert-success py-2 px-3 small border-0 mb-4">
-            <i class="bi bi-check-circle ms-1"></i>
-            <?= html_escape($this->session->flashdata('success')); ?>
-        </div>
-    <?php endif; ?>
-
-    <?php if ($this->session->flashdata('error')): ?>
-        <div class="alert alert-danger py-2 px-3 small border-0 mb-4" role="alert">
-            <i class="bi bi-exclamation-triangle ms-1"></i>
-            <?= html_escape($this->session->flashdata('error')); ?>
-        </div>
-    <?php endif; ?>
 
     <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-3">
         <div>
@@ -30,7 +17,7 @@
 
     <?php $this->load->view('dashboard/summary'); ?>
     <br>
-    <?php $this->load->view('transactions/recent_table'); ?>
+    <?php $this->load->view('transactions/ta_index'); ?>
 </div>
 
 <?php $this->load->view('dashboard/line_chart'); ?>
