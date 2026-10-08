@@ -140,7 +140,9 @@
 </div>
 
 <script>
+
 const categoriesApp = Vue.createApp({
+
     data() {
         return {
             categories: [],
@@ -149,8 +151,11 @@ const categoriesApp = Vue.createApp({
             deletedCategories: [],
             deletedExpenseCategories: [],
             deletedIncomeCategories: [],
-
-            categoryForm: {id: '', title: '', type: 'expense'},
+            categoryForm: {
+                id: '',
+                title: '',
+                type: 'expense'
+            },
             categoryLoading: false,
             categoryMessage: '',
             categoryMessageSuccess: false
@@ -162,82 +167,117 @@ const categoriesApp = Vue.createApp({
             return formatNumber(value);
         },
 
-        errorText(error) {
-            if (error.response && error.response.data && error.response.data.message) {
-                return error.response.data.message;
-            }
-            return 'خطا در ارتباط با سرور';
-        },
-
-        refreshTransactionCategories() {
-            if (typeof reloadCategoryOptions === 'function') reloadCategoryOptions();
-        },
-
-        openCategoryManager() {
-            this.categoryMessage = '';
-            this.categoryForm = {id: '', title: '', type: 'expense'};
-            this.loadDeletedCategories();
-        },
-
         async loadCategories() {
             try {
-                const response = await axios.get("<?= site_url('api/categories') ?>");
+                const response = await axios.get(
+                    "<?= site_url('api/categories') ?>"
+                );
+
                 const data = response.data;
 
                 if (data.status) {
-                    this.categories = data.categories || [];
-                    this.expenseCategories = this.categories.filter(c => c.type === 'expense');
-                    this.incomeCategories = this.categories.filter(c => c.type === 'income');
+                    this.categories = data.categories;
+                    this.expenseCategories = this.categories.filter(category => category.type === 'expense');
+                    this.incomeCategories = this.categories.filter(category => category.type === 'income');
                 }
+
             } catch (error) {
                 console.error(error);
             }
         },
 
         async loadDeletedCategories() {
+
             try {
-                const response = await axios.get("<?= site_url('api/categories/deleted') ?>");
+                const response = await axios.get(
+                    "<?= site_url('api/categories/deleted') ?>"
+                );
+
                 const data = response.data;
 
                 if (data.status) {
-                    this.deletedCategories = data.categories || [];
-                    this.deletedExpenseCategories = this.deletedCategories.filter(c => c.type === 'expense');
-                    this.deletedIncomeCategories = this.deletedCategories.filter(c => c.type === 'income');
+
+                    this.deletedCategories = data.categories;
+
+                    this.deletedExpenseCategories = this.deletedCategories.filter(category => category.type === 'expense');
+                    this.deletedIncomeCategories = this.deletedCategories.filter(category => category.type === 'income');
                 }
+
             } catch (error) {
                 console.error(error);
             }
         },
 
         editCategory(category) {
+
             this.categoryMessage = '';
-            this.categoryForm = {id: category.id, title: category.title, type: category.type};
+
+            this.categoryForm = {
+                id: category.id,
+                title: category.title,
+                type: category.type
+            };
+
             this.$refs.categoryTitle.focus();
         },
 
         async saveCategory() {
-            const title = this.categoryForm.title.trim();
-            if (!title) return;
 
-            let url = "<?= site_url('api/categories/create') ?>";
-            if (this.categoryForm.id) url = "<?= site_url('api/categories/update/') ?>" + this.categoryForm.id;
+            const title = this.categoryForm.title.trim();
+
+            if (!title) {
+                return;
+            }
+
+            let url;
+
+            if (this.categoryForm.id) {
+                url = "<?= site_url('api/categories/update/') ?>"
+                    + this.categoryForm.id;
+            } else {
+                url = "<?= site_url('api/categories/create') ?>";
+            }
 
             this.categoryLoading = true;
 
             try {
-                const response = await axios.post(url, new URLSearchParams({title: title, type: this.categoryForm.type}));
+                const response = await axios.post(
+                    url,
+                    new URLSearchParams({
+                        title: title,
+                        type: this.categoryForm.type
+                    })
+                );
+
                 const data = response.data;
 
-                this.categoryMessage = data.message || (data.status ? 'دسته‌بندی ذخیره شد' : 'خطا در ذخیره دسته‌بندی');
-                this.categoryMessageSuccess = data.status ? true : false;
-
                 if (data.status) {
-                    this.categoryForm = {id: '', title: '', type: 'expense'};
+
+                    this.categoryMessage =
+                        data.message || 'دسته‌بندی ذخیره شد';
+
+                    this.categoryMessageSuccess = true;
+
+                    this.categoryForm = {
+                        id: '',
+                        title: '',
+                        type: 'expense'
+                    };
+
                     await this.loadCategories();
-                    this.refreshTransactionCategories();
+
+                    reloadCategoryOptions();
+
+                } else {
+                    this.categoryMessage =
+                        data.message || 'خطا در ذخیره دسته‌بندی';
+
+                    this.categoryMessageSuccess = false;
                 }
+
+
             } catch (error) {
-                this.categoryMessage = this.errorText(error);
+                this.categoryMessage = 'خطا در ارتباط با سرور';
                 this.categoryMessageSuccess = false;
             }
 
@@ -245,61 +285,99 @@ const categoriesApp = Vue.createApp({
         },
 
         async deleteCategory(id) {
-            if (!confirm('آیا از حذف این دسته‌بندی اطمینان دارید؟')) return;
+
+            if (!confirm('آیا از حذف این دسته‌بندی اطمینان دارید؟')) {
+                return;
+            }
 
             this.categoryLoading = true;
 
             try {
-                const response = await axios.post("<?= site_url('api/categories/delete/') ?>" + id);
+                const response = await axios.post(
+                    "<?= site_url('api/categories/delete/') ?>" + id
+                );
                 const data = response.data;
 
-                this.categoryMessage = data.message || (data.status ? 'دسته‌بندی حذف شد' : 'خطا در حذف دسته‌بندی');
-                this.categoryMessageSuccess = data.status ? true : false;
-
                 if (data.status) {
+
+                    this.categoryMessage = data.message || 'دسته‌بندی حذف شد';
+                    this.categoryMessageSuccess = true;
+
                     await this.loadCategories();
                     await this.loadDeletedCategories();
-                    this.refreshTransactionCategories();
+
+                    reloadCategoryOptions();
+                } else {
+                    this.categoryMessage = data.message || 'خطا در حذف دسته‌بندی';
+                    this.categoryMessageSuccess = false;
                 }
+
+
             } catch (error) {
-                this.categoryMessage = this.errorText(error);
+                this.categoryMessage = 'خطا در ارتباط با سرور';
                 this.categoryMessageSuccess = false;
             }
 
             this.categoryLoading = false;
         },
 
+
         async restoreCategory(id) {
             this.categoryLoading = true;
 
             try {
-                const response = await axios.post("<?= site_url('api/categories/restore/') ?>" + id);
+                const response = await axios.post(
+                    "<?= site_url('api/categories/restore/') ?>" + id
+                );
                 const data = response.data;
 
-                this.categoryMessage = data.message || (data.status ? 'دسته‌بندی بازیابی شد' : 'خطا در بازیابی دسته‌بندی');
-                this.categoryMessageSuccess = data.status ? true : false;
-
                 if (data.status) {
+                    this.categoryMessage = data.message || 'دسته‌بندی بازیابی شد';
+
+                    this.categoryMessageSuccess = true;
+
                     await this.loadCategories();
                     await this.loadDeletedCategories();
-                    this.refreshTransactionCategories();
+
+                    reloadCategoryOptions();
+
+                } else {
+                    this.categoryMessage = data.message || 'خطا در بازیابی دسته‌بندی';
+                    this.categoryMessageSuccess = false;
                 }
+
             } catch (error) {
-                this.categoryMessage = this.errorText(error);
+                this.categoryMessage = 'خطا در ارتباط با سرور';
                 this.categoryMessageSuccess = false;
             }
 
             this.categoryLoading = false;
+        },
+
+        openCategoryManager() {
+            this.categoryMessage = '';
+
+            this.categoryForm = {
+                id: '',
+                title: '',
+                type: 'expense'
+            };
+
+            this.loadDeletedCategories();
         }
+
     },
 
     mounted() {
         this.loadCategories();
 
-        this.$refs.categoryModal.addEventListener('show.bs.modal', this.openCategoryManager);
+        this.$refs.categoryModal.addEventListener(
+            'show.bs.modal',
+            this.openCategoryManager
+        );
     }
 });
 
-document.addEventListener('DOMContentLoaded', () => categoriesApp.mount('#categories-app'));
+categoriesApp.mount('#categories-app');
 
 </script>
