@@ -44,9 +44,17 @@
 
         methods: {
 
-            fmtNumber(value) { return formatNumber(value); },
-            fmtDate(date) { return formatPersianDate(date); },
-            amountHtml(tx) { return formatAmount(tx.amount, tx.type); },
+            fmtNumber(value) {
+                return formatNumber(value);
+            },
+
+            fmtDate(date) {
+                return formatPersianDate(date);
+            },
+
+            amountHtml(tx) {
+                return formatAmount(tx.amount, tx.type);
+            },
 
             cleanupModal() {
                 document.querySelectorAll('.modal-backdrop').forEach(el => el.remove());
@@ -55,7 +63,7 @@
                 document.body.style.removeProperty('padding-right');
             },
 
-            initDatePickers() {
+            DatePickers() {
                 $(this.$refs.filterFromDate).pDatepicker({
                     format: 'YYYY/MM/DD',
                     autoClose: true,
@@ -310,7 +318,7 @@
 
             this.loadCategoryOptions();
             this.loadTransactions();
-            this.initDatePickers();
+            this.DatePickers();
 
             this.$refs.transactionModal.addEventListener('hidden.bs.modal', this.cleanupModal);
             this.$refs.deleteModal.addEventListener('hidden.bs.modal', this.cleanupModal);
