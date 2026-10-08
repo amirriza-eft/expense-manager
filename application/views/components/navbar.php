@@ -40,7 +40,7 @@
                         ?: ($this->session->userdata('full_name') ?: 'کاربر');
                 ?>
                 <div class="d-flex align-items-center gap-3">
-                    <button type="button" class="btn btn-outline-danger" title="خروج" @click="openLogoutModal">
+                    <button type="button" class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#logoutModal">
                         <i class="bi bi-box-arrow-right"></i>
                         <span class="d-none d-sm-inline">خروج</span>
                     </button>
@@ -100,14 +100,7 @@
                 logoutModal: null
             };
         },
-        mounted() {
-            const element = document.getElementById('logoutModal');
-            if (element) this.logoutModal = new bootstrap.Modal(element);
-        },
         methods: {
-            openLogoutModal() {
-                if (this.logoutModal) this.logoutModal.show();
-            },
             async logout() {
                 if (this.logoutLoading) return;
                 this.logoutLoading = true;
