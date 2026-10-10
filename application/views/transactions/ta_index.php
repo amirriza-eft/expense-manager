@@ -194,12 +194,6 @@
             openEditTransactionModal(tx) {
                 let categoryId = '';
 
-                for (const category of this.categoryOptions) {
-                    if (category.type === tx.type && String(category.id) === String(tx.category_id)) {
-                        categoryId = tx.category_id;
-                    }
-                }
-
                 this.transactionMessage = '';
 
                 this.transactionForm = {
