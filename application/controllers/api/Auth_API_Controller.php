@@ -42,28 +42,17 @@ class Auth_API_Controller extends Base_API_Controller
 
                 'status'=>false,
                 'message'=>validation_errors()
-
             ],400);
-
         }
 
         return $this->json(
 
             $this->auth_service->register([
-
-                'full_name'=>
-                    $this->input->post('full_name',true),
-
-                'email'=>
-                    $this->input->post('email',true),
-
-                'password'=>
-                    $this->input->post('password')
-
+                'full_name'=> $this->input->post('full_name',true),
+                'email'=> $this->input->post('email',true),
+                'password'=> $this->input->post('password')
             ])
-
         );
-
     }
 
     public function login()
@@ -71,6 +60,7 @@ class Auth_API_Controller extends Base_API_Controller
         $remember_me = $this->input->post('remember_me', true) === '1';
 
         return $this->json(
+
             $this->auth_service->login(
                 $this->input->post('email', true),
                 $this->input->post('password'),
@@ -84,11 +74,8 @@ class Auth_API_Controller extends Base_API_Controller
         return $this->json(
 
             $this->auth_service->restore(
-
                 $this->input->post('email',true),
-
                 $this->input->post('password')
-
             )
         );
     }
@@ -110,9 +97,7 @@ class Auth_API_Controller extends Base_API_Controller
         return $this->json(
 
             $this->auth_service->delete(
-
                 $user_id,
-
                 $this->input->post('password')
             )
         );

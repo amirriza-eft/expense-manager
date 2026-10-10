@@ -25,17 +25,9 @@ class Dashboard_API_Controller extends Base_API_Controller
         return $this->json([
 
             'status'=>true,
-
-            'budget_amount'=>
-                $budget->amount ?? 0,
-
-            'monthly_income'=>
-                $this->Transaction_model
-                    ->get_monthly_income($user_id),
-
-            'monthly_expense'=>
-                $this->Transaction_model
-                    ->get_monthly_expense($user_id)
+            'budget_amount'=> $budget->amount ?? 0,
+            'monthly_income'=> $this->Transaction_model->get_monthly_income($user_id),
+            'monthly_expense'=> $this->Transaction_model->get_monthly_expense($user_id)
         ]);
     }
 }

@@ -9,10 +9,7 @@ class Category_service
     protected $category_policy;
 
 
-    public function __construct(
-        $category_model,
-        $category_policy
-    )
+    public function __construct($category_model, $category_policy)
     {
         $this->category_model = $category_model;
         $this->category_policy = $category_policy;

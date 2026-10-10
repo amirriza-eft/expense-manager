@@ -9,11 +9,8 @@ class Auth_service
     protected $session;
     protected $remember_token_model;
 
-    public function __construct(
-        $user_model,
-        $session,
-        $remember_token_model
-    ) {
+    public function __construct($user_model, $session, $remember_token_model)
+    {
         $this->user_model = $user_model;
         $this->session = $session;
         $this->remember_token_model = $remember_token_model;
@@ -29,16 +26,9 @@ class Auth_service
             ];
         }
 
-        $data['password'] =
-            password_hash(
-                $data['password'],
-                PASSWORD_DEFAULT
-            );
+        $data['password'] = password_hash($data['password'], PASSWORD_DEFAULT);
 
-
-        $data['created_at'] =
-            date('Y-m-d H:i:s');
-
+        $data['created_at'] = date('Y-m-d H:i:s');
 
         $user_id = $this->user_model->create($data);
 
