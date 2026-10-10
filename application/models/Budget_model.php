@@ -55,15 +55,15 @@ class Budget_model extends CI_Model
         $query = $this->db
             ->select("DATE(transaction_date) AS day", false)
             ->select("
-            SUM(
-                IF(type = 'income', amount, 0)
-            ) AS income
-        ", false)
+                SUM(
+                    IF(type = 'income', amount, 0)
+                ) AS income
+            ", false)
             ->select("
-            SUM(
-                IF(type = 'expense', amount, 0)
-            ) AS expense
-        ", false)
+                SUM(
+                    IF(type = 'expense', amount, 0)
+                ) AS expense
+            ", false)
             ->where('user_id', $user_id)
             ->where('deleted_at IS NULL', null, false)
             ->where('transaction_date >=', $from)
