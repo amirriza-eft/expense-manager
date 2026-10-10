@@ -11,7 +11,7 @@
             <i class="bi bi-inbox"></i>تراکنشی وجود ندارد
         </div>
 
-        <article v-for="tx in transactions" :key="tx.id" class="transaction-card" :data-transaction-id="tx.id">
+        <article v-for="tx in transactions" :key="tx.id" class="transaction-card">
             <div class="transaction-card__left">
                 <div class="transaction-card__actions">
                     <button type="button" class="btn btn-sm btn-outline-secondary" title="ویرایش"

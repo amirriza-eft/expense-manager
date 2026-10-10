@@ -134,7 +134,7 @@
                     );
 
                     this.profileMessage = data.message || '';
-                    this.profileMessageSuccess = !!data.status;
+                    this.profileMessageSuccess = data.status;
 
                     if (data.status && data.user) {
                         this.setAvatar(data.user);
@@ -164,7 +164,7 @@
                     );
 
                     this.passwordMessage = data.message || '';
-                    this.passwordMessageSuccess = !!data.status;
+                    this.passwordMessageSuccess = data.status;
 
                     if (data.status) {
                         this.currentPassword = '';
@@ -196,7 +196,7 @@
                     );
 
                     this.deleteMessage = data.message || '';
-                    this.deleteMessageSuccess = !!data.status;
+                    this.deleteMessageSuccess = data.status;
 
                     if (data.status) {
                         setTimeout(() => {

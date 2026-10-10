@@ -21,7 +21,7 @@
                         <i class="bi bi-inbox"></i>تراکنش حذف‌شده‌ای وجود ندارد
                     </div>
 
-                    <article v-for="tx in deletedTransactions" :key="tx.id" class="transaction-card transaction-card--deleted" :data-transaction-id="tx.id">
+                    <article v-for="tx in deletedTransactions" :key="tx.id" class="transaction-card transaction-card--deleted">
                         <div class="transaction-card__left">
                             <div class="transaction-card__actions">
                                 <button type="button" class="btn btn-sm btn-orange-outline" title="بازیابی"
