@@ -56,13 +56,6 @@
                 return formatAmount(tx.amount, tx.type);
             },
 
-            cleanupModal() {
-                document.querySelectorAll('.modal-backdrop').forEach(el => el.remove());
-                document.body.classList.remove('modal-open');
-                document.body.style.removeProperty('overflow');
-                document.body.style.removeProperty('padding-right');
-            },
-
             DatePickers() {
                 $(this.$refs.filterFromDate).pDatepicker({
                     format: 'YYYY/MM/DD',
@@ -194,6 +187,8 @@
                     description: '',
                     date_display: formatPersianDate(todayGregorianDate())
                 };
+
+                bootstrap.Modal.getOrCreateInstance(this.$refs.transactionModal).show();
             },
 
             openEditTransactionModal(tx) {
@@ -319,9 +314,6 @@
             this.loadCategoryOptions();
             this.loadTransactions();
             this.DatePickers();
-
-            this.$refs.transactionModal.addEventListener('hidden.bs.modal', this.cleanupModal);
-            this.$refs.deleteModal.addEventListener('hidden.bs.modal', this.cleanupModal);
         }
     });
 

@@ -16,16 +16,16 @@
             <div class="d-flex flex-column flex-sm-row align-items-center gap-4 mb-4">
                 <div class="profile-avatar-wrap position-relative">
                     <?php
-                    $session_name = $this->session->userdata('user_name')
-                            ?: ($this->session->userdata('full_name') ?: 'کاربر');
-                    $this->load->view('profile/avatar', [
-                            'avatar_filename' => $this->session->userdata('user_avatar'),
-                            'user_name' => $session_name,
-                            'size' => 100,
-                            'css_class' => 'rounded-circle border profile-avatar-preview',
-                            'element_id' => 'avatarPreview',
-                            'alt' => 'آواتار پروفایل',
-                    ]);
+                        $session_name = $this->session->userdata('user_name')
+                                ?: ($this->session->userdata('full_name') ?: 'کاربر');
+                        $this->load->view('profile/avatar', [
+                                'avatar_filename' => $this->session->userdata('user_avatar'),
+                                'user_name' => $session_name,
+                                'size' => 100,
+                                'css_class' => 'rounded-circle border profile-avatar-preview',
+                                'element_id' => 'avatarPreview',
+                                'alt' => 'آواتار پروفایل',
+                        ]);
                     ?>
 
                     <div v-if="profileLoading"

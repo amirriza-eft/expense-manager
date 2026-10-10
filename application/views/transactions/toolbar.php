@@ -15,11 +15,9 @@
         </button>
 
         <button
-            type="button"
-            class="btn btn-orange-glow"
-            data-bs-toggle="modal"
-            data-bs-target="#transactionModal"
-            @click="openCreateTransactionModal"
+                type="button"
+                class="btn btn-orange-glow"
+                @click="openCreateTransactionModal"
         >
             <i class="bi bi-plus-circle"></i>
             ثبت تراکنش
