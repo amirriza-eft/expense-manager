@@ -15,22 +15,10 @@
         <form @submit.prevent="updateProfile" enctype="multipart/form-data">
             <div class="d-flex flex-column flex-sm-row align-items-center gap-4 mb-4">
                 <div class="profile-avatar-wrap position-relative">
-                    <?php
-                        $session_name = $this->session->userdata('user_name')
-                                ?: ($this->session->userdata('full_name') ?: 'کاربر');
-                        $this->load->view('profile/avatar', [
-                                'avatar_filename' => $this->session->userdata('user_avatar'),
-                                'user_name' => $session_name,
-                                'size' => 100,
-                                'css_class' => 'rounded-circle border profile-avatar-preview',
-                                'element_id' => 'avatarPreview',
-                                'alt' => 'آواتار پروفایل',
-                        ]);
-                    ?>
+                    <img :src="avatarUrl" alt="آواتار پروفایل" class="rounded-circle border profile-avatar-preview"
+                         style="width:100px;height:100px;object-fit:cover;border-color:var(--accent-orange)!important;background-color:var(--bg-surface);">
 
-                    <div v-if="profileLoading"
-                         class="profile-avatar-loading"
-                         aria-hidden="true">
+                    <div v-if="profileLoading" class="profile-avatar-loading" aria-hidden="true">
                         <div class="spinner-border spinner-border-sm text-warning" role="status"></div>
                     </div>
                 </div>
@@ -52,24 +40,12 @@
 
             <div class="mb-3">
                 <label class="form-label text-light small">نام و نام خانوادگی</label>
-                <input
-                        type="text"
-                        class="form-control"
-                        name="full_name"
-                        v-model="fullName"
-                        required
-                >
+                <input type="text" class="form-control" name="full_name" v-model="fullName" required>
             </div>
 
             <div class="mb-4">
                 <label class="form-label text-light small">ایمیل</label>
-                <input
-                        type="email"
-                        class="form-control"
-                        name="email"
-                        v-model="email"
-                        required
-                >
+                <input type="email" class="form-control" name="email" v-model="email" required>
             </div>
 
             <button type="submit" class="btn btn-orange-glow" :disabled="profileLoading">
@@ -86,6 +62,7 @@
     Vue.createApp({
         data() {
             return {
+                avatarUrl: "<?= base_url('assets/img/default-avatar.png') ?>",
                 fullName: '',
                 email: '',
                 profileLoading: false,
@@ -110,63 +87,32 @@
 
         methods: {
 
-            async loadProfile() {
-                try {
-                    const { data } = await axios.get("<?= site_url('api/profile') ?>");
-
-                    if (!data.status || !data.user) return;
-
-                    this.fullName = data.user.full_name || '';
-                    this.email = data.user.email || '';
-
-                    this.updateAvatar(
-                        this.$refs.avatarPreview,
-                        data.user.avatar,
-                        data.user.full_name,
-                        100
-                    );
-
-                    this.updateAvatar(
-                        document.getElementById('navbarAvatar'),
-                        data.user.avatar,
-                        data.user.full_name,
-                        38
-                    );
-                } catch (error) {
-                    console.error(error);
+            setAvatar(user) {
+                if (user.avatar) {
+                    this.avatarUrl = "<?= base_url('uploads/avatars/') ?>" + user.avatar;
+                } else {
+                    this.avatarUrl = "<?= base_url('assets/img/default-avatar.png') ?>";
                 }
+
+                document.getElementById('navbarAvatar').src = this.avatarUrl;
             },
 
-            updateAvatar(element, avatar, name, size) {
-                if (!element) return;
+            async loadProfile() {
+                const response = await axios.get("<?= site_url('api/profile') ?>");
 
-                if (avatar) {
-                    element.src = "<?= base_url('uploads/avatars/') ?>" + avatar;
-                    return;
+                if (response.data.status) {
+                    this.fullName = response.data.user.full_name;
+                    this.email = response.data.user.email;
+                    this.setAvatar(response.data.user);
                 }
-
-                const initial = (name || 'کاربر').trim().charAt(0);
-
-                const fallbackUrl =
-                    'https://placehold.co/' +
-                    size + 'x' + size +
-                    '/1e1e24/ff6b00?text=' +
-                    encodeURIComponent(initial || 'ک');
-
-                element.src = fallbackUrl;
             },
 
             previewAvatar(event) {
                 const file = event.target.files[0];
-                if (!file) return;
 
-                const reader = new FileReader();
-
-                reader.onload = event => {
-                    this.$refs.avatarPreview.src = event.target.result;
-                };
-
-                reader.readAsDataURL(file);
+                if (file) {
+                    this.avatarUrl = URL.createObjectURL(file);
+                }
             },
 
             async updateProfile() {
@@ -191,19 +137,7 @@
                     this.profileMessageSuccess = !!data.status;
 
                     if (data.status && data.user) {
-                        this.updateAvatar(
-                            this.$refs.avatarPreview,
-                            data.user.avatar,
-                            data.user.full_name,
-                            100
-                        );
-
-                        this.updateAvatar(
-                            document.getElementById('navbarAvatar'),
-                            data.user.avatar,
-                            data.user.full_name,
-                            38
-                        );
+                        this.setAvatar(data.user);
                     }
                 } catch (error) {
                     this.profileMessage = 'خطا در ارتباط با سرور';
@@ -256,13 +190,9 @@
                 this.deleteMessage = '';
 
                 try {
-                    const formData = new URLSearchParams({
-                        password: this.deletePassword
-                    });
-
                     const { data } = await axios.post(
                         "<?= site_url('api/user/delete') ?>",
-                        formData
+                        new URLSearchParams({password: this.deletePassword})
                     );
 
                     this.deleteMessage = data.message || '';

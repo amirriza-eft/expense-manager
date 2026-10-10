@@ -36,8 +36,12 @@
             <?php if ($this->session->userdata('user_id')): ?>
                 <?php
                 $avatar = $this->session->userdata('user_avatar');
-                $user_name = $this->session->userdata('user_name')
-                        ?: ($this->session->userdata('full_name') ?: 'کاربر');
+
+                if ($avatar) {
+                    $avatar_url = base_url('uploads/avatars/' . $avatar);
+                } else {
+                    $avatar_url = base_url('assets/img/default-avatar.png');
+                }
                 ?>
                 <div class="d-flex align-items-center gap-3">
                     <button type="button" class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#logoutModal">
@@ -46,14 +50,8 @@
                     </button>
 
                     <a href="<?= site_url('profile') ?>" class="text-decoration-none" title="پروفایل">
-                        <?php $this->load->view('profile/avatar', [
-                                'avatar_filename' => $avatar,
-                                'user_name' => $user_name,
-                                'size' => 38,
-                                'css_class' => 'user-nav-avatar',
-                                'element_id' => 'navbarAvatar',
-                                'alt' => 'آواتار کاربر',
-                        ]); ?>
+                        <img id="navbarAvatar" src="<?= html_escape($avatar_url) ?>" alt="آواتار کاربر"
+                             class="user-nav-avatar" style="width:38px;height:38px;object-fit:cover;">
                     </a>
                 </div>
             <?php else: ?>
@@ -91,39 +89,38 @@
 
 <main class="flex-grow-1">
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-<script>
-    Vue.createApp({
-        data() {
-            return {
-                logoutLoading: false,
-                logoutModal: null
-            };
-        },
-        methods: {
-            async logout() {
-                if (this.logoutLoading) return;
-                this.logoutLoading = true;
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        Vue.createApp({
+            data() {
+                return {
+                    logoutLoading: false,
+                    logoutModal: null
+                };
+            },
+            methods: {
+                async logout() {
+                    if (this.logoutLoading) return;
+                    this.logoutLoading = true;
 
-                try {
-                    const response = await axios.post("<?= site_url('api/auth/logout') ?>");
+                    try {
+                        const response = await axios.post("<?= site_url('api/auth/logout') ?>");
 
-                    if (response.data.status) {
+                        if (response.data.status) {
 
-                        setTimeout(() => {
-                            window.location.href = "<?= site_url('login') ?>";
-                        }, 800);
+                            setTimeout(() => {
+                                window.location.href = "<?= site_url('login') ?>";
+                            }, 800);
 
-                        return;
+                            return;
+                        }
+
+                        this.logoutLoading = false;
+                    } catch (error) {
+                        console.error(error);
+                        this.logoutLoading = false;
                     }
-
-                    this.logoutLoading = false;
-                } catch (error) {
-                    console.error(error);
-                    this.logoutLoading = false;
                 }
             }
-        }
-    }).mount('#navbar-app');
-</script>
-
+        }).mount('#navbar-app');
+    </script>
