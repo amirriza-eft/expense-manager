@@ -20,7 +20,8 @@ class Migration_Create_users extends CI_Migration
 
             'email' => [
                 'type' => 'VARCHAR',
-                'constraint' => 255
+                'constraint' => 255,
+                'unique' => TRUE
             ],
 
             'password' => [
@@ -43,7 +44,6 @@ class Migration_Create_users extends CI_Migration
         ]);
 
         $this->dbforge->add_key('id', TRUE);
-        $this->dbforge->add_key('email', FALSE, TRUE);
 
         $this->dbforge->create_table('users');
     }

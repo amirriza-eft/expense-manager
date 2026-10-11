@@ -15,7 +15,8 @@ class Migration_Create_budgets extends CI_Migration
 
             'user_id' => [
                 'type' => 'INT',
-                'unsigned' => TRUE
+                'unsigned' => TRUE,
+                'unique' => TRUE
             ],
 
             'amount' => [
@@ -33,7 +34,6 @@ class Migration_Create_budgets extends CI_Migration
         ]);
 
         $this->dbforge->add_key('id', TRUE);
-        $this->dbforge->add_key('user_id', FALSE, TRUE);
 
         $this->dbforge->add_field(
             'CONSTRAINT fk_budget_user

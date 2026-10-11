@@ -25,15 +25,21 @@ class Migration_Add_unique_full_name_to_users extends CI_Migration
             );
         }
 
+        // TRIM-based uniqueness so whitespace-only variants cannot bypass the rule.
         $this->db->query(
-            'ALTER TABLE `users` ADD UNIQUE KEY `full_name` (`full_name`)'
+            'ALTER TABLE `users`
+             ADD COLUMN `full_name_normalized` VARCHAR(100)
+             GENERATED ALWAYS AS (TRIM(`full_name`)) STORED,
+             ADD UNIQUE KEY `full_name_normalized` (`full_name_normalized`)'
         );
     }
 
     public function down()
     {
         $this->db->query(
-            'ALTER TABLE `users` DROP INDEX `full_name`'
+            'ALTER TABLE `users`
+             DROP INDEX `full_name_normalized`,
+             DROP COLUMN `full_name_normalized`'
         );
     }
 }

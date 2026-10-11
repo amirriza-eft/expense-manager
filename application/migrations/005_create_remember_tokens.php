@@ -18,7 +18,8 @@ class Migration_Create_remember_tokens extends CI_Migration
 
             'selector' => [
                 'type' => 'VARCHAR',
-                'constraint' => 32
+                'constraint' => 32,
+                'unique' => TRUE
             ],
 
             'token_hash' => [
@@ -38,7 +39,6 @@ class Migration_Create_remember_tokens extends CI_Migration
 
         $this->dbforge->add_key('id', TRUE);
         $this->dbforge->add_key('user_id');
-        $this->dbforge->add_key('selector', TRUE);
 
         $this->dbforge->create_table('remember_tokens', TRUE);
     }
