@@ -59,7 +59,7 @@
                                         <button type="button" class="btn btn-sm btn-outline-secondary edit-category-btn" title="ویرایش"
                                                 @click="editCategory(category)"><i class="bi bi-pencil"></i></button>
                                         <button type="button" class="btn btn-sm btn-outline-danger delete-category-btn" title="حذف"
-                                                :disabled="categoryLoading" @click="deleteCategory(category.id)"><i class="bi bi-trash"></i></button>
+                                                :disabled="categoryLoading" @click="confirmDeleteCategory(category)"><i class="bi bi-trash"></i></button>
                                     </div>
                                 </li>
                             </ul>
@@ -77,7 +77,7 @@
                                         <button type="button" class="btn btn-sm btn-outline-secondary edit-category-btn" title="ویرایش"
                                                 @click="editCategory(category)"><i class="bi bi-pencil"></i></button>
                                         <button type="button" class="btn btn-sm btn-outline-danger delete-category-btn" title="حذف"
-                                                :disabled="categoryLoading" @click="deleteCategory(category.id)"><i class="bi bi-trash"></i></button>
+                                                :disabled="categoryLoading" @click="confirmDeleteCategory(category)"><i class="bi bi-trash"></i></button>
                                     </div>
                                 </li>
                             </ul>
@@ -137,6 +137,39 @@
             </div>
         </div>
     </div>
+
+    <div class="modal fade" id="deleteCategoryConfirmModal" tabindex="-1" aria-hidden="true" ref="deleteCategoryModal">
+        <div class="modal-dialog modal-dialog-centered modal-sm">
+            <div class="modal-content glass-panel text-white" style="background:#1e1e24; border:1px solid var(--border-subtle);">
+                <div class="modal-body text-center p-4">
+                    <i class="bi bi-exclamation-triangle text-danger fs-1 mb-2 d-block"></i>
+
+                    <h6 class="fw-bold mb-2">حذف دسته‌بندی</h6>
+
+                    <p class="text-muted small mb-1">
+                        آیا از حذف دسته‌بندی
+                        <strong class="text-white">«{{ deleteCategoryTitle }}»</strong>
+                        اطمینان دارید؟
+                    </p>
+                    <p class="text-muted small">با حذف این دسته، تراکنش‌های مرتبط نیز حذف می‌شوند.</p>
+
+                    <div v-if="deleteCategoryError" class="alert alert-danger py-2 px-3 small mt-3 mb-0">
+                        {{ deleteCategoryError }}
+                    </div>
+
+                    <div class="d-flex justify-content-center gap-2 mt-3">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"
+                                :disabled="categoryLoading">انصراف</button>
+                        <button type="button" class="btn btn-danger"
+                                :disabled="categoryLoading" @click="deleteCategory">
+                            <span v-if="categoryLoading" class="spinner-border spinner-border-sm me-1"></span>
+                            {{ categoryLoading ? 'در حال حذف...' : 'بله، حذف کن' }}
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 
 <script>
@@ -158,7 +191,10 @@ const categoriesApp = Vue.createApp({
             },
             categoryLoading: false,
             categoryMessage: '',
-            categoryMessageSuccess: false
+            categoryMessageSuccess: false,
+            deleteCategoryId: null,
+            deleteCategoryTitle: '',
+            deleteCategoryError: ''
         };
     },
 
@@ -277,21 +313,33 @@ const categoriesApp = Vue.createApp({
             this.categoryLoading = false;
         },
 
-        async deleteCategory(id) {
+        confirmDeleteCategory(category) {
+            this.deleteCategoryId = category.id;
+            this.deleteCategoryTitle = category.title;
+            this.deleteCategoryError = '';
 
-            if (!confirm('آیا از حذف این دسته‌بندی اطمینان دارید؟ تراکنش‌های مرتبط نیز حذف می‌شوند.')) {
+            bootstrap.Modal.getOrCreateInstance(this.$refs.deleteCategoryModal).show();
+        },
+
+        async deleteCategory() {
+            if (!this.deleteCategoryId || this.categoryLoading) {
                 return;
             }
 
             this.categoryLoading = true;
+            this.deleteCategoryError = '';
 
             try {
                 const response = await axios.post(
-                    "<?= site_url('api/categories/delete/') ?>" + id
+                    "<?= site_url('api/categories/delete/') ?>" + this.deleteCategoryId
                 );
                 const data = response.data;
 
                 if (data.status) {
+                    bootstrap.Modal.getInstance(this.$refs.deleteCategoryModal).hide();
+
+                    this.deleteCategoryId = null;
+                    this.deleteCategoryTitle = '';
 
                     this.categoryMessage = data.message || 'دسته‌بندی حذف شد';
                     this.categoryMessageSuccess = true;
@@ -313,14 +361,15 @@ const categoriesApp = Vue.createApp({
                         reloadFinanceChart();
                     }
                 } else {
-                    this.categoryMessage = data.message || 'خطا در حذف دسته‌بندی';
-                    this.categoryMessageSuccess = false;
+                    this.deleteCategoryError = data.message || 'خطا در حذف دسته‌بندی';
                 }
 
-
             } catch (error) {
-                this.categoryMessage = 'خطا در ارتباط با سرور';
-                this.categoryMessageSuccess = false;
+                if (error.response && error.response.data && error.response.data.message) {
+                    this.deleteCategoryError = error.response.data.message;
+                } else {
+                    this.deleteCategoryError = 'خطا در ارتباط با سرور';
+                }
             }
 
             this.categoryLoading = false;
