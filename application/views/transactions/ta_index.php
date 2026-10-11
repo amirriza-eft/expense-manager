@@ -311,6 +311,7 @@
 
         mounted() {
             window.reloadCategoryOptions = this.loadCategoryOptions;
+            window.reloadTransactions = () => this.loadTransactions(this.currentPage);
 
             this.loadCategoryOptions();
             this.loadTransactions();

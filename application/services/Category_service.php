@@ -150,7 +150,7 @@ class Category_service
         {
             return [
                 'status'=>true,
-                'message'=>'دسته حذف شد'
+                'message'=>'دسته و تراکنش‌های مرتبط حذف شدند'
             ];
         }
 

@@ -279,7 +279,7 @@ const categoriesApp = Vue.createApp({
 
         async deleteCategory(id) {
 
-            if (!confirm('آیا از حذف این دسته‌بندی اطمینان دارید؟')) {
+            if (!confirm('آیا از حذف این دسته‌بندی اطمینان دارید؟ تراکنش‌های مرتبط نیز حذف می‌شوند.')) {
                 return;
             }
 
@@ -300,6 +300,14 @@ const categoriesApp = Vue.createApp({
                     await this.loadDeletedCategories();
 
                     reloadCategoryOptions();
+
+                    if (typeof reloadTransactions === 'function') {
+                        reloadTransactions();
+                    }
+
+                    if (typeof loadDashboardSummary === 'function') {
+                        loadDashboardSummary();
+                    }
                 } else {
                     this.categoryMessage = data.message || 'خطا در حذف دسته‌بندی';
                     this.categoryMessageSuccess = false;

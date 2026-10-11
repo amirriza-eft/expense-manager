@@ -67,13 +67,39 @@ class Category_model extends CI_Model
 
     public function delete($id, $user_id)
     {
-        return $this->db
+        $this->db->trans_start();
+
+        $category_deleted = $this->db
             ->where('id', $id)
             ->where('user_id', $user_id)
             ->where('deleted_at IS NULL', null, false)
             ->update($this->table, [
                 'deleted_at' => date('Y-m-d H:i:s')
             ]);
+
+        if (!$category_deleted || $this->db->affected_rows() < 1) {
+            $this->db->trans_rollback();
+            return false;
+        }
+
+        $this->db
+            ->where('category_id', $id)
+            ->where('user_id', $user_id)
+            ->where('deleted_at IS NULL', null, false)
+            ->update('transactions', [
+                'deleted_at' => date('Y-m-d H:i:s')
+            ]);
+
+        $this->load->model('Transaction_model');
+
+        if (!$this->Transaction_model->recalculate_budget($user_id)) {
+            $this->db->trans_rollback();
+            return false;
+        }
+
+        $this->db->trans_complete();
+
+        return $this->db->trans_status();
     }
 
     public function restore($id, $user_id)
