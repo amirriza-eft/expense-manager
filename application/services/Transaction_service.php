@@ -227,6 +227,25 @@ class Transaction_service
 
     public function restore($user_id, $id)
     {
+        $transaction = $this->model->get_deleted_by_id($id, $user_id);
+
+        if (!$transaction) {
+            return [
+                'status' => false,
+                'code' => 404,
+                'message' => 'تراکنش پیدا نشد'
+            ];
+        }
+
+        $category_error = $this->validate_restore_category(
+            $user_id,
+            $transaction->category_id
+        );
+
+        if ($category_error !== null) {
+            return $category_error;
+        }
+
         if ($this->model->restore($id, $user_id)) {
             return [
                 'status' => true,
@@ -239,5 +258,36 @@ class Transaction_service
             'code' => 500,
             'message' => 'خطا در بازیابی تراکنش'
         ];
+    }
+
+    private function validate_restore_category($user_id, $category_id)
+    {
+        if ($category_id === null || $category_id === '') {
+            return [
+                'status' => false,
+                'code' => 400,
+                'message' => 'این تراکنش دسته‌بندی ندارد و قابل بازیابی نیست'
+            ];
+        }
+
+        $category = $this->category_model->get_by_id($category_id, $user_id);
+
+        if (!$category) {
+            return [
+                'status' => false,
+                'code' => 400,
+                'message' => 'دسته‌بندی این تراکنش یافت نشد'
+            ];
+        }
+
+        if ($category->deleted_at !== null) {
+            return [
+                'status' => false,
+                'code' => 400,
+                'message' => 'ابتدا دسته‌بندی این تراکنش را بازیابی کنید'
+            ];
+        }
+
+        return null;
     }
 }

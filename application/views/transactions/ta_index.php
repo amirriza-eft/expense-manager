@@ -170,11 +170,14 @@
                             reloadFinanceChart();
                         }
                     } else {
-                        alert(response.data.message);
+                        alert(response.data.message || 'خطا در بازیابی تراکنش');
                     }
                 } catch (error) {
-                    console.error(error);
-                    alert('خطا در ارتباط با سرور');
+                    if (error.response && error.response.data && error.response.data.message) {
+                        alert(error.response.data.message);
+                    } else {
+                        alert('خطا در ارتباط با سرور');
+                    }
                 }
             },
 

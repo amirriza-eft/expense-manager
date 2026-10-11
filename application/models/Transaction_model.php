@@ -318,14 +318,19 @@ class Transaction_model extends CI_Model
             ->result();
     }
 
-    public function restore($id, $user_id)
+    public function get_deleted_by_id($id, $user_id)
     {
-        $transaction = $this->db
+        return $this->db
             ->where('id', $id)
             ->where('user_id', $user_id)
             ->where('deleted_at IS NOT NULL', null, false)
             ->get($this->table)
             ->row();
+    }
+
+    public function restore($id, $user_id)
+    {
+        $transaction = $this->get_deleted_by_id($id, $user_id);
 
         if (!$transaction) {
             return false;
