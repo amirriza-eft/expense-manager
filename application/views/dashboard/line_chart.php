@@ -26,9 +26,18 @@
 
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/apexcharts@3.54.1"></script>
+<script type="importmap">
+    {
+        "imports": {
+            "apexcharts": "<?= base_url('assets/js/apexcharts/apexcharts.esm.js') ?>",
+        "apexcharts/core": "<?= base_url('assets/js/apexcharts/core.esm.js') ?>"
+    }
+}
+</script>
 
-<script>
+<script type="module">
+    import ApexCharts from 'apexcharts';
+
     Vue.createApp({
         data() {
             return {
