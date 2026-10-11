@@ -192,15 +192,13 @@
             },
 
             openEditTransactionModal(tx) {
-                let categoryId = '';
-
                 this.transactionMessage = '';
 
                 this.transactionForm = {
                     id: tx.id,
                     title: tx.title,
                     type: tx.type,
-                    category_id: categoryId,
+                    category_id: tx.category_id || '',
                     amount: formatAmountInput(tx.amount),
                     description: tx.description || '',
                     date_display: formatPersianDate(tx.transaction_date)
@@ -225,6 +223,12 @@
             async saveTransaction() {
                 const form = this.transactionForm;
                 const date = convertPersianToGregorian(form.date_display);
+
+                if (!form.category_id) {
+                    this.transactionMessage = 'انتخاب دسته‌بندی الزامی است';
+                    this.transactionMessageSuccess = false;
+                    return;
+                }
 
                 if (!date) {
                     this.transactionMessage = 'لطفاً تاریخ تراکنش را انتخاب کنید';
@@ -262,8 +266,11 @@
                         loadDashboardSummary();
                     }
                 } catch (error) {
-                    console.error(error);
-                    this.transactionMessage = 'خطا در ارتباط با سرور';
+                    if (error.response && error.response.data && error.response.data.message) {
+                        this.transactionMessage = error.response.data.message;
+                    } else {
+                        this.transactionMessage = 'خطا در ارتباط با سرور';
+                    }
                     this.transactionMessageSuccess = false;
                 }
 

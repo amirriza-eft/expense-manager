@@ -14,6 +14,7 @@ class Transaction_API_Controller extends Base_API_Controller
         parent::__construct();
 
         $this->load->model('Transaction_model');
+        $this->load->model('Category_model');
 
         require_once APPPATH . 'services/Transaction_service.php';
         require_once APPPATH . 'validators/Transaction_validator.php';
@@ -21,6 +22,7 @@ class Transaction_API_Controller extends Base_API_Controller
 
         $this->transaction_service = new Transaction_service(
             $this->Transaction_model,
+            $this->Category_model,
             new Transaction_policy()
         );
 
@@ -46,12 +48,12 @@ class Transaction_API_Controller extends Base_API_Controller
         if (!$this->validator->validate_create()) {
             return $this->json([
                 'status' => false,
-                'message' => $this->validator->errors()
+                'message' => strip_tags($this->validator->errors())
             ], 400);
         }
 
         $data = [
-            'category_id' => $this->input->post('category_id', true) ?: null,
+            'category_id' => $this->input->post('category_id', true),
             'title' => $this->input->post('title', true),
             'amount' => $this->input->post('amount', true),
             'type' => $this->input->post('type', true),
@@ -77,14 +79,14 @@ class Transaction_API_Controller extends Base_API_Controller
         if (!$this->validator->validate_update()) {
             return $this->json([
                 'status' => false,
-                'message' => $this->validator->errors()
+                'message' => strip_tags($this->validator->errors())
             ], 400);
         }
 
         $id = $this->input->post('id', true);
 
         $data = [
-            'category_id' => $this->input->post('category_id', true) ?: null,
+            'category_id' => $this->input->post('category_id', true),
             'title' => $this->input->post('title', true),
             'amount' => $this->input->post('amount', true),
             'type' => $this->input->post('type', true),

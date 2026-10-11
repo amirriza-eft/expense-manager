@@ -41,6 +41,16 @@ class Category_model extends CI_Model
             ->row();
     }
 
+    public function get_active_by_id($id, $user_id)
+    {
+        return $this->db
+            ->where('id', $id)
+            ->where('user_id', $user_id)
+            ->where('deleted_at IS NULL', null, false)
+            ->get($this->table)
+            ->row();
+    }
+
     public function create($data)
     {
         return $this->db->insert($this->table, $data);

@@ -68,6 +68,17 @@ class Transaction_validator
 
 
         $this->CI->form_validation->set_rules(
+            'category_id',
+            'دسته‌بندی',
+            'required|integer',
+            [
+                'required' => 'انتخاب دسته‌بندی الزامی است',
+                'integer' => 'دسته‌بندی نامعتبر است'
+            ]
+        );
+
+
+        $this->CI->form_validation->set_rules(
             'transaction_date',
             'تاریخ',
             'required'

@@ -3,13 +3,16 @@
 class Transaction_service
 {
     protected $model;
+    protected $category_model;
     protected $policy;
 
     public function __construct(
         Transaction_model $model,
+        Category_model $category_model,
         Transaction_policy $policy
     ) {
         $this->model = $model;
+        $this->category_model = $category_model;
         $this->policy = $policy;
     }
 
@@ -63,6 +66,16 @@ class Transaction_service
             ];
         }
 
+        $category_error = $this->validate_category(
+            $user_id,
+            $data['category_id'] ?? null,
+            $data['type'] ?? null
+        );
+
+        if ($category_error !== null) {
+            return $category_error;
+        }
+
         $data['user_id'] = $user_id;
 
         if ($this->model->create($data)) {
@@ -99,6 +112,16 @@ class Transaction_service
             ];
         }
 
+        $category_error = $this->validate_category(
+            $user_id,
+            $data['category_id'] ?? null,
+            $data['type'] ?? null
+        );
+
+        if ($category_error !== null) {
+            return $category_error;
+        }
+
         if ($this->model->update($id, $user_id, $data)) {
             return [
                 'status' => true,
@@ -111,6 +134,40 @@ class Transaction_service
             'code' => 500,
             'message' => 'خطا در بروزرسانی'
         ];
+    }
+
+    private function validate_category($user_id, $category_id, $type)
+    {
+        if ($category_id === null || $category_id === '') {
+            return [
+                'status' => false,
+                'code' => 400,
+                'message' => 'انتخاب دسته‌بندی الزامی است'
+            ];
+        }
+
+        $category = $this->category_model->get_active_by_id(
+            $category_id,
+            $user_id
+        );
+
+        if (!$category) {
+            return [
+                'status' => false,
+                'code' => 400,
+                'message' => 'دسته‌بندی معتبر نیست'
+            ];
+        }
+
+        if ($category->type !== $type) {
+            return [
+                'status' => false,
+                'code' => 400,
+                'message' => 'نوع دسته‌بندی با نوع تراکنش هم‌خوانی ندارد'
+            ];
+        }
+
+        return null;
     }
 
     public function delete($user_id, $id)
