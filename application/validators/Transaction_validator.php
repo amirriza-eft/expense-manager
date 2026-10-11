@@ -50,9 +50,11 @@ class Transaction_validator
         $this->CI->form_validation->set_rules(
             'amount',
             'مبلغ',
-            'required',
+            'required|regex_match[/^\d+(\.\d{1,2})?$/]|greater_than[0]',
             [
-                'required'=>'مبلغ الزامی است',
+                'required' => 'مبلغ الزامی است',
+                'regex_match' => 'مبلغ باید عدد مثبت معتبر باشد',
+                'greater_than' => 'مبلغ باید بزرگ‌تر از صفر باشد',
             ]
         );
 

@@ -47,7 +47,7 @@
                         <div class="col-6">
                             <label for="tx_amount" class="form-label small text-muted">مبلغ (تومان)</label>
                             <input type="text" class="form-control" id="tx_amount" required
-                                   placeholder="مثال: ۵۰۰۰۰۰۰" inputmode="numeric"
+                                   placeholder="مثال: ۵۰۰۰۰۰۰" inputmode="decimal"
                                    :value="transactionForm.amount" @input="onAmountInput">
                         </div>
 

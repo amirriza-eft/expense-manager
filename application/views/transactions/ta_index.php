@@ -230,6 +230,14 @@
                     return;
                 }
 
+                const amountValue = getAmountInputValue(form.amount);
+
+                if (!amountValue || Number(amountValue) <= 0) {
+                    this.transactionMessage = 'مبلغ باید عدد مثبت معتبر باشد';
+                    this.transactionMessageSuccess = false;
+                    return;
+                }
+
                 if (!date) {
                     this.transactionMessage = 'لطفاً تاریخ تراکنش را انتخاب کنید';
                     this.transactionMessageSuccess = false;
@@ -241,7 +249,7 @@
                 formData.append('title', form.title);
                 formData.append('type', form.type);
                 formData.append('category_id', form.category_id);
-                formData.append('amount', getAmountInputValue(form.amount));
+                formData.append('amount', amountValue);
                 formData.append('description', form.description);
                 formData.append('transaction_date', date);
 
