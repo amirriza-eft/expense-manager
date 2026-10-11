@@ -308,6 +308,10 @@ const categoriesApp = Vue.createApp({
                     if (typeof loadDashboardSummary === 'function') {
                         loadDashboardSummary();
                     }
+
+                    if (typeof reloadFinanceChart === 'function') {
+                        reloadFinanceChart();
+                    }
                 } else {
                     this.categoryMessage = data.message || 'خطا در حذف دسته‌بندی';
                     this.categoryMessageSuccess = false;

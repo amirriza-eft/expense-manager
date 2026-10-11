@@ -166,6 +166,9 @@
                         await this.loadTransactions(this.currentPage);
                         this.loadDeletedTransactions();
                         loadDashboardSummary();
+                        if (typeof reloadFinanceChart === 'function') {
+                            reloadFinanceChart();
+                        }
                     } else {
                         alert(response.data.message);
                     }
@@ -272,6 +275,9 @@
 
                         await this.loadTransactions(form.id ? this.currentPage : 1);
                         loadDashboardSummary();
+                        if (typeof reloadFinanceChart === 'function') {
+                            reloadFinanceChart();
+                        }
                     }
                 } catch (error) {
                     if (error.response && error.response.data && error.response.data.message) {
@@ -305,6 +311,9 @@
                         await this.loadTransactions(this.currentPage);
                         this.loadDeletedTransactions();
                         loadDashboardSummary();
+                        if (typeof reloadFinanceChart === 'function') {
+                            reloadFinanceChart();
+                        }
                     } else {
                         alert(response.data.message);
                     }

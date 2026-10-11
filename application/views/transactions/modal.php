@@ -11,7 +11,7 @@
 
             <form id="txForm" @submit.prevent="saveTransaction">
 
-                <div v-if="transactionMessage" class="alert py-2 px-3 small"
+                <div v-if="transactionMessage" class="alert py-2 px-3 small mx-3 mt-3"
                      :class="transactionMessageSuccess ? 'alert-success' : 'alert-danger'">{{ transactionMessage }}</div>
 
                 <div class="modal-body">

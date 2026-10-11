@@ -132,6 +132,7 @@
         },
 
         mounted() {
+            window.reloadFinanceChart = () => this.loadChart();
             this.loadChart();
         },
 
