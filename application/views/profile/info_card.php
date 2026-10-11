@@ -115,6 +115,18 @@
                 }
             },
 
+            apiErrorMessage(error, fallback) {
+                if (error.response && error.response.data) {
+                    const message = error.response.data.message;
+
+                    if (typeof message === 'string' && message.trim()) {
+                        return message;
+                    }
+                }
+
+                return fallback;
+            },
+
             async updateProfile() {
                 this.profileLoading = true;
                 this.profileMessage = '';
@@ -122,8 +134,8 @@
                 try {
                     const formData = new FormData();
 
-                    formData.append('full_name', this.fullName);
-                    formData.append('email', this.email);
+                    formData.append('full_name', this.fullName.trim());
+                    formData.append('email', this.email.trim());
 
                     const file = this.$refs.avatarInput.files[0];
                     if (file) formData.append('avatar', file);
@@ -140,7 +152,10 @@
                         this.setAvatar(data.user);
                     }
                 } catch (error) {
-                    this.profileMessage = 'خطا در ارتباط با سرور';
+                    this.profileMessage = this.apiErrorMessage(
+                        error,
+                        'خطا در ارتباط با سرور'
+                    );
                     this.profileMessageSuccess = false;
                 } finally {
                     this.profileLoading = false;
@@ -172,7 +187,10 @@
                         this.newPasswordConfirm = '';
                     }
                 } catch (error) {
-                    this.passwordMessage = 'خطا در ارتباط با سرور';
+                    this.passwordMessage = this.apiErrorMessage(
+                        error,
+                        'خطا در ارتباط با سرور'
+                    );
                     this.passwordMessageSuccess = false;
                 } finally {
                     this.passwordLoading = false;
@@ -204,7 +222,10 @@
                         }, 1500);
                     }
                 } catch (error) {
-                    this.deleteMessage = 'خطا در ارتباط با سرور';
+                    this.deleteMessage = this.apiErrorMessage(
+                        error,
+                        'خطا در ارتباط با سرور'
+                    );
                     this.deleteMessageSuccess = false;
                 } finally {
                     this.deleteLoading = false;

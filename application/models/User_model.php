@@ -32,9 +32,7 @@ class User_model extends CI_Model
 
     public function email_exists($email, $except_user_id = null)
     {
-        $this->db
-            ->where('email', $email)
-            ->where('deleted_at IS NULL', null, false);
+        $this->db->where('email', trim($email));
 
         if ($except_user_id !== null) {
             $this->db->where('id !=', $except_user_id);
