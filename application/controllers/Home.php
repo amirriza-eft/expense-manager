@@ -12,12 +12,6 @@ class Home extends Base_Controller
 
     public function index()
     {
-        $user_id = $this->session->userdata('user_id');
-
-        if (!$user_id) {
-            redirect('login');
-        }
-
         $data['page_title'] = 'خانه';
         $this->load->view('home', $data);
     }

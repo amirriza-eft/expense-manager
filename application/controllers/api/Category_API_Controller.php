@@ -46,7 +46,7 @@ class Category_API_Controller extends Base_API_Controller
 
     public function create()
     {
-        $user_id=$this->user();
+        $user_id = $this->auth_user();
 
         $result =
             $this->category_service
@@ -65,10 +65,12 @@ class Category_API_Controller extends Base_API_Controller
 
     public function update($id)
     {
+        $user_id = $this->auth_user();
+
         $result =
             $this->category_service
                 ->update(
-                    $this->user(),
+                    $user_id,
                     $id,
                     $this->input->post('title',true),
                     $this->input->post('type', true)
@@ -82,10 +84,12 @@ class Category_API_Controller extends Base_API_Controller
 
     public function delete($id)
     {
+        $user_id = $this->auth_user();
+
         $result =
             $this->category_service
                 ->delete(
-                    $this->user(),
+                    $user_id,
                     $id
                 );
 
@@ -108,10 +112,12 @@ class Category_API_Controller extends Base_API_Controller
 
     public function restore($id)
     {
+        $user_id = $this->auth_user();
+
         $result =
             $this->category_service
                 ->restore(
-                    $this->user(),
+                    $user_id,
                     $id
                 );
 
