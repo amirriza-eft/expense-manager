@@ -14,13 +14,17 @@ class Transaction_validator
 
     public function validate_create()
     {
-        $this->set_rules();
-
-        return $this->CI->form_validation->run();
+        return $this->run();
     }
 
 
     public function validate_update()
+    {
+        return $this->run();
+    }
+
+
+    private function run()
     {
         $this->set_rules();
 

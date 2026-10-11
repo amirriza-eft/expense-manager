@@ -46,24 +46,12 @@ class Transaction_API_Controller extends Base_API_Controller
         $user_id = $this->auth_user();
 
         if (!$this->validator->validate_create()) {
-            return $this->json([
-                'status' => false,
-                'message' => strip_tags($this->validator->errors())
-            ], 400);
+            return $this->validation_error();
         }
-
-        $data = [
-            'category_id' => $this->input->post('category_id', true),
-            'title' => $this->input->post('title', true),
-            'amount' => $this->input->post('amount', true),
-            'type' => $this->input->post('type', true),
-            'transaction_date' => $this->input->post('transaction_date', true),
-            'description' => $this->input->post('description', true)
-        ];
 
         $result = $this->transaction_service->create(
             $user_id,
-            $data
+            $this->transaction_input()
         );
 
         return $this->json(
@@ -77,27 +65,13 @@ class Transaction_API_Controller extends Base_API_Controller
         $user_id = $this->auth_user();
 
         if (!$this->validator->validate_update()) {
-            return $this->json([
-                'status' => false,
-                'message' => strip_tags($this->validator->errors())
-            ], 400);
+            return $this->validation_error();
         }
-
-        $id = $this->input->post('id', true);
-
-        $data = [
-            'category_id' => $this->input->post('category_id', true),
-            'title' => $this->input->post('title', true),
-            'amount' => $this->input->post('amount', true),
-            'type' => $this->input->post('type', true),
-            'transaction_date' => $this->input->post('transaction_date', true),
-            'description' => $this->input->post('description', true)
-        ];
 
         $result = $this->transaction_service->update(
             $user_id,
-            $id,
-            $data
+            $this->input->post('id', true),
+            $this->transaction_input()
         );
 
         return $this->json(
@@ -110,11 +84,9 @@ class Transaction_API_Controller extends Base_API_Controller
     {
         $user_id = $this->auth_user();
 
-        $id = $this->input->post('id', true);
-
         $result = $this->transaction_service->delete(
             $user_id,
-            $id
+            $this->input->post('id', true)
         );
 
         return $this->json(
@@ -136,16 +108,34 @@ class Transaction_API_Controller extends Base_API_Controller
     {
         $user_id = $this->auth_user();
 
-        $id = $this->input->post('id', true);
-
         $result = $this->transaction_service->restore(
             $user_id,
-            $id
+            $this->input->post('id', true)
         );
 
         return $this->json(
             $result,
             $result['code'] ?? 200
         );
+    }
+
+    private function transaction_input()
+    {
+        return [
+            'category_id' => $this->input->post('category_id', true),
+            'title' => $this->input->post('title', true),
+            'amount' => $this->input->post('amount', true),
+            'type' => $this->input->post('type', true),
+            'transaction_date' => $this->input->post('transaction_date', true),
+            'description' => $this->input->post('description', true)
+        ];
+    }
+
+    private function validation_error()
+    {
+        return $this->json([
+            'status' => false,
+            'message' => strip_tags($this->validator->errors())
+        ], 400);
     }
 }

@@ -94,22 +94,14 @@ class Transaction_service
 
     public function update($user_id, $id, $data)
     {
-        $transaction = $this->model->get_by_id($id);
+        $access_error = $this->authorize_transaction(
+            $user_id,
+            $id,
+            'update'
+        );
 
-        if (!$transaction) {
-            return [
-                'status' => false,
-                'code' => 404,
-                'message' => 'تراکنش پیدا نشد'
-            ];
-        }
-
-        if (!$this->policy->can_update($user_id, $transaction)) {
-            return [
-                'status' => false,
-                'code' => 403,
-                'message' => 'اجازه ویرایش این تراکنش را ندارید'
-            ];
+        if ($access_error !== null) {
+            return $access_error;
         }
 
         $category_error = $this->validate_category(
@@ -134,6 +126,61 @@ class Transaction_service
             'code' => 500,
             'message' => 'خطا در بروزرسانی'
         ];
+    }
+
+    public function delete($user_id, $id)
+    {
+        $access_error = $this->authorize_transaction(
+            $user_id,
+            $id,
+            'delete'
+        );
+
+        if ($access_error !== null) {
+            return $access_error;
+        }
+
+        if ($this->model->delete($id, $user_id)) {
+            return [
+                'status' => true,
+                'message' => 'تراکنش حذف شد'
+            ];
+        }
+
+        return [
+            'status' => false,
+            'code' => 500,
+            'message' => 'خطا در حذف'
+        ];
+    }
+
+    private function authorize_transaction($user_id, $id, $action)
+    {
+        $transaction = $this->model->get_by_id($id);
+
+        if (!$transaction) {
+            return [
+                'status' => false,
+                'code' => 404,
+                'message' => 'تراکنش پیدا نشد'
+            ];
+        }
+
+        $allowed = $action === 'delete'
+            ? $this->policy->can_delete($user_id, $transaction)
+            : $this->policy->can_update($user_id, $transaction);
+
+        if (!$allowed) {
+            return [
+                'status' => false,
+                'code' => 403,
+                'message' => $action === 'delete'
+                    ? 'اجازه حذف این تراکنش را ندارید'
+                    : 'اجازه ویرایش این تراکنش را ندارید'
+            ];
+        }
+
+        return null;
     }
 
     private function validate_category($user_id, $category_id, $type)
@@ -168,40 +215,6 @@ class Transaction_service
         }
 
         return null;
-    }
-
-    public function delete($user_id, $id)
-    {
-        $transaction = $this->model->get_by_id($id);
-
-        if (!$transaction) {
-            return [
-                'status' => false,
-                'code' => 404,
-                'message' => 'تراکنش پیدا نشد'
-            ];
-        }
-
-        if (!$this->policy->can_delete($user_id, $transaction)) {
-            return [
-                'status' => false,
-                'code' => 403,
-                'message' => 'اجازه حذف این تراکنش را ندارید'
-            ];
-        }
-
-        if ($this->model->delete($id, $user_id)) {
-            return [
-                'status' => true,
-                'message' => 'تراکنش حذف شد'
-            ];
-        }
-
-        return [
-            'status' => false,
-            'code' => 500,
-            'message' => 'خطا در حذف'
-        ];
     }
 
     public function deleted($user_id)
