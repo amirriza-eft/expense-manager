@@ -38,7 +38,6 @@ class Migration_Create_remember_tokens extends CI_Migration
         ]);
 
         $this->dbforge->add_key('id', TRUE);
-        $this->dbforge->add_key('user_id');
 
         $this->dbforge->create_table('remember_tokens', TRUE);
     }

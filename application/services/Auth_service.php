@@ -40,20 +40,41 @@ class Auth_service
 
         $data['created_at'] = date('Y-m-d H:i:s');
 
+        $db = $this->user_model->db;
+        $db->trans_start();
+
         $user_id = $this->user_model->create($data);
 
-        if(!$user_id){
+        if (!$user_id) {
+            $db->trans_rollback();
+
             return [
-                'status'=>false,
-                'message'=>'خطا در ایجاد حساب'
+                'status' => false,
+                'message' => 'خطا در ایجاد حساب'
             ];
         }
 
-        $this->user_model->create_budget($user_id);
+        if (!$this->user_model->create_budget($user_id)) {
+            $db->trans_rollback();
+
+            return [
+                'status' => false,
+                'message' => 'خطا در ایجاد حساب'
+            ];
+        }
+
+        $db->trans_complete();
+
+        if (!$db->trans_status()) {
+            return [
+                'status' => false,
+                'message' => 'خطا در ایجاد حساب'
+            ];
+        }
 
         return [
-            'status'=>true,
-            'message'=>'ثبت نام موفق'
+            'status' => true,
+            'message' => 'ثبت نام موفق'
         ];
     }
 
@@ -148,21 +169,34 @@ class Auth_service
             ];
         }
 
-        if ($this->user_model->soft_delete($user_id))
-        {
-            $this->remember_token_model->delete_by_user($user_id);
+        $db = $this->user_model->db;
+        $db->trans_start();
 
-            $this->session->sess_destroy();
+        if (!$this->user_model->soft_delete($user_id)) {
+            $db->trans_rollback();
 
             return [
-                'status' => true,
-                'message' => 'حساب شما حذف شد'
+                'status' => false,
+                'message' => 'خطا در حذف حساب'
             ];
         }
 
+        $this->remember_token_model->delete_by_user($user_id);
+
+        $db->trans_complete();
+
+        if (!$db->trans_status()) {
+            return [
+                'status' => false,
+                'message' => 'خطا در حذف حساب'
+            ];
+        }
+
+        $this->session->sess_destroy();
+
         return [
-            'status'=>false,
-            'message'=>'خطا در حذف حساب'
+            'status' => true,
+            'message' => 'حساب شما حذف شد'
         ];
     }
 
