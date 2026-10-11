@@ -15,7 +15,8 @@ class Migration_Create_users extends CI_Migration
 
             'full_name' => [
                 'type' => 'VARCHAR',
-                'constraint' => 100
+                'constraint' => 100,
+                'unique' => TRUE
             ],
 
             'email' => [
