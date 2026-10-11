@@ -85,6 +85,11 @@
                 this.error = '';
                 this.success = '';
 
+                if (!this.full_name.trim()) {
+                    this.error = 'وارد کردن نام و نام خانوادگی الزامی است.';
+                    return;
+                }
+
                 if (this.password !== this.password_confirm) {
                     this.error = 'رمز عبور و تکرار آن یکسان نیست';
                     return;
@@ -95,8 +100,8 @@
                 try {
                     const formData = new FormData();
 
-                    formData.append('full_name', this.full_name);
-                    formData.append('email', this.email);
+                    formData.append('full_name', this.full_name.trim());
+                    formData.append('email', this.email.trim());
                     formData.append('password', this.password);
                     formData.append('password_confirm', this.password_confirm);
 
@@ -117,7 +122,11 @@
                         this.error = data.message;
                     }
                 } catch (error) {
-                    this.error = 'خطا در ارتباط با سرور';
+                    if (error.response && error.response.data && error.response.data.message) {
+                        this.error = error.response.data.message;
+                    } else {
+                        this.error = 'خطا در ارتباط با سرور';
+                    }
                 } finally {
                     this.loading = false;
                 }

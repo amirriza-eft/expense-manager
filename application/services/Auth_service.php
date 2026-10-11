@@ -18,11 +18,21 @@ class Auth_service
 
     public function register($data)
     {
+        $data['full_name'] = trim($data['full_name'] ?? '');
+        $data['email'] = trim($data['email'] ?? '');
+
         if( $this->user_model->find_any_by_email($data['email']) )
         {
             return [
                 'status'=>false,
                 'message'=>'این ایمیل قبلا ثبت شده است'
+            ];
+        }
+
+        if ($this->user_model->full_name_exists($data['full_name'])) {
+            return [
+                'status' => false,
+                'message' => 'این نام و نام خانوادگی قبلا ثبت شده است'
             ];
         }
 

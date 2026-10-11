@@ -63,6 +63,14 @@ class Profile_service
             ];
         }
 
+        if ($this->user_model->full_name_exists($data['full_name'], $user_id)) {
+            return [
+                'status' => false,
+                'message' => 'این نام و نام خانوادگی قبلا ثبت شده است',
+                'code' => 422
+            ];
+        }
+
         if (!empty($files['avatar']['name'])) {
 
             $this->upload->initialize([

@@ -41,7 +41,7 @@ class Auth_API_Controller extends Base_API_Controller
             return $this->json([
 
                 'status'=>false,
-                'message'=>validation_errors()
+                'message'=>strip_tags(validation_errors())
             ],400);
         }
 

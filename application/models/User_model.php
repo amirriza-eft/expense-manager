@@ -43,6 +43,21 @@ class User_model extends CI_Model
         return $this->db->count_all_results($this->table) > 0;
     }
 
+    public function full_name_exists($full_name, $except_user_id = null)
+    {
+        $this->db->where(
+            'TRIM(full_name) = ' . $this->db->escape(trim($full_name)),
+            null,
+            false
+        );
+
+        if ($except_user_id !== null) {
+            $this->db->where('id !=', $except_user_id);
+        }
+
+        return $this->db->count_all_results($this->table) > 0;
+    }
+
     public function find_by_email($email)
     {
         return $this->db
