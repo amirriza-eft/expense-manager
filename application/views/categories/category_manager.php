@@ -262,7 +262,8 @@ const categoriesApp = Vue.createApp({
                 return;
             }
 
-            const duplicate = this.categories.find(category =>
+            const allCategories = this.categories.concat(this.deletedCategories);
+            const duplicate = allCategories.find(category =>
                 category.title.trim() === title &&
                 category.type === this.categoryForm.type &&
                 String(category.id) !== String(this.categoryForm.id)

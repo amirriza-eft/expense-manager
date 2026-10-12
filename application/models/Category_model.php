@@ -55,13 +55,8 @@ class Category_model extends CI_Model
     {
         $this->db
             ->where('user_id', $user_id)
-            ->where('type', $type)
-            ->where('deleted_at IS NULL', null, false)
-            ->where(
-                'TRIM(title) = ' . $this->db->escape(trim($title)),
-                null,
-                false
-            );
+            ->where('title', trim($title))
+            ->where('type', $type);
 
         if ($except_id !== null) {
             $this->db->where('id !=', $except_id);

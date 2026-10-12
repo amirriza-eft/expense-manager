@@ -181,7 +181,7 @@ class Category_service
         ];
     }
 
-    public function restore($user_id,$id)
+    public function restore($user_id, $id)
     {
         $cat = $this->category_model->get_by_id($id, $user_id);
 
@@ -190,14 +190,6 @@ class Category_service
                 'status' => false,
                 'message' => 'دسته یافت نشد',
                 'code' => 404
-            ];
-        }
-
-        if ($this->category_model->title_exists($user_id, $cat->title, $cat->type)) {
-            return [
-                'status' => false,
-                'message' => 'این نام دسته قبلا ثبت شده است',
-                'code' => 400
             ];
         }
 
