@@ -33,7 +33,7 @@ class Migration_Create_categories extends CI_Migration
             'updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
                 ON UPDATE CURRENT_TIMESTAMP',
 
-            'deleted_at DATETIME NULL'
+            'deleted_at DATETIME NULL',
         ]);
 
         $this->dbforge->add_key('id', TRUE);
