@@ -232,7 +232,6 @@ class Auth_service
         );
     }
 
-
     public function restore_remembered_session()
     {
         if ($this->session->userdata('logged_in')) {
@@ -253,29 +252,25 @@ class Auth_service
         $selector = $parts[0];
         $validator = $parts[1];
 
-        $token = $this->remember_token_model
-            ->find_by_selector($selector);
+        $token = $this->remember_token_model->find_by_selector($selector);
 
         if (!$token) {
             $this->forget_remember_cookie();
             return false;
         }
 
-        if (strtotime($token->expires_at) < time()) {
-            $this->remember_token_model
-                ->delete_by_selector($selector);
+        if (strtotime($token->expires_at) < time())
+        {
+            $this->remember_token_model->delete_by_selector($selector);
 
             $this->forget_remember_cookie();
 
             return false;
         }
 
-        if (!hash_equals(
-            $token->token_hash,
-            hash('sha256', $validator)
-        )) {
-            $this->remember_token_model
-                ->delete_by_selector($selector);
+        if (!hash_equals($token->token_hash, hash('sha256', $validator)))
+        {
+            $this->remember_token_model->delete_by_selector($selector);
 
             $this->forget_remember_cookie();
 
@@ -285,8 +280,7 @@ class Auth_service
         $user = $this->user_model->find($token->user_id);
 
         if (!$user) {
-            $this->remember_token_model
-                ->delete_by_selector($selector);
+            $this->remember_token_model->delete_by_selector($selector);
 
             $this->forget_remember_cookie();
 
