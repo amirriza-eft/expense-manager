@@ -262,6 +262,18 @@ const categoriesApp = Vue.createApp({
                 return;
             }
 
+            const duplicate = this.categories.find(category =>
+                category.title.trim() === title &&
+                category.type === this.categoryForm.type &&
+                String(category.id) !== String(this.categoryForm.id)
+            );
+
+            if (duplicate) {
+                this.categoryMessage = 'این نام دسته قبلا ثبت شده است';
+                this.categoryMessageSuccess = false;
+                return;
+            }
+
             let url;
 
             if (this.categoryForm.id) {
@@ -306,7 +318,10 @@ const categoriesApp = Vue.createApp({
 
 
             } catch (error) {
-                this.categoryMessage = 'خطا در ارتباط با سرور';
+                this.categoryMessage =
+                    (error.response && error.response.data && error.response.data.message)
+                        ? error.response.data.message
+                        : 'خطا در ارتباط با سرور';
                 this.categoryMessageSuccess = false;
             }
 
@@ -401,7 +416,10 @@ const categoriesApp = Vue.createApp({
                 }
 
             } catch (error) {
-                this.categoryMessage = 'خطا در ارتباط با سرور';
+                this.categoryMessage =
+                    (error.response && error.response.data && error.response.data.message)
+                        ? error.response.data.message
+                        : 'خطا در ارتباط با سرور';
                 this.categoryMessageSuccess = false;
             }
 

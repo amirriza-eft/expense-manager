@@ -64,6 +64,16 @@ class Category_service
             ];
         }
 
+        $title = trim($title);
+
+        if ($this->category_model->title_exists($user_id, $title, $type)) {
+            return [
+                'status' => false,
+                'message' => 'این نام دسته قبلا ثبت شده است',
+                'code' => 400
+            ];
+        }
+
         $data = [
             'user_id' => $user_id,
             'title' => $title,
@@ -108,6 +118,16 @@ class Category_service
             return [
                 'status' => false,
                 'message' => 'نوع دسته نامعتبر است',
+                'code' => 400
+            ];
+        }
+
+        $title = trim($title);
+
+        if ($this->category_model->title_exists($user_id, $title, $type, $id)) {
+            return [
+                'status' => false,
+                'message' => 'این نام دسته قبلا ثبت شده است',
                 'code' => 400
             ];
         }
@@ -163,19 +183,35 @@ class Category_service
 
     public function restore($user_id,$id)
     {
+        $cat = $this->category_model->get_by_id($id, $user_id);
 
-        if( $this->category_model->restore($id,$user_id) )
-        {
+        if (!$cat || empty($cat->deleted_at)) {
             return [
-                'status'=>true,
-                'message'=>'دسته بازیابی شد'
+                'status' => false,
+                'message' => 'دسته یافت نشد',
+                'code' => 404
+            ];
+        }
+
+        if ($this->category_model->title_exists($user_id, $cat->title, $cat->type)) {
+            return [
+                'status' => false,
+                'message' => 'این نام دسته قبلا ثبت شده است',
+                'code' => 400
+            ];
+        }
+
+        if ($this->category_model->restore($id, $user_id)) {
+            return [
+                'status' => true,
+                'message' => 'دسته بازیابی شد'
             ];
         }
 
         return [
-            'status'=>false,
-            'message'=>'خطا در بازیابی دسته',
-            'code'=>500
+            'status' => false,
+            'message' => 'خطا در بازیابی دسته',
+            'code' => 500
         ];
     }
 }

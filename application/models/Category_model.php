@@ -51,6 +51,25 @@ class Category_model extends CI_Model
             ->row();
     }
 
+    public function title_exists($user_id, $title, $type, $except_id = null)
+    {
+        $this->db
+            ->where('user_id', $user_id)
+            ->where('type', $type)
+            ->where('deleted_at IS NULL', null, false)
+            ->where(
+                'TRIM(title) = ' . $this->db->escape(trim($title)),
+                null,
+                false
+            );
+
+        if ($except_id !== null) {
+            $this->db->where('id !=', $except_id);
+        }
+
+        return $this->db->count_all_results($this->table) > 0;
+    }
+
     public function create($data)
     {
         return $this->db->insert($this->table, $data);
