@@ -316,7 +316,6 @@ class Auth_service
         unset($_COOKIE['remember_me']);
     }
 
-
     public function logout()
     {
         if (!empty($_COOKIE['remember_me'])) {

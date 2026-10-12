@@ -60,68 +60,27 @@ class Transaction_model extends CI_Model
         $from_date = null,
         $to_date = null,
         $sort = 'newest'
-    )
-    {
+    ) {
         $this->db
-            ->select('transactions.*, categories.title as category_name')
-            ->from('transactions')
-            ->join(
-                'categories',
-                'categories.id = transactions.category_id',
-                'left'
-            )
-            ->where('transactions.user_id', $user_id)
-            ->where('transactions.deleted_at IS NULL', null, false);
+            ->select('transactions.*, categories.title as category_name');
 
-        if (!empty($search)) {
-
-            $this->db->group_start()
-                ->like('transactions.title', $search)
-                ->or_like('transactions.description', $search)
-                ->or_like('categories.title', $search)
-                ->group_end();
-
-        }
-
-        if (!empty($type)) {
-            $this->db->where(
-                'transactions.type',
-                $type
-            );
-        }
-
-        if (!empty($category_id)) {
-            $this->db->where(
-                'transactions.category_id',
-                $category_id
-            );
-        }
-
-        if (!empty($from_date)) {
-            $this->db->where(
-                'transactions.transaction_date >=',
-                $from_date
-            );
-        }
-
-
-        if (!empty($to_date)) {
-            $this->db->where(
-                'transactions.transaction_date <=',
-                $to_date
-            );
-        }
+        $this->build_user_transactions_query(
+            $user_id,
+            $search,
+            $type,
+            $category_id,
+            $from_date,
+            $to_date
+        );
 
         if ($sort === 'oldest') {
             $this->db
                 ->order_by('transactions.transaction_date', 'ASC')
                 ->order_by('transactions.id', 'ASC');
-
         } else {
             $this->db
                 ->order_by('transactions.transaction_date', 'DESC')
                 ->order_by('transactions.id', 'DESC');
-
         }
 
         return $this->db
@@ -137,8 +96,27 @@ class Transaction_model extends CI_Model
         $category_id = null,
         $from_date = null,
         $to_date = null
-    )
-    {
+    ) {
+        $this->build_user_transactions_query(
+            $user_id,
+            $search,
+            $type,
+            $category_id,
+            $from_date,
+            $to_date
+        );
+
+        return $this->db->count_all_results();
+    }
+
+    private function build_user_transactions_query(
+        $user_id,
+        $search = null,
+        $type = null,
+        $category_id = null,
+        $from_date = null,
+        $to_date = null
+    ) {
         $this->db
             ->from('transactions')
             ->join(
@@ -158,17 +136,11 @@ class Transaction_model extends CI_Model
         }
 
         if (!empty($type)) {
-            $this->db->where(
-                'transactions.type',
-                $type
-            );
+            $this->db->where('transactions.type', $type);
         }
 
         if (!empty($category_id)) {
-            $this->db->where(
-                'transactions.category_id',
-                $category_id
-            );
+            $this->db->where('transactions.category_id', $category_id);
         }
 
         if (!empty($from_date)) {
@@ -178,15 +150,12 @@ class Transaction_model extends CI_Model
             );
         }
 
-
         if (!empty($to_date)) {
             $this->db->where(
                 'transactions.transaction_date <=',
-                $to_date . ' 23:59:59'
+                $to_date
             );
         }
-
-        return $this->db->count_all_results();
     }
 
     public function update($id, $user_id, $data)
