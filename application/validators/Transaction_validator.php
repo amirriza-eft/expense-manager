@@ -1,93 +1,75 @@
 <?php
 
+defined('BASEPATH') OR exit('No direct script access allowed');
+
 class Transaction_validator
 {
-    protected $CI;
+    protected $form_validation;
 
-    public function __construct()
+    public function __construct($form_validation)
     {
-        $this->CI =& get_instance();
-
-        $this->CI->load->library('form_validation');
+        $this->form_validation = $form_validation;
     }
 
-
-    public function validate_create()
+    public function create()
     {
-        return $this->run();
-    }
-
-
-    public function validate_update()
-    {
-        return $this->run();
-    }
-
-
-    private function run()
-    {
-        $this->set_rules();
-
-        return $this->CI->form_validation->run();
-    }
-
-
-    public function errors()
-    {
-        return validation_errors();
-    }
-
-
-    private function set_rules()
-    {
-        $this->CI->form_validation->set_rules(
+        $this->form_validation->set_rules(
             'title',
             'عنوان',
             'required|min_length[2]|max_length[100]',
             [
-                'required'=>'عنوان الزامی است',
-                'min_length'=>'عنوان کوتاه است'
+                'required'   => 'عنوان الزامی است',
+                'min_length' => 'عنوان کوتاه است',
+                'max_length' => 'عنوان نباید بیشتر از ۱۰۰ کاراکتر باشد'
             ]
         );
 
-
-        $this->CI->form_validation->set_rules(
+        $this->form_validation->set_rules(
             'amount',
             'مبلغ',
             'required|regex_match[/^\d+(\.\d{1,2})?$/]|greater_than[0]',
             [
-                'required' => 'مبلغ الزامی است',
-                'regex_match' => 'مبلغ باید عدد مثبت معتبر باشد',
-                'greater_than' => 'مبلغ باید بزرگ‌تر از صفر باشد',
+                'required'     => 'مبلغ الزامی است',
+                'regex_match'  => 'مبلغ باید عدد مثبت معتبر باشد',
+                'greater_than' => 'مبلغ باید بزرگ‌تر از صفر باشد'
             ]
         );
 
-
-        $this->CI->form_validation->set_rules(
+        $this->form_validation->set_rules(
             'type',
             'نوع',
             'required|in_list[income,expense]',
             [
-                'required'=>'نوع تراکنش الزامی است'
+                'required' => 'نوع تراکنش الزامی است',
+                'in_list'  => 'نوع تراکنش نامعتبر است'
             ]
         );
 
-
-        $this->CI->form_validation->set_rules(
+        $this->form_validation->set_rules(
             'category_id',
             'دسته‌بندی',
-            'required|integer',
+            'required|integer|greater_than[0]',
             [
-                'required' => 'انتخاب دسته‌بندی الزامی است',
-                'integer' => 'دسته‌بندی نامعتبر است'
+                'required'     => 'انتخاب دسته‌بندی الزامی است',
+                'integer'      => 'دسته‌بندی نامعتبر است',
+                'greater_than' => 'دسته‌بندی نامعتبر است'
             ]
         );
 
-
-        $this->CI->form_validation->set_rules(
+        $this->form_validation->set_rules(
             'transaction_date',
             'تاریخ',
-            'required'
+            'required',
+            [
+                'required' => 'تاریخ تراکنش الزامی است'
+            ]
         );
+
+        return $this->form_validation->run();
+    }
+
+    public function update()
+    {
+        return $this->create();
     }
 }

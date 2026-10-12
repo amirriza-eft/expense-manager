@@ -26,7 +26,10 @@ class Transaction_API_Controller extends Base_API_Controller
             new Transaction_policy()
         );
 
-        $this->validator = new Transaction_validator();
+        $this->validator =
+            new Transaction_validator(
+            $this->form_validation
+        );
     }
 
     public function index()
@@ -45,7 +48,7 @@ class Transaction_API_Controller extends Base_API_Controller
     {
         $user_id = $this->auth_user();
 
-        if (!$this->validator->validate_create()) {
+        if (!$this->validator->create()) {
             return $this->validation_error();
         }
 
@@ -64,7 +67,7 @@ class Transaction_API_Controller extends Base_API_Controller
     {
         $user_id = $this->auth_user();
 
-        if (!$this->validator->validate_update()) {
+        if (!$this->validator->update()) {
             return $this->validation_error();
         }
 
