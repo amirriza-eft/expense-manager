@@ -138,7 +138,10 @@ class Transaction_API_Controller extends Base_API_Controller
     {
         return $this->json([
             'status' => false,
-            'message' => strip_tags($this->validator->errors())
+            'message' => strip_tags(
+                validation_errors()
+            )
         ], 400);
     }
+
 }
