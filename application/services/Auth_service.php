@@ -82,53 +82,49 @@ class Auth_service
     {
         $user = $this->user_model->find_by_email($email);
 
-        if ($user) {
+        if (!$user) {
 
-            if (!password_verify($password, $user->password)) {
+            $deleted = $this->user_model->find_deleted_by_email($email);
 
+            if ($deleted && password_verify($password, $deleted->password)) {
                 return [
                     'status' => false,
-                    'message' => 'ایمیل یا رمز عبور اشتباه است'
+                    'code' => 'account_deleted',
+                    'message' => 'این حساب حذف شده است. برای بازیابی حساب کلیک کنید.'
                 ];
             }
 
-            $this->session->set_userdata([
-                'user_id' => $user->id,
-                'full_name' => $user->full_name,
-                'user_name' => $user->full_name,
-                'user_avatar' => $user->avatar ?? null,
-                'email' => $user->email,
-                'logged_in' => true
-            ]);
-
-            if ($remember_me) {
-                $this->create_remember_token($user->id);
-            }
-
             return [
-                'status' => true,
-                'message' => 'ورود موفق'
+                'status' => false,
+                'message' => 'ایمیل یا رمز عبور اشتباه است'
             ];
         }
 
-        $deleted = $this->user_model->find_deleted_by_email($email);
-
-        if ($deleted && password_verify($password, $deleted->password)) {
-
+        if (!password_verify($password, $user->password)) {
             return [
                 'status' => false,
-                'code' => 'account_deleted',
-                'message' =>
-                    'این حساب حذف شده است. برای بازیابی حساب کلیک کنید.'
+                'message' => 'ایمیل یا رمز عبور اشتباه است'
             ];
+        }
+
+        $this->session->set_userdata([
+            'user_id' => $user->id,
+            'full_name' => $user->full_name,
+            'user_name' => $user->full_name,
+            'user_avatar' => $user->avatar ?? null,
+            'email' => $user->email,
+            'logged_in' => true
+        ]);
+
+        if ($remember_me) {
+            $this->create_remember_token($user->id);
         }
 
         return [
-            'status' => false,
-            'message' => 'ایمیل یا رمز عبور اشتباه است'
+            'status' => true,
+            'message' => 'ورود موفق'
         ];
     }
-
 
     public function restore($email,$password)
     {
