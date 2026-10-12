@@ -21,7 +21,7 @@ class Migration_Create_transactions extends CI_Migration
             'category_id' => [
                 'type' => 'INT',
                 'unsigned' => TRUE,
-                'null' => TRUE
+                'null' => FALSE
             ],
 
             'title' => [
@@ -69,7 +69,7 @@ class Migration_Create_transactions extends CI_Migration
             'CONSTRAINT fk_transaction_category
             FOREIGN KEY (category_id)
             REFERENCES categories(id)
-            ON DELETE SET NULL'
+            ON DELETE CASCADE'
         );
 
         $this->dbforge->create_table('transactions');
