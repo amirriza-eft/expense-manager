@@ -28,11 +28,6 @@ class Category_API_Controller extends Base_API_Controller
             );
     }
 
-    private function user()
-    {
-        return $this->session->userdata('user_id');
-    }
-
     public function index()
     {
         $user_id = $this->auth_user();
