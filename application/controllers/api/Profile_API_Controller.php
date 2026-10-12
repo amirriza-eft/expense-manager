@@ -30,9 +30,7 @@ class Profile_API_Controller extends Base_API_Controller
     {
         $user_id = $this->auth_user();
 
-        $result = $this->profile_service->get(
-            $this->session->userdata('user_id')
-        );
+        $result = $this->profile_service->get($user_id);
 
         return $this->json($result);
     }
@@ -42,7 +40,7 @@ class Profile_API_Controller extends Base_API_Controller
         $user_id = $this->auth_user();
 
         $result = $this->profile_service->update(
-            $this->session->userdata('user_id'),
+            $user_id,
             $this->input->post(),
             $_FILES
         );
@@ -55,7 +53,7 @@ class Profile_API_Controller extends Base_API_Controller
         $user_id = $this->auth_user();
 
         $result = $this->profile_service->change_password(
-            $this->session->userdata('user_id'),
+            $user_id,
             $this->input->post()
         );
 
