@@ -39,7 +39,6 @@ class Auth_API_Controller extends Base_API_Controller
         if(!$this->validator->register()){
 
             return $this->json([
-
                 'status'=>false,
                 'message'=>strip_tags(validation_errors())
             ],400);
