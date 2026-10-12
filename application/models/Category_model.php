@@ -77,7 +77,7 @@ class Category_model extends CI_Model
                 'deleted_at' => date('Y-m-d H:i:s')
             ]);
 
-        if (!$category_deleted || $this->db->affected_rows() < 1) {
+        if (!$category_deleted) {
             $this->db->trans_rollback();
             return false;
         }
