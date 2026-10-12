@@ -32,7 +32,8 @@ class Auth_validator
             'required|valid_email|max_length[100]',
             [
                 'required'=>'وارد کردن {field} الزامی است.',
-                'valid_email'=>'فرمت {field} صحیح نیست.'
+                'valid_email'=>'فرمت {field} صحیح نیست.',
+                'max_length' => '{field} نباید بیشتر از ۱۰۰ کاراکتر باشد.'
             ]
         );
 
