@@ -262,18 +262,14 @@ class Auth_service
         if (strtotime($token->expires_at) < time())
         {
             $this->remember_token_model->delete_by_selector($selector);
-
             $this->forget_remember_cookie();
-
             return false;
         }
 
         if (!hash_equals($token->token_hash, hash('sha256', $validator)))
         {
             $this->remember_token_model->delete_by_selector($selector);
-
             $this->forget_remember_cookie();
-
             return false;
         }
 
@@ -281,9 +277,7 @@ class Auth_service
 
         if (!$user) {
             $this->remember_token_model->delete_by_selector($selector);
-
             $this->forget_remember_cookie();
-
             return false;
         }
 
