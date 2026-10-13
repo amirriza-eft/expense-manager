@@ -26,7 +26,7 @@ class Category_model extends CI_Model
     {
         return $this->db
             ->where('user_id', $user_id)
-            ->where('deleted_at IS NOT NULL', false)
+            ->where('deleted_at IS NOT NULL', null, false)
             ->order_by('deleted_at', 'DESC')
             ->get($this->table)
             ->result();
@@ -57,10 +57,6 @@ class Category_model extends CI_Model
             ->where('user_id', $user_id)
             ->where('title', trim($title))
             ->where('type', $type);
-
-        if ($except_id !== null) {
-            $this->db->where('id !=', $except_id);
-        }
 
         return $this->db->count_all_results($this->table) > 0;
     }
