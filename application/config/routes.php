@@ -59,7 +59,7 @@ $route['profile'] = 'Auth/profile';
 
 $route['test'] = 'Home/test';
 
-//=== Auth ===//
+// === Auth ===
 $route['api/auth/register']['POST'] =
     'api/Auth_API_Controller/register';
 
@@ -72,11 +72,11 @@ $route['api/auth/logout']['POST'] =
 $route['api/auth/restore']['POST'] =
     'api/Auth_API_Controller/restore';
 
-$route['api/user/delete'] =
+$route['api/user/delete']['DELETE'] =
     'api/Auth_API_Controller/delete_account';
 
 
-//=== Profile ===//
+// === Profile ===
 $route['api/profile']['GET'] =
     'api/Profile_API_Controller/get';
 
@@ -87,30 +87,27 @@ $route['api/profile/password']['POST'] =
     'api/Profile_API_Controller/change_password';
 
 
-
-//=== Dashboard ===//
+// === Dashboard ===
 $route['api/dashboard']['GET'] =
     'api/Dashboard_API_Controller/summary';
 
 
-
-//=== Chart ===//
+// === Chart ===
 $route['api/chart']['GET'] =
     'api/Chart_API_Controller/chart';
 
 
-
-//=== Transactions ===//
+// === Transactions ===
 $route['api/transaction']['GET'] =
     'api/Transaction_API_Controller/index';
 
-$route['api/transaction/create'] ['POST'] =
+$route['api/transaction/create']['POST'] =
     'api/Transaction_API_Controller/create';
 
-$route['api/transaction/update/(:num)'] =
+$route['api/transaction/update/(:num)']['POST'] =
     'api/Transaction_API_Controller/update/$1';
 
-$route['api/transaction/delete/(:num)'] =
+$route['api/transaction/delete/(:num)']['DELETE'] =
     'api/Transaction_API_Controller/delete/$1';
 
 $route['api/transaction/deleted']['GET'] =
@@ -120,18 +117,17 @@ $route['api/transaction/restore']['POST'] =
     'api/Transaction_API_Controller/restore';
 
 
-
-//=== Categories ===//
+// === Categories ===
 $route['api/categories']['GET'] =
     'api/Category_API_Controller/index';
 
 $route['api/categories/create']['POST'] =
     'api/Category_API_Controller/create';
 
-$route['api/categories/update/(:num)'] =
+$route['api/categories/update/(:num)']['POST'] =
     'api/Category_API_Controller/update/$1';
 
-$route['api/categories/delete/(:num)'] =
+$route['api/categories/delete/(:num)']['DELETE'] =
     'api/Category_API_Controller/delete/$1';
 
 $route['api/categories/deleted']['GET'] =

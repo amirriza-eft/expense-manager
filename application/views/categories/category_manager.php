@@ -346,7 +346,7 @@ const categoriesApp = Vue.createApp({
             this.deleteCategoryError = '';
 
             try {
-                const response = await axios.post(
+                const response = await axios.delete(
                     "<?= site_url('api/categories/delete/') ?>" + this.deleteCategoryId
                 );
                 const data = response.data;

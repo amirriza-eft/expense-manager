@@ -208,7 +208,7 @@
                 this.deleteMessage = '';
 
                 try {
-                    const { data } = await axios.post(
+                    const { data } = await axios.delete(
                         "<?= site_url('api/user/delete') ?>",
                         new URLSearchParams({password: this.deletePassword})
                     );

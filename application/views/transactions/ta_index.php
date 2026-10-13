@@ -303,7 +303,7 @@
                 this.transactionLoading = true;
 
                 try {
-                    const response = await axios.post(
+                    const response = await axios.delete(
                         "<?= site_url('api/transaction/delete/') ?>" + this.deleteTransactionId,
                         new URLSearchParams({id: this.deleteTransactionId})
                     );
