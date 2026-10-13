@@ -26,7 +26,7 @@ class Category_model extends CI_Model
     {
         return $this->db
             ->where('user_id', $user_id)
-            ->where('deleted_at IS NOT NULL', null, false)
+            ->where('deleted_at IS NOT NULL', false)
             ->order_by('deleted_at', 'DESC')
             ->get($this->table)
             ->result();
