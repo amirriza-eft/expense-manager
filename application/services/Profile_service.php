@@ -28,14 +28,83 @@ class Profile_service
             ];
         }
 
+        $question_id = !empty($user->security_question_id)
+            ? (int) $user->security_question_id
+            : null;
+
         return [
             'status' => true,
             'user'=>[
                 'id'=>$user->id,
                 'full_name'=>$user->full_name,
                 'email'=>$user->email,
-                'avatar'=>$user->avatar
-            ]
+                'avatar'=>$user->avatar,
+                'security_question_id' => $question_id,
+                'security_question' => $question_id
+                    ? security_question_text($question_id)
+                    : ''
+            ],
+            'security_questions' => security_questions_list()
+        ];
+    }
+
+    public function update_security_question($user_id, $input)
+    {
+        $user = $this->user_model->find($user_id);
+
+        if (!$user) {
+            return [
+                'status' => false,
+                'message' => 'کاربر پیدا نشد',
+                'code' => 404
+            ];
+        }
+
+        if (empty($input['current_password']) || !password_verify($input['current_password'], $user->password)) {
+            return [
+                'status' => false,
+                'message' => 'رمز عبور فعلی اشتباه است',
+                'code' => 400
+            ];
+        }
+
+        $question_id = (int) ($input['security_question_id'] ?? 0);
+        $answer = $input['security_answer'] ?? '';
+
+        if (!is_valid_security_question_id($question_id)) {
+            return [
+                'status' => false,
+                'message' => 'سوال امنیتی انتخاب‌شده معتبر نیست',
+                'code' => 422
+            ];
+        }
+
+        if (normalize_security_answer($answer) === '') {
+            return [
+                'status' => false,
+                'message' => 'پاسخ سوال امنیتی الزامی است',
+                'code' => 422
+            ];
+        }
+
+        $updated = $this->user_model->update($user_id, [
+            'security_question_id' => $question_id,
+            'security_answer_hash' => hash_security_answer($answer)
+        ]);
+
+        if (!$updated) {
+            return [
+                'status' => false,
+                'message' => 'خطا در ذخیره سوال امنیتی',
+                'code' => 500
+            ];
+        }
+
+        return [
+            'status' => true,
+            'message' => 'سوال و پاسخ امنیتی ذخیره شد',
+            'security_question_id' => $question_id,
+            'security_question' => security_question_text($question_id)
         ];
     }
 

@@ -372,10 +372,6 @@ const categoriesApp = Vue.createApp({
                     if (typeof loadDashboardSummary === 'function') {
                         loadDashboardSummary();
                     }
-
-                    if (typeof reloadFinanceChart === 'function') {
-                        reloadFinanceChart();
-                    }
                 } else {
                     this.deleteCategoryError = data.message || 'خطا در حذف دسته‌بندی';
                 }

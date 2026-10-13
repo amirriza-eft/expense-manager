@@ -59,9 +59,30 @@ class Transaction_validator
         $this->form_validation->set_rules(
             'transaction_date',
             'تاریخ',
-            'required',
             [
-                'required' => 'تاریخ تراکنش الزامی است'
+                'required',
+                [
+                    'transaction_date_ok',
+                    function ($date) {
+                        $date = substr(trim((string) $date), 0, 10);
+
+                        if (!preg_match('/^\d{4}-\d{2}-\d{2}$/', $date)) {
+                            return false;
+                        }
+
+                        list($y, $m, $d) = array_map('intval', explode('-', $date));
+
+                        if (!checkdate($m, $d, $y)) {
+                            return false;
+                        }
+
+                        return $date <= date('Y-m-d');
+                    }
+                ]
+            ],
+            [
+                'required' => 'تاریخ تراکنش الزامی است',
+                'transaction_date_ok' => 'تاریخ تراکنش نمی‌تواند در آینده باشد'
             ]
         );
 

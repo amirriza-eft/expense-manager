@@ -49,7 +49,9 @@ class Auth_API_Controller extends Base_API_Controller
             $this->auth_service->register([
                 'full_name'=> $this->input->post('full_name',true),
                 'email'=> $this->input->post('email',true),
-                'password'=> $this->input->post('password')
+                'password'=> $this->input->post('password'),
+                'security_question_id'=> $this->input->post('security_question_id', true),
+                'security_answer'=> $this->input->post('security_answer', true)
             ])
         );
     }
@@ -98,6 +100,42 @@ class Auth_API_Controller extends Base_API_Controller
             $this->auth_service->delete(
                 $user_id,
                 $this->input->post('password')
+            )
+        );
+    }
+
+    public function recovery_question()
+    {
+        return $this->json(
+            $this->auth_service->recovery_get_question(
+                $this->input->post('email', true)
+            )
+        );
+    }
+
+    public function recovery_verify()
+    {
+        return $this->json(
+            $this->auth_service->recovery_verify_answer(
+                $this->input->post('email', true),
+                $this->input->post('security_answer', true)
+            )
+        );
+    }
+
+    public function recovery_reset()
+    {
+        if (!$this->validator->recovery_reset()) {
+            return $this->json([
+                'status' => false,
+                'message' => strip_tags(validation_errors())
+            ], 400);
+        }
+
+        return $this->json(
+            $this->auth_service->recovery_reset_password(
+                $this->input->post('new_password'),
+                $this->input->post('new_password_confirm')
             )
         );
     }

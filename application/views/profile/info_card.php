@@ -55,6 +55,7 @@
         </form>
     </div>
 
+    <?php $this->load->view('profile/security_question_card'); ?>
     <?php $this->load->view('profile/password_card'); ?>
 </div>
 
@@ -77,7 +78,16 @@
                 deletePassword: '',
                 deleteLoading: false,
                 deleteMessage: '',
-                deleteMessageSuccess: false
+                deleteMessageSuccess: false,
+
+                securityQuestions: {},
+                securityQuestionId: '',
+                securityAnswer: '',
+                securityCurrentPassword: '',
+                currentSecurityQuestion: '',
+                securityLoading: false,
+                securityMessage: '',
+                securityMessageSuccess: false
             };
         },
 
@@ -104,6 +114,51 @@
                     this.fullName = response.data.user.full_name;
                     this.email = response.data.user.email;
                     this.setAvatar(response.data.user);
+
+                    this.securityQuestions = response.data.security_questions || {};
+                    this.currentSecurityQuestion = response.data.user.security_question || '';
+                    this.securityQuestionId = response.data.user.security_question_id
+                        ? String(response.data.user.security_question_id)
+                        : '';
+                    this.securityAnswer = '';
+                    this.securityCurrentPassword = '';
+                }
+            },
+
+            async saveSecurityQuestion() {
+                this.securityLoading = true;
+                this.securityMessage = '';
+
+                try {
+                    const formData = new FormData();
+                    formData.append('security_question_id', this.securityQuestionId);
+                    formData.append('security_answer', this.securityAnswer);
+                    formData.append('current_password', this.securityCurrentPassword);
+
+                    const response = await axios.post(
+                        "<?= site_url('api/profile/security-question') ?>",
+                        formData
+                    );
+
+                    this.securityMessage = response.data.message || '';
+                    this.securityMessageSuccess = response.data.status;
+
+                    if (response.data.status) {
+                        this.currentSecurityQuestion = response.data.security_question || '';
+                        this.securityQuestionId = response.data.security_question_id
+                            ? String(response.data.security_question_id)
+                            : this.securityQuestionId;
+                        this.securityAnswer = '';
+                        this.securityCurrentPassword = '';
+                    }
+                } catch (error) {
+                    this.securityMessage = this.apiErrorMessage(
+                        error,
+                        'خطا در ذخیره سوال امنیتی'
+                    );
+                    this.securityMessageSuccess = false;
+                } finally {
+                    this.securityLoading = false;
                 }
             },
 
@@ -208,9 +263,12 @@
                 this.deleteMessage = '';
 
                 try {
-                    const { data } = await axios.delete(
+                    const formData = new FormData();
+                    formData.append('password', this.deletePassword);
+
+                    const { data } = await axios.post(
                         "<?= site_url('api/user/delete') ?>",
-                        new URLSearchParams({password: this.deletePassword})
+                        formData
                     );
 
                     this.deleteMessage = data.message || '';

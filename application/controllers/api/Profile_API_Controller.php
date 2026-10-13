@@ -59,4 +59,16 @@ class Profile_API_Controller extends Base_API_Controller
 
         return $this->json($result, $result['code'] ?? 200);
     }
+
+    public function update_security_question()
+    {
+        $user_id = $this->auth_user();
+
+        $result = $this->profile_service->update_security_question(
+            $user_id,
+            $this->input->post()
+        );
+
+        return $this->json($result, $result['code'] ?? 200);
+    }
 }

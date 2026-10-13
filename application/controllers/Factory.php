@@ -14,11 +14,6 @@ class Factory extends CI_Controller
         $this->load->model('Transaction_model');
     }
 
-    public function test()
-    {
-        echo Carbon::now()->format('Y-m-d H:i:s');
-    }
-
     public function transactions($count = 50)
     {
         $user_id = $this->session->userdata('user_id');
@@ -28,6 +23,15 @@ class Factory extends CI_Controller
         }
 
         $count = max(1, (int) $count);
+
+        $income_ids = $this->factory_category_ids($user_id, 'income');
+        $expense_ids = $this->factory_category_ids($user_id, 'expense');
+
+        if (empty($income_ids) || empty($expense_ids)) {
+            show_error(
+                'Could not find or create income and expense categories for this user.'
+            );
+        }
 
         $start = Carbon::now()
             ->subDays(29)
@@ -49,6 +53,9 @@ class Factory extends CI_Controller
                 ? 'income'
                 : 'expense';
 
+            $pool = ($type === 'income') ? $income_ids : $expense_ids;
+            $category_id = $pool[array_rand($pool)];
+
             $amount = random_int(100000, 5000000);
 
             $transaction_date = Carbon::createFromTimestamp(
@@ -64,7 +71,7 @@ class Factory extends CI_Controller
                 'description' => 'Random generated transaction',
                 'amount' => $amount,
                 'type' => $type,
-                'category_id' => null,
+                'category_id' => $category_id,
                 'transaction_date' => $transaction_date->format(
                     'Y-m-d H:i:s'
                 ),
@@ -95,5 +102,47 @@ class Factory extends CI_Controller
         }
 
         echo "Generated {$count} transactions for the last 30 days.";
+    }
+
+    /**
+     * Active category IDs for a type. Creates a default category if none exist.
+     *
+     * @return int[]
+     */
+    private function factory_category_ids($user_id, $type)
+    {
+        $rows = $this->db
+            ->select('id')
+            ->where('user_id', $user_id)
+            ->where('type', $type)
+            ->where('deleted_at IS NULL', null, false)
+            ->get('categories')
+            ->result();
+
+        $ids = [];
+
+        foreach ($rows as $row) {
+            $ids[] = (int) $row->id;
+        }
+
+        if (!empty($ids)) {
+            return $ids;
+        }
+
+        $title = ($type === 'income')
+            ? 'Factory Income'
+            : 'Factory Expense';
+
+        $inserted = $this->db->insert('categories', [
+            'user_id' => $user_id,
+            'title' => $title,
+            'type' => $type,
+        ]);
+
+        if (!$inserted) {
+            return [];
+        }
+
+        return [(int) $this->db->insert_id()];
     }
 }

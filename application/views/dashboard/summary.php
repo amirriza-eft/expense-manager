@@ -1,6 +1,11 @@
 <?php defined('BASEPATH') or exit('No direct script access allowed'); ?>
 
 <div id="dashboard-summary">
+    <div class="text-center mb-3" v-if="periodLabel">
+        <h5 class="fw-bold text-white mb-0">خلاصه مالی {{ periodLabel }}</h5>
+        <p class="text-muted small mb-0">از ابتدای ماه تا امروز</p>
+    </div>
+
     <div class="row g-3 mb-5 justify-content-center">
         <div class="col-12 col-sm-6 col-lg-3">
             <div class="glass-panel p-3 h-100 position-relative">
@@ -21,7 +26,7 @@
         <div class="col-12 col-sm-6 col-lg-3">
             <div class="glass-panel p-3 h-100 position-relative">
                 <div class="d-flex justify-content-between align-items-center mb-2">
-                    <span class="text-muted small fw-medium">درآمد یک ماه گذشته</span>
+                    <span class="text-muted small fw-medium">درآمد {{ periodLabel || 'این ماه' }}</span>
                     <i class="bi bi-arrow-down-left-circle fs-4"
                        style="color: var(--income-green);"></i>
                 </div>
@@ -38,7 +43,7 @@
         <div class="col-12 col-sm-6 col-lg-3">
             <div class="glass-panel p-3 h-100 position-relative">
                 <div class="d-flex justify-content-between align-items-center mb-2">
-                    <span class="text-muted small fw-medium">هزینه یک ماه گذشته</span>
+                    <span class="text-muted small fw-medium">هزینه {{ periodLabel || 'این ماه' }}</span>
                     <i class="bi bi-arrow-up-right-circle fs-4"
                        style="color: var(--expense-red);"></i>
                 </div>
@@ -60,7 +65,8 @@
             return {
                 budgetAmount: 0,
                 monthlyIncome: 0,
-                monthlyExpense: 0
+                monthlyExpense: 0,
+                periodLabel: ''
             };
         },
 
@@ -78,6 +84,7 @@
                         this.budgetAmount = data.budget_amount;
                         this.monthlyIncome = data.monthly_income;
                         this.monthlyExpense = data.monthly_expense;
+                        this.periodLabel = data.period_label || '';
                     }
                 } catch (error) {
                     console.error('Dashboard error:', error);

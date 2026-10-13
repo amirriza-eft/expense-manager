@@ -21,6 +21,25 @@ class Auth_service
         $data['full_name'] = trim($data['full_name'] ?? '');
         $data['email'] = trim($data['email'] ?? '');
 
+        $question_id = (int) ($data['security_question_id'] ?? 0);
+        $security_answer = $data['security_answer'] ?? '';
+
+        unset($data['security_answer'], $data['password_confirm']);
+
+        if (!is_valid_security_question_id($question_id)) {
+            return [
+                'status' => false,
+                'message' => 'سوال امنیتی انتخاب‌شده معتبر نیست'
+            ];
+        }
+
+        if (normalize_security_answer($security_answer) === '') {
+            return [
+                'status' => false,
+                'message' => 'پاسخ سوال امنیتی الزامی است'
+            ];
+        }
+
         if( $this->user_model->find_any_by_email($data['email']) )
         {
             return [
@@ -37,6 +56,8 @@ class Auth_service
         }
 
         $data['password'] = password_hash($data['password'], PASSWORD_DEFAULT);
+        $data['security_question_id'] = $question_id;
+        $data['security_answer_hash'] = hash_security_answer($security_answer);
 
         $data['created_at'] = date('Y-m-d H:i:s');
 
@@ -312,18 +333,170 @@ class Auth_service
 
     public function logout()
     {
-        if (!empty($_COOKIE['remember_me'])) {
+        $user_id = $this->session->userdata('user_id');
 
-            $parts = explode(':', $_COOKIE['remember_me'], 2);
-
-            if (count($parts) === 2) {
-                $this->remember_token_model
-                    ->delete_by_selector($parts[0]);
-            }
+        if ($user_id) {
+            $this->remember_token_model->delete_by_user($user_id);
         }
 
+        $this->clear_password_reset();
         $this->forget_remember_cookie();
 
         $this->session->sess_destroy();
+    }
+
+    /**
+     * Step 1: look up the account and return its saved security question text.
+     */
+    public function recovery_get_question($email)
+    {
+        $email = trim((string) $email);
+        $user = $this->user_model->find_by_email($email);
+
+        if (
+            !$user
+            || empty($user->security_question_id)
+            || empty($user->security_answer_hash)
+        ) {
+            return [
+                'status' => false,
+                'message' => 'بازیابی با سوال امنیتی برای این حساب در دسترس نیست. اگر حساب دارید، از صفحه پروفایل سوال امنیتی را تنظیم کنید.'
+            ];
+        }
+
+        $question = security_question_text($user->security_question_id);
+
+        if ($question === '') {
+            return [
+                'status' => false,
+                'message' => 'بازیابی با سوال امنیتی برای این حساب در دسترس نیست.'
+            ];
+        }
+
+        return [
+            'status' => true,
+            'question' => $question
+        ];
+    }
+
+    /**
+     * Step 2: verify the answer, then allow a short password-reset window.
+     */
+    public function recovery_verify_answer($email, $answer)
+    {
+        $email = trim((string) $email);
+        $user = $this->user_model->find_by_email($email);
+
+        $attempts = (int) $this->session->userdata('recovery_attempts');
+
+        if ($attempts >= 5) {
+            return [
+                'status' => false,
+                'message' => 'تعداد تلاش‌های ناموفق زیاد است. کمی بعد دوباره امتحان کنید.'
+            ];
+        }
+
+        if (
+            !$user
+            || empty($user->security_question_id)
+            || empty($user->security_answer_hash)
+        ) {
+            $this->session->set_userdata('recovery_attempts', $attempts + 1);
+
+            return [
+                'status' => false,
+                'message' => 'پاسخ اشتباه است'
+            ];
+        }
+
+        if (!verify_security_answer($answer, $user->security_answer_hash)) {
+            $this->session->set_userdata('recovery_attempts', $attempts + 1);
+
+            return [
+                'status' => false,
+                'message' => 'پاسخ اشتباه است'
+            ];
+        }
+
+        $this->session->set_userdata([
+            'password_reset_user_id' => (int) $user->id,
+            'password_reset_expires' => time() + (15 * 60),
+            'recovery_attempts' => 0
+        ]);
+
+        return [
+            'status' => true,
+            'message' => 'پاسخ صحیح است. رمز عبور جدید را وارد کنید.'
+        ];
+    }
+
+    /**
+     * Step 3: reset password only if recovery was verified recently.
+     */
+    public function recovery_reset_password($new_password, $new_password_confirm)
+    {
+        $user_id = (int) $this->session->userdata('password_reset_user_id');
+        $expires = (int) $this->session->userdata('password_reset_expires');
+
+        if (!$user_id || !$expires || time() > $expires) {
+            $this->clear_password_reset();
+
+            return [
+                'status' => false,
+                'message' => 'اجازه بازیابی منقضی شده است. دوباره از ابتدا شروع کنید.'
+            ];
+        }
+
+        if ($new_password !== $new_password_confirm) {
+            return [
+                'status' => false,
+                'message' => 'تکرار رمز عبور صحیح نیست'
+            ];
+        }
+
+        if (strlen($new_password) < 8) {
+            return [
+                'status' => false,
+                'message' => 'رمز عبور باید حداقل ۸ کاراکتر باشد'
+            ];
+        }
+
+        $user = $this->user_model->find($user_id);
+
+        if (!$user) {
+            $this->clear_password_reset();
+
+            return [
+                'status' => false,
+                'message' => 'کاربر پیدا نشد'
+            ];
+        }
+
+        $updated = $this->user_model->update($user_id, [
+            'password' => password_hash($new_password, PASSWORD_DEFAULT)
+        ]);
+
+        $this->clear_password_reset();
+
+        if (!$updated) {
+            return [
+                'status' => false,
+                'message' => 'خطا در تغییر رمز عبور'
+            ];
+        }
+
+        return [
+            'status' => true,
+            'message' => 'رمز عبور با موفقیت تغییر کرد'
+        ];
+    }
+
+    private function clear_password_reset()
+    {
+        $this->session->unset_userdata([
+            'password_reset_user_id',
+            'password_reset_expires',
+            'recovery_attempts'
+        ]);
     }
 }

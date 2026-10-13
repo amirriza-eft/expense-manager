@@ -95,6 +95,8 @@ $autoload['drivers'] = array();
 */
 $autoload['helper'] = array(
     'url',
+    'jalali',
+    'security_question',
 );
 
 /*

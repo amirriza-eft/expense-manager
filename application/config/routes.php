@@ -57,8 +57,6 @@ $route['login'] = 'Auth/login';
 $route['signup'] = 'Auth/register';
 $route['profile'] = 'Auth/profile';
 
-$route['test'] = 'Home/test';
-
 // === Auth ===
 $route['api/auth/register']['POST'] =
     'api/Auth_API_Controller/register';
@@ -72,7 +70,16 @@ $route['api/auth/logout']['POST'] =
 $route['api/auth/restore']['POST'] =
     'api/Auth_API_Controller/restore';
 
-$route['api/user/delete']['DELETE'] =
+$route['api/auth/recovery/question']['POST'] =
+    'api/Auth_API_Controller/recovery_question';
+
+$route['api/auth/recovery/verify']['POST'] =
+    'api/Auth_API_Controller/recovery_verify';
+
+$route['api/auth/recovery/reset']['POST'] =
+    'api/Auth_API_Controller/recovery_reset';
+
+$route['api/user/delete']['POST'] =
     'api/Auth_API_Controller/delete_account';
 
 
@@ -85,6 +92,9 @@ $route['api/profile/update']['POST'] =
 
 $route['api/profile/password']['POST'] =
     'api/Profile_API_Controller/change_password';
+
+$route['api/profile/security-question']['POST'] =
+    'api/Profile_API_Controller/update_security_question';
 
 
 // === Dashboard ===

@@ -10,7 +10,7 @@
             <p class="text-muted small mb-0">
                 خوش آمدید،
                 <?= html_escape($this->session->userdata('user_name') ?: ($this->session->userdata('full_name') ?: 'کاربر')) ?>.
-                خلاصه وضعیت دخل و خرج این ماه:
+                خلاصه وضعیت دخل و خرج ماه جاری :
             </p>
         </div>
     </div>

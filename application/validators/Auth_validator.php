@@ -49,6 +49,59 @@ class Auth_validator
             'required|matches[password]'
         );
 
+        $this->form_validation->set_rules(
+            'security_question_id',
+            'سوال امنیتی',
+            [
+                'required',
+                [
+                    'valid_security_question',
+                    function ($id) {
+                        return is_valid_security_question_id($id);
+                    }
+                ]
+            ],
+            [
+                'required' => 'انتخاب سوال امنیتی الزامی است',
+                'valid_security_question' => 'سوال امنیتی انتخاب‌شده معتبر نیست'
+            ]
+        );
+
+        $this->form_validation->set_rules(
+            'security_answer',
+            'پاسخ امنیتی',
+            [
+                'required',
+                [
+                    'security_answer_ok',
+                    function ($answer) {
+                        return normalize_security_answer($answer) !== '';
+                    }
+                ]
+            ],
+            [
+                'required' => 'پاسخ سوال امنیتی الزامی است',
+                'security_answer_ok' => 'پاسخ سوال امنیتی نمی‌تواند خالی باشد'
+            ]
+        );
+
+        return $this->form_validation->run();
+    }
+
+    public function recovery_reset()
+    {
+        $this->form_validation->set_rules(
+            'new_password',
+            'رمز عبور جدید',
+            'required|min_length[8]|max_length[100]'
+        );
+
+        $this->form_validation->set_rules(
+            'new_password_confirm',
+            'تکرار رمز عبور جدید',
+            'required|matches[new_password]'
+        );
+
         return $this->form_validation->run();
     }
 }

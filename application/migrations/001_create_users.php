@@ -36,6 +36,18 @@ class Migration_Create_users extends CI_Migration
                 'null' => TRUE
             ],
 
+            'security_question_id' => [
+                'type' => 'INT',
+                'unsigned' => TRUE,
+                'null' => TRUE
+            ],
+
+            'security_answer_hash' => [
+                'type' => 'VARCHAR',
+                'constraint' => 255,
+                'null' => TRUE
+            ],
+
             'created_at DATETIME DEFAULT CURRENT_TIMESTAMP',
 
             'updated_at DATETIME DEFAULT CURRENT_TIMESTAMP

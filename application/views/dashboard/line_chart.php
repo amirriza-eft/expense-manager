@@ -1,15 +1,15 @@
 <div id="finance-chart-app" class="chart-wrapper" v-cloak>
 
-    <div class="chart-header d-flex justify-content-between align-items-center mt-5 mb-3 gap-3">
+    <div class="chart-header d-flex justify-content-between align-items-center mt-5 mb-3 gap-3 flex-wrap">
         <div>
             <h4 class="fw-bold text-white mb-1">نمودار مالی</h4>
-            <p class="text-muted small mb-0">بررسی درآمد و هزینه‌های اخیر</p>
+            <p class="text-muted small mb-0">بررسی درآمد و هزینه‌ها در ماه جاری یا بازه انتخابی</p>
         </div>
 
-        <select v-model="period" class="form-select form-select-sm flex-shrink-0">
-            <option value="monthly">ماهانه</option>
-            <option value="weekly">هفتگی</option>
-        </select>
+        <button type="button" class="btn btn-sm btn-outline-secondary flex-shrink-0"
+                @click="resetToCurrentMonth" title="بازگشت به ماه جاری شمسی">
+            ماه جاری
+        </button>
     </div>
 
     <div class="d-flex justify-content-center align-items-center gap-3 mb-3">
@@ -41,7 +41,8 @@
     Vue.createApp({
         data() {
             return {
-                period: 'monthly',
+                from: '',
+                to: '',
                 loading: false,
                 error: '',
 
@@ -78,7 +79,7 @@
                     series: this.series,
                     colors: this.legend.map(item => item.color),
                     dataLabels: { enabled: false },
-                    stroke: { curve: 'smooth', width: 3 },
+                    stroke: { curve: 'smooth', width: 3, connectNulls: false },
                     fill: {
                         type: 'gradient',
                         gradient: { opacityFrom: 0.35, opacityTo: 0.05 }
@@ -91,7 +92,9 @@
                         categories: this.categories,
                         tickAmount: 10,
                         labels: {
-                            style: { colors: '#adb5bd', fontSize: '12px', fontWeight: 600 }
+                            style: { colors: '#adb5bd', fontSize: '12px', fontWeight: 600 },
+                            rotate: -45,
+                            hideOverlappingLabels: true
                         },
                         axisBorder: { show: false },
                         axisTicks: { show: false }
@@ -104,7 +107,12 @@
                     },
                     tooltip: {
                         y: {
-                            formatter: value => value.toLocaleString('fa-IR') + ' تومان'
+                            formatter: value => {
+                                if (value === null || value === undefined) {
+                                    return '—';
+                                }
+                                return Number(value).toLocaleString('fa-IR') + ' تومان';
+                            }
                         }
                     },
                     legend: { show: false },
@@ -125,14 +133,8 @@
             }
         },
 
-        watch: {
-            period() {
-                this.loadChart();
-            }
-        },
-
         mounted() {
-            window.reloadFinanceChart = () => this.loadChart();
+            window.reloadFinanceChart = (from, to) => this.loadChart(from, to);
             this.loadChart();
         },
 
@@ -143,6 +145,10 @@
 
         methods: {
             formatAxisValue(value) {
+                if (value === null || value === undefined) {
+                    return '';
+                }
+
                 const abs  = Math.abs(value);
                 const sign = value < 0 ? '-' : '';
 
@@ -155,7 +161,28 @@
                 return value.toLocaleString('fa-IR');
             },
 
-            async loadChart() {
+            resetToCurrentMonth() {
+                // Clears date filters and reloads the list; that syncs the chart to the current month.
+                if (typeof clearTransactionDateFilters === 'function') {
+                    clearTransactionDateFilters();
+                    return;
+                }
+
+                this.loadChart('', '');
+            },
+
+            /**
+             * @param {string|undefined} from Gregorian YYYY-MM-DD, or omit to keep last range
+             * @param {string|undefined} to   Gregorian YYYY-MM-DD, or omit to keep last range
+             */
+            async loadChart(from, to) {
+                if (from !== undefined) {
+                    this.from = from || '';
+                }
+                if (to !== undefined) {
+                    this.to = to || '';
+                }
+
                 if (this.controller) this.controller.abort();
                 this.controller = new AbortController();
 
@@ -163,31 +190,55 @@
                 this.error = '';
 
                 try {
+                    const params = {};
+
+                    if (this.from && this.to) {
+                        if (this.from > this.to) {
+                            this.error = 'تاریخ شروع نمی‌تواند بعد از تاریخ پایان باشد';
+                            this.destroyChart();
+                            return;
+                        }
+                        params.from = this.from;
+                        params.to = this.to;
+                    }
+
                     const response = await axios.get("<?= site_url('api/chart') ?>", {
-                        params: { period: this.period },
+                        params,
                         signal: this.controller.signal
                     });
 
                     const result = response.data;
 
-                    if (!result.status) return;
-
-                    const rows = result.data;
-
-                    if (!rows || rows.length === 0) {
+                    if (!result.status) {
+                        this.error = result.message || 'خطا در دریافت اطلاعات نمودار';
                         this.destroyChart();
                         return;
                     }
 
-                    this.categories = rows.map(item => new Date(item.day).toLocaleDateString('fa-IR'));
-                    this.incomes    = rows.map(item => Number(item.income)  || 0);
-                    this.expenses   = rows.map(item => Number(item.expense) || 0);
-                    this.balances   = rows.map(item => Number(item.balance) || 0);
+                    const rows = result.data || [];
+
+                    if (rows.length === 0) {
+                        this.categories = [];
+                        this.incomes = [];
+                        this.expenses = [];
+                        this.balances = [];
+                        this.destroyChart();
+                        return;
+                    }
+
+                    this.categories = rows.map(item => item.label || formatPersianDate(item.day));
+                    this.incomes    = rows.map(item => item.income === null ? null : Number(item.income) || 0);
+                    this.expenses   = rows.map(item => item.expense === null ? null : Number(item.expense) || 0);
+                    this.balances   = rows.map(item => item.balance === null ? null : Number(item.balance) || 0);
 
                     this.renderChart();
                 } catch (error) {
-                    if (axios.isCancel(error)) return;
-                    this.error = 'خطا در دریافت اطلاعات نمودار';
+                    if (axios.isCancel(error) || error.name === 'CanceledError' || error.code === 'ERR_CANCELED') {
+                        return;
+                    }
+
+                    const message = error.response && error.response.data && error.response.data.message;
+                    this.error = message || 'خطا در دریافت اطلاعات نمودار';
                 } finally {
                     this.loading = false;
                 }
@@ -230,10 +281,6 @@
         width: 100%;
     }
 
-    .chart-header select {
-        width: 120px;
-    }
-
     .legend-dot {
         display: inline-block;
         width: 10px;
@@ -259,10 +306,6 @@
             flex-direction: column;
             align-items: stretch !important;
             gap: 12px;
-        }
-
-        .chart-header select {
-            width: 100%;
         }
 
         #hs-curved-area-charts {

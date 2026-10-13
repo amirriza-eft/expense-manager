@@ -2,7 +2,7 @@
 
 <div id="login-app">
 
-    <div v-if="!showRecoveryPanel" class="glass-panel p-4 p-sm-5 shadow-lg border" style="border-color: var(--border-subtle) !important;">
+    <div v-if="!showRecoveryPanel && !showPasswordRecoveryPanel" class="glass-panel p-4 p-sm-5 shadow-lg border" style="border-color: var(--border-subtle) !important;">
 
         <div class="text-center mb-5">
             <a href="<?= site_url('home') ?>" class="d-inline-block mb-3">
@@ -46,6 +46,11 @@
                     <input type="checkbox" value="1" id="rememberMe" name="remember_me" v-model="rememberMe">
                     <label for="rememberMe">مرا به خاطر بسپار</label>
                 </div>
+
+                <button type="button" class="btn btn-link text-decoration-none small fw-bold text-accent-orange p-0"
+                        @click="openPasswordRecovery">
+                    فراموشی رمز عبور؟
+                </button>
             </div>
 
             <button type="submit" class="btn btn-orange-glow w-100" :disabled="loading">
@@ -61,6 +66,7 @@
     </div>
 
     <?php $this->load->view('auth/account_recovery_card'); ?>
+    <?php $this->load->view('auth/password_recovery_card'); ?>
 
 </div>
 
@@ -80,11 +86,21 @@
                 deletedAccount: false,
                 deletedMessage: '',
 
-                showRecoveryPanel:false,
-                showRecoveryPassword:false,
-                recoveryLoading:false,
-                recoveryError:'',
-                recoverySuccess:'',
+                showRecoveryPanel: false,
+                showRecoveryPassword: false,
+                recoveryLoading: false,
+                recoveryError: '',
+                recoverySuccess: '',
+
+                showPasswordRecoveryPanel: false,
+                passwordRecoveryStep: 1,
+                passwordRecoveryLoading: false,
+                passwordRecoveryError: '',
+                passwordRecoverySuccess: '',
+                recoveryQuestion: '',
+                recoveryAnswer: '',
+                recoveryNewPassword: '',
+                recoveryNewPasswordConfirm: ''
             };
         },
 
@@ -136,48 +152,159 @@
                 }
             },
 
-            showRecovery(){
-                this.showRecoveryPanel=true;
-                this.deletedAccount=false;
+            showRecovery() {
+                this.showRecoveryPanel = true;
+                this.showPasswordRecoveryPanel = false;
+                this.deletedAccount = false;
             },
 
-            async restoreAccount(){
+            openPasswordRecovery() {
+                this.showPasswordRecoveryPanel = true;
+                this.showRecoveryPanel = false;
+                this.passwordRecoveryStep = 1;
+                this.passwordRecoveryError = '';
+                this.passwordRecoverySuccess = '';
+                this.recoveryQuestion = '';
+                this.recoveryAnswer = '';
+                this.recoveryNewPassword = '';
+                this.recoveryNewPasswordConfirm = '';
+            },
 
-                this.recoveryError='';
-                this.recoverySuccess='';
-                this.recoveryLoading=true;
+            closePasswordRecovery() {
+                this.showPasswordRecoveryPanel = false;
+                this.passwordRecoveryStep = 1;
+                this.passwordRecoveryError = '';
+                this.passwordRecoverySuccess = '';
+            },
 
-                let formData=new FormData();
+            async loadRecoveryQuestion() {
+                this.passwordRecoveryError = '';
+                this.passwordRecoverySuccess = '';
+                this.passwordRecoveryLoading = true;
 
-                formData.append('email',this.email);
-                formData.append('password',this.password);
+                try {
+                    const formData = new FormData();
+                    formData.append('email', this.email);
 
-                try{
+                    const response = await axios.post(
+                        "<?= site_url('api/auth/recovery/question') ?>",
+                        formData
+                    );
 
-                    let response=await axios.post(
+                    if (response.data.status) {
+                        this.recoveryQuestion = response.data.question;
+                        this.passwordRecoveryStep = 2;
+                    } else {
+                        this.passwordRecoveryError = response.data.message;
+                    }
+                } catch (e) {
+                    this.passwordRecoveryError = 'خطا در ارتباط با سرور';
+                } finally {
+                    this.passwordRecoveryLoading = false;
+                }
+            },
+
+            async verifyRecoveryAnswer() {
+                this.passwordRecoveryError = '';
+                this.passwordRecoverySuccess = '';
+                this.passwordRecoveryLoading = true;
+
+                try {
+                    const formData = new FormData();
+                    formData.append('email', this.email);
+                    formData.append('security_answer', this.recoveryAnswer);
+
+                    const response = await axios.post(
+                        "<?= site_url('api/auth/recovery/verify') ?>",
+                        formData
+                    );
+
+                    if (response.data.status) {
+                        this.passwordRecoverySuccess = response.data.message;
+                        this.passwordRecoveryStep = 3;
+                        this.recoveryAnswer = '';
+                    } else {
+                        this.passwordRecoveryError = response.data.message;
+                    }
+                } catch (e) {
+                    this.passwordRecoveryError = 'خطا در ارتباط با سرور';
+                } finally {
+                    this.passwordRecoveryLoading = false;
+                }
+            },
+
+            async resetRecoveredPassword() {
+                this.passwordRecoveryError = '';
+                this.passwordRecoverySuccess = '';
+                this.passwordRecoveryLoading = true;
+
+                try {
+                    const formData = new FormData();
+                    formData.append('new_password', this.recoveryNewPassword);
+                    formData.append('new_password_confirm', this.recoveryNewPasswordConfirm);
+
+                    const response = await axios.post(
+                        "<?= site_url('api/auth/recovery/reset') ?>",
+                        formData
+                    );
+
+                    if (response.data.status) {
+                        this.passwordRecoverySuccess = response.data.message;
+                        setTimeout(() => {
+                            this.closePasswordRecovery();
+                            this.success = 'رمز عبور تغییر کرد. وارد شوید.';
+                        }, 1200);
+                    } else {
+                        this.passwordRecoveryError = response.data.message;
+                    }
+                } catch (error) {
+                    if (error.response && error.response.data && error.response.data.message) {
+                        this.passwordRecoveryError = error.response.data.message;
+                    } else {
+                        this.passwordRecoveryError = 'خطا در ارتباط با سرور';
+                    }
+                } finally {
+                    this.passwordRecoveryLoading = false;
+                }
+            },
+
+            async restoreAccount() {
+
+                this.recoveryError = '';
+                this.recoverySuccess = '';
+                this.recoveryLoading = true;
+
+                let formData = new FormData();
+
+                formData.append('email', this.email);
+                formData.append('password', this.password);
+
+                try {
+
+                    let response = await axios.post(
                         "<?= site_url('api/auth/restore') ?>",
                         formData
                     );
 
-                    let data=response.data;
+                    let data = response.data;
 
-                    if(data.status){
+                    if (data.status) {
 
-                        this.recoverySuccess=data.message;
+                        this.recoverySuccess = data.message;
 
-                        setTimeout(()=>{
-                            window.location.href="<?= site_url('login') ?>";
-                        },1200);
+                        setTimeout(() => {
+                            window.location.href = "<?= site_url('login') ?>";
+                        }, 1200);
 
                         return;
                     }
-                    this.recoveryError=data.message;
+                    this.recoveryError = data.message;
 
-                }catch(e){
-                    this.recoveryError='خطا در ارتباط با سرور';
+                } catch (e) {
+                    this.recoveryError = 'خطا در ارتباط با سرور';
 
-                }finally{
-                    this.recoveryLoading=false;
+                } finally {
+                    this.recoveryLoading = false;
                 }
             }
         }

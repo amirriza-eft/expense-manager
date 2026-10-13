@@ -380,14 +380,13 @@ class Transaction_model extends CI_Model
             ->update('budgets');
     }
 
-    public function get_monthly_income($user_id)
+    public function get_monthly_income($user_id, $from = null, $to = null)
     {
-        $from = date(
-            'Y-m-d 00:00:00',
-            strtotime('-29 days')
-        );
-
-        $to = date('Y-m-d 23:59:59');
+        if ($from === null || $to === null) {
+            $range = current_jalali_month_range(true);
+            $from = $range['from'];
+            $to = $range['to'];
+        }
 
         $result = $this->db
             ->select_sum('amount')
@@ -402,14 +401,13 @@ class Transaction_model extends CI_Model
         return (float) ($result->amount ?? 0);
     }
 
-    public function get_monthly_expense($user_id)
+    public function get_monthly_expense($user_id, $from = null, $to = null)
     {
-        $from = date(
-            'Y-m-d 00:00:00',
-            strtotime('-29 days')
-        );
-
-        $to = date('Y-m-d 23:59:59');
+        if ($from === null || $to === null) {
+            $range = current_jalali_month_range(true);
+            $from = $range['from'];
+            $to = $range['to'];
+        }
 
         $result = $this->db
             ->select_sum('amount')

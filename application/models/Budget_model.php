@@ -18,13 +18,9 @@ class Budget_model extends CI_Model
             ->get($this->table)
             ->row();
     }
-
-    public function get_chart_data($user_id, $period = 'monthly')
+    public function get_chart_data($user_id, $from, $to, $empty_after_today = false)
     {
-        $days = ($period === 'weekly') ? 7 : 30;
-
-        $from = date('Y-m-d', strtotime('-' . ($days - 1) . ' days'));
-        $to   = date('Y-m-d');
+        $today = app_today();
 
         $budget = $this->db
             ->select('amount')
@@ -33,6 +29,8 @@ class Budget_model extends CI_Model
             ->row();
 
         $current_balance = (float) ($budget->amount ?? 0);
+
+        $balance_to = ($to < $today) ? $to : $today;
 
         $period_net = $this->db
             ->select("
@@ -46,7 +44,7 @@ class Budget_model extends CI_Model
             ->where('user_id', $user_id)
             ->where('deleted_at IS NULL', null, false)
             ->where('transaction_date >=', $from)
-            ->where('transaction_date <=', $to . ' 23:59:59')
+            ->where('transaction_date <=', $balance_to)
             ->get('transactions')
             ->row();
 
@@ -67,7 +65,7 @@ class Budget_model extends CI_Model
             ->where('user_id', $user_id)
             ->where('deleted_at IS NULL', null, false)
             ->where('transaction_date >=', $from)
-            ->where('transaction_date <=', $to . ' 23:59:59')
+            ->where('transaction_date <=', $to)
             ->group_by('DATE(transaction_date)')
             ->order_by('day', 'ASC')
             ->get('transactions')
@@ -84,12 +82,19 @@ class Budget_model extends CI_Model
 
         $data = [];
 
-        for ($i = 0; $i < $days; $i++) {
+        foreach (each_date_inclusive($from, $to) as $day) {
+            $is_future = $empty_after_today && $day > $today;
 
-            $day = date(
-                'Y-m-d',
-                strtotime($from . ' +' . $i . ' days')
-            );
+            if ($is_future) {
+                $data[] = [
+                    'day'     => $day,
+                    'label'   => format_jalali_date($day, true),
+                    'income'  => null,
+                    'expense' => null,
+                    'balance' => null,
+                ];
+                continue;
+            }
 
             $income = $totals[$day]['income'] ?? 0;
             $expense = $totals[$day]['expense'] ?? 0;
@@ -98,6 +103,7 @@ class Budget_model extends CI_Model
 
             $data[] = [
                 'day'     => $day,
+                'label'   => format_jalali_date($day, true),
                 'income'  => $income,
                 'expense' => $expense,
                 'balance' => $balance,

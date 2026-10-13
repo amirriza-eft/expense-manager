@@ -2,7 +2,7 @@
 
 <div class="glass-panel p-3 mb-4">
     <div class="row g-2 align-items-center">
-        <div class="col-12 col-md-3">
+        <div class="col-12 col-md-2">
             <div class="input-group">
                 <span class="input-group-text"><i class="bi bi-search"></i></span>
                 <input type="text" id="search" class="form-control" placeholder="جستجو..."
@@ -37,10 +37,17 @@
                    ref="filterToDate" v-model="filters.to_date">
         </div>
 
-        <div class="col-12 col-md-1">
-            <button type="button" class="btn btn-orange-outline w-100" id="applyFiltersBtn" @click="loadTransactions(1)">
-                اعمال
-            </button>
+        <div class="col-12 col-md-2">
+            <div class="d-flex gap-1">
+                <button type="button" class="btn btn-orange-outline flex-grow-1" id="applyFiltersBtn"
+                        @click="loadTransactions(1)">
+                    اعمال
+                </button>
+                <button type="button" class="btn btn-outline-secondary flex-grow-1" id="resetFiltersBtn"
+                        @click="resetFilters" title="بازگشت به حالت پیش‌فرض">
+                    پیش‌فرض
+                </button>
+            </div>
         </div>
     </div>
 </div>

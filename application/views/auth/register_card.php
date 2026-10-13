@@ -40,7 +40,7 @@
             </div>
         </div>
 
-        <div class="mb-4">
+        <div class="mb-3">
             <label class="form-label text-light small fw-medium">تکرار رمز عبور</label>
             <div class="input-group">
                 <span class="input-group-text"><i class="bi bi-shield-check"></i></span>
@@ -49,6 +49,23 @@
                     <i :class="showPasswordConfirm ? 'bi bi-eye-slash' : 'bi bi-eye'"></i>
                 </button>
             </div>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label text-light small fw-medium">سوال امنیتی</label>
+            <select class="form-select" name="security_question_id" v-model="security_question_id" required>
+                <option value="">یک سوال انتخاب کنید</option>
+                <option v-for="(text, id) in securityQuestions" :key="id" :value="String(id)">{{ text }}</option>
+            </select>
+        </div>
+
+        <div class="mb-4">
+            <label class="form-label text-light small fw-medium">پاسخ سوال امنیتی</label>
+            <div class="input-group">
+                <span class="input-group-text"><i class="bi bi-question-circle"></i></span>
+                <input type="text" class="form-control" name="security_answer" placeholder="پاسخ خود را وارد کنید" v-model="security_answer" required autocomplete="off">
+            </div>
+            <small class="text-muted">این پاسخ برای بازیابی رمز عبور استفاده می‌شود</small>
         </div>
 
         <button type="submit" class="btn btn-orange-glow w-100" :disabled="loading">
@@ -72,6 +89,9 @@
                 email: '',
                 password: '',
                 password_confirm: '',
+                security_question_id: '',
+                security_answer: '',
+                securityQuestions: <?= json_encode(security_questions_list(), JSON_UNESCAPED_UNICODE) ?>,
                 showPassword: false,
                 showPasswordConfirm: false,
                 loading: false,
@@ -95,6 +115,16 @@
                     return;
                 }
 
+                if (!this.security_question_id) {
+                    this.error = 'انتخاب سوال امنیتی الزامی است';
+                    return;
+                }
+
+                if (!this.security_answer.trim()) {
+                    this.error = 'پاسخ سوال امنیتی الزامی است';
+                    return;
+                }
+
                 this.loading = true;
 
                 try {
@@ -104,6 +134,8 @@
                     formData.append('email', this.email.trim());
                     formData.append('password', this.password);
                     formData.append('password_confirm', this.password_confirm);
+                    formData.append('security_question_id', this.security_question_id);
+                    formData.append('security_answer', this.security_answer);
 
                     const response = await axios.post(
                         "<?= site_url('api/auth/register') ?>",

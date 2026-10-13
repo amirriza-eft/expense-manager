@@ -61,6 +61,7 @@
                     format: 'YYYY/MM/DD',
                     autoClose: true,
                     initialValue: false,
+                    maxDate: new persianDate(),
                     calendar: {persian: {locale: 'fa'}},
                     onSelect: () => {
                         this.filters.from_date = this.$refs.filterFromDate.value;
@@ -71,6 +72,7 @@
                     format: 'YYYY/MM/DD',
                     autoClose: true,
                     initialValue: false,
+                    maxDate: new persianDate(),
                     calendar: {persian: {locale: 'fa'}},
                     onSelect: () => {
                         this.filters.to_date = this.$refs.filterToDate.value;
@@ -81,6 +83,7 @@
                     format: 'YYYY/MM/DD',
                     autoClose: true,
                     initialValue: true,
+                    maxDate: new persianDate(),
                     calendar: {persian: {locale: 'fa'}},
                     onSelect: () => {
                         this.transactionForm.date_display = this.$refs.txDateDisplay.value;
@@ -96,9 +99,65 @@
                 }
             },
 
+            /**
+             * Resolve from/to for APIs. If only from is set, use today as to
+             * and fill the filter input so the UI matches what was submitted.
+             */
+            resolveFilterDates() {
+                let from = this.filters.from_date
+                    ? convertPersianToGregorian(this.filters.from_date)
+                    : '';
+                let to = this.filters.to_date
+                    ? convertPersianToGregorian(this.filters.to_date)
+                    : '';
+
+                if (from && !to) {
+                    to = todayGregorianDate();
+                    this.filters.to_date = formatPersianDate(to);
+                }
+
+                return {from, to};
+            },
+
+            syncFinanceChart(range) {
+                if (typeof reloadFinanceChart !== 'function') {
+                    return;
+                }
+
+                if (!range) {
+                    range = this.resolveFilterDates();
+                }
+
+                reloadFinanceChart(range.from, range.to);
+            },
+
+            resetFilters() {
+                this.filters = {
+                    search: '',
+                    type: '',
+                    category_id: '',
+                    from_date: '',
+                    to_date: '',
+                    sort: 'newest'
+                };
+                this.loadTransactions(1);
+            },
+
+            clearDateFilters() {
+                this.filters.from_date = '';
+                this.filters.to_date = '';
+            },
+
+            clearDateFiltersAndReload() {
+                this.clearDateFilters();
+                this.loadTransactions(1);
+            },
+
             async loadTransactions(page = 1) {
                 this.currentPage = page;
                 this.transactionLoading = true;
+
+                const range = this.resolveFilterDates();
 
                 try {
                     const response = await axios.get("<?= site_url('api/transaction') ?>", {
@@ -107,8 +166,8 @@
                             search: this.filters.search,
                             type: this.filters.type,
                             category_id: this.filters.category_id,
-                            from_date: this.filters.from_date ? convertPersianToGregorian(this.filters.from_date) : '',
-                            to_date: this.filters.to_date ? convertPersianToGregorian(this.filters.to_date) : '',
+                            from_date: range.from,
+                            to_date: range.to,
                             sort: this.filters.sort
                         }
                     });
@@ -140,6 +199,7 @@
                 }
 
                 this.transactionLoading = false;
+                this.syncFinanceChart(range);
             },
 
             onFilterTypeChange() {
@@ -166,9 +226,6 @@
                         await this.loadTransactions(this.currentPage);
                         this.loadDeletedTransactions();
                         loadDashboardSummary();
-                        if (typeof reloadFinanceChart === 'function') {
-                            reloadFinanceChart();
-                        }
                     } else {
                         alert(response.data.message || 'خطا در بازیابی تراکنش');
                     }
@@ -250,6 +307,12 @@
                     return;
                 }
 
+                if (date > todayGregorianDate()) {
+                    this.transactionMessage = 'تاریخ تراکنش نمی‌تواند در آینده باشد';
+                    this.transactionMessageSuccess = false;
+                    return;
+                }
+
                 const formData = new FormData();
                 formData.append('id', form.id);
                 formData.append('title', form.title);
@@ -278,9 +341,6 @@
 
                         await this.loadTransactions(form.id ? this.currentPage : 1);
                         loadDashboardSummary();
-                        if (typeof reloadFinanceChart === 'function') {
-                            reloadFinanceChart();
-                        }
                     }
                 } catch (error) {
                     if (error.response && error.response.data && error.response.data.message) {
@@ -314,9 +374,6 @@
                         await this.loadTransactions(this.currentPage);
                         this.loadDeletedTransactions();
                         loadDashboardSummary();
-                        if (typeof reloadFinanceChart === 'function') {
-                            reloadFinanceChart();
-                        }
                     } else {
                         alert(response.data.message);
                     }
@@ -332,6 +389,7 @@
         mounted() {
             window.reloadCategoryOptions = this.loadCategoryOptions;
             window.reloadTransactions = () => this.loadTransactions(this.currentPage);
+            window.clearTransactionDateFilters = this.clearDateFiltersAndReload;
 
             this.loadCategoryOptions();
             this.loadTransactions();
