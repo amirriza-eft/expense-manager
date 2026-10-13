@@ -143,13 +143,9 @@
                 this.loadTransactions(1);
             },
 
-            clearDateFilters() {
+            clearDateFiltersAndReload() {
                 this.filters.from_date = '';
                 this.filters.to_date = '';
-            },
-
-            clearDateFiltersAndReload() {
-                this.clearDateFilters();
                 this.loadTransactions(1);
             },
 

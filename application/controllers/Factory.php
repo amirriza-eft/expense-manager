@@ -104,11 +104,6 @@ class Factory extends CI_Controller
         echo "Generated {$count} transactions for the last 30 days.";
     }
 
-    /**
-     * Active category IDs for a type. Creates a default category if none exist.
-     *
-     * @return int[]
-     */
     private function factory_category_ids($user_id, $type)
     {
         $rows = $this->db

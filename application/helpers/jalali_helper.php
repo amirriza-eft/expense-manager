@@ -270,28 +270,22 @@ if (!function_exists('current_jalali_month_range')) {
      *
      * @param bool $through_today When true, end is today (for summary).
      *                            When false, end is last day of the Shamsi month (for chart axis).
-     * @return array{from:string,to:string,jy:int,jm:int,month_name:string,label:string}
+     * @return array{from:string,to:string,month_end:string,label:string}
      */
     function current_jalali_month_range($through_today = true)
     {
         $today = app_today();
-        list($jy, $jm, $jd) = gregorian_to_jalali_parts($today);
+        list($jy, $jm) = gregorian_to_jalali_parts($today);
 
         $from = jalali_to_gregorian_date($jy, $jm, 1);
         $month_end = jalali_to_gregorian_date($jy, $jm, jalali_month_length($jy, $jm));
         $to = $through_today ? $today : $month_end;
 
-        $month_name = jalali_month_name($jm);
-
         return [
-            'from'       => $from,
-            'to'         => $to,
-            'month_end'  => $month_end,
-            'jy'         => $jy,
-            'jm'         => $jm,
-            'jd'         => $jd,
-            'month_name' => $month_name,
-            'label'      => $month_name . ' ' . to_persian_digits($jy),
+            'from'      => $from,
+            'to'        => $to,
+            'month_end' => $month_end,
+            'label'     => jalali_month_name($jm) . ' ' . to_persian_digits($jy),
         ];
     }
 }

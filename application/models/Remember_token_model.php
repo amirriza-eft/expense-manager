@@ -38,11 +38,4 @@ class Remember_token_model extends CI_Model
             ->where('user_id', $user_id)
             ->delete($this->table);
     }
-
-    public function delete_expired()
-    {
-        return $this->db
-            ->where('expires_at <', date('Y-m-d H:i:s'))
-            ->delete($this->table);
-    }
 }

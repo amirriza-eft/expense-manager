@@ -24,7 +24,7 @@ class Auth_service
         $question_id = (int) ($data['security_question_id'] ?? 0);
         $security_answer = $data['security_answer'] ?? '';
 
-        unset($data['security_answer'], $data['password_confirm']);
+        unset($data['security_answer']);
 
         if (!is_valid_security_question_id($question_id)) {
             return [
@@ -345,19 +345,13 @@ class Auth_service
         $this->session->sess_destroy();
     }
 
-    /**
-     * Step 1: look up the account and return its saved security question text.
-     */
     public function recovery_get_question($email)
     {
         $email = trim((string) $email);
         $user = $this->user_model->find_by_email($email);
 
-        if (
-            !$user
-            || empty($user->security_question_id)
-            || empty($user->security_answer_hash)
-        ) {
+        if (!$user || empty($user->security_question_id) || empty($user->security_answer_hash))
+        {
             return [
                 'status' => false,
                 'message' => 'بازیابی با سوال امنیتی برای این حساب در دسترس نیست. اگر حساب دارید، از صفحه پروفایل سوال امنیتی را تنظیم کنید.'
@@ -379,30 +373,13 @@ class Auth_service
         ];
     }
 
-    /**
-     * Step 2: verify the answer, then allow a short password-reset window.
-     */
     public function recovery_verify_answer($email, $answer)
     {
         $email = trim((string) $email);
         $user = $this->user_model->find_by_email($email);
 
-        $attempts = (int) $this->session->userdata('recovery_attempts');
-
-        if ($attempts >= 5) {
-            return [
-                'status' => false,
-                'message' => 'تعداد تلاش‌های ناموفق زیاد است. کمی بعد دوباره امتحان کنید.'
-            ];
-        }
-
-        if (
-            !$user
-            || empty($user->security_question_id)
-            || empty($user->security_answer_hash)
-        ) {
-            $this->session->set_userdata('recovery_attempts', $attempts + 1);
-
+        if (!$user || empty($user->security_question_id) || empty($user->security_answer_hash))
+        {
             return [
                 'status' => false,
                 'message' => 'پاسخ اشتباه است'
@@ -410,8 +387,6 @@ class Auth_service
         }
 
         if (!verify_security_answer($answer, $user->security_answer_hash)) {
-            $this->session->set_userdata('recovery_attempts', $attempts + 1);
-
             return [
                 'status' => false,
                 'message' => 'پاسخ اشتباه است'
@@ -420,8 +395,7 @@ class Auth_service
 
         $this->session->set_userdata([
             'password_reset_user_id' => (int) $user->id,
-            'password_reset_expires' => time() + (15 * 60),
-            'recovery_attempts' => 0
+            'password_reset_expires' => time() + (15 * 60)
         ]);
 
         return [
@@ -430,9 +404,6 @@ class Auth_service
         ];
     }
 
-    /**
-     * Step 3: reset password only if recovery was verified recently.
-     */
     public function recovery_reset_password($new_password, $new_password_confirm)
     {
         $user_id = (int) $this->session->userdata('password_reset_user_id');
@@ -495,8 +466,7 @@ class Auth_service
     {
         $this->session->unset_userdata([
             'password_reset_user_id',
-            'password_reset_expires',
-            'recovery_attempts'
+            'password_reset_expires'
         ]);
     }
 }
