@@ -63,7 +63,7 @@ class Transaction_API_Controller extends Base_API_Controller
         );
     }
 
-    public function update()
+    public function update($id)
     {
         $user_id = $this->auth_user();
 
@@ -73,7 +73,7 @@ class Transaction_API_Controller extends Base_API_Controller
 
         $result = $this->transaction_service->update(
             $user_id,
-            $this->input->post('id', true),
+            $id,
             $this->transaction_input()
         );
 
@@ -83,13 +83,13 @@ class Transaction_API_Controller extends Base_API_Controller
         );
     }
 
-    public function delete()
+    public function delete($id)
     {
         $user_id = $this->auth_user();
 
         $result = $this->transaction_service->delete(
             $user_id,
-            $this->input->post('id', true)
+            $id
         );
 
         return $this->json(
