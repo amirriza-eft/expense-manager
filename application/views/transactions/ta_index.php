@@ -99,10 +99,6 @@
                 }
             },
 
-            /**
-             * Resolve from/to for APIs. If only from is set, use today as to
-             * and fill the filter input so the UI matches what was submitted.
-             */
             resolveFilterDates() {
                 let from = this.filters.from_date
                     ? convertPersianToGregorian(this.filters.from_date)

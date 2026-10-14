@@ -162,7 +162,6 @@
             },
 
             resetToCurrentMonth() {
-                // Clears date filters and reloads the list; that syncs the chart to the current month.
                 if (typeof clearTransactionDateFilters === 'function') {
                     clearTransactionDateFilters();
                     return;
@@ -171,10 +170,6 @@
                 this.loadChart('', '');
             },
 
-            /**
-             * @param {string|undefined} from Gregorian YYYY-MM-DD, or omit to keep last range
-             * @param {string|undefined} to   Gregorian YYYY-MM-DD, or omit to keep last range
-             */
             async loadChart(from, to) {
                 if (from !== undefined) {
                     this.from = from || '';
