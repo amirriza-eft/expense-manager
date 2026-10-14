@@ -16,6 +16,17 @@ class Auth_service
         $this->remember_token_model = $remember_token_model;
     }
 
+    public function security_questions(): array
+    {
+        $questions = [];
+
+        foreach (security_questions_list() as $id => $text) {
+            $questions[] = ['id' => $id, 'text' => $text];
+        }
+
+        return $questions;
+    }
+
     public function register($data)
     {
         $data['full_name'] = trim($data['full_name'] ?? '');

@@ -80,7 +80,7 @@
                 deleteMessage: '',
                 deleteMessageSuccess: false,
 
-                securityQuestions: {},
+                securityQuestions: [],
                 securityQuestionId: '',
                 securityAnswer: '',
                 securityCurrentPassword: '',
@@ -93,6 +93,7 @@
 
         mounted() {
             this.loadProfile();
+            this.loadSecurityQuestions();
         },
 
         methods: {
@@ -111,18 +112,22 @@
                 const response = await axios.get("<?= site_url('api/profile') ?>");
 
                 if (response.data.status) {
-                    this.fullName = response.data.user.full_name;
-                    this.email = response.data.user.email;
-                    this.setAvatar(response.data.user);
+                    const user = response.data.user;
 
-                    this.securityQuestions = response.data.security_questions || {};
-                    this.currentSecurityQuestion = response.data.user.security_question || '';
-                    this.securityQuestionId = response.data.user.security_question_id
-                        ? String(response.data.user.security_question_id)
+                    this.fullName = user.full_name;
+                    this.email = user.email;
+                    this.setAvatar(user);
+
+                    this.currentSecurityQuestion = user.security_question || '';
+                    this.securityQuestionId = user.security_question_id
+                        ? String(user.security_question_id)
                         : '';
-                    this.securityAnswer = '';
-                    this.securityCurrentPassword = '';
                 }
+            },
+
+            async loadSecurityQuestions() {
+                const response = await axios.get("<?= site_url('api/auth/security_questions') ?>");
+                this.securityQuestions = response.data;
             },
 
             async saveSecurityQuestion() {

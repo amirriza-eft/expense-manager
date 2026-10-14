@@ -55,7 +55,7 @@
             <label class="form-label text-light small fw-medium">سوال امنیتی</label>
             <select class="form-select" name="security_question_id" v-model="security_question_id" required>
                 <option value="">یک سوال انتخاب کنید</option>
-                <option v-for="(text, id) in securityQuestions" :key="id" :value="String(id)">{{ text }}</option>
+                <option v-for="q in securityQuestions" :key="q.id" :value="String(q.id)">{{ q.text }}</option>
             </select>
         </div>
 
@@ -89,9 +89,11 @@
                 email: '',
                 password: '',
                 password_confirm: '',
+
+                securityQuestions: [],
                 security_question_id: '',
                 security_answer: '',
-                securityQuestions: <?= json_encode(security_questions_list(), JSON_UNESCAPED_UNICODE) ?>,
+
                 showPassword: false,
                 showPasswordConfirm: false,
                 loading: false,
@@ -100,7 +102,24 @@
             };
         },
 
+        mounted() {
+            this.loadSecurityQuestions();
+        },
+
         methods: {
+
+            async loadSecurityQuestions() {
+                try {
+                    const { data } = await axios.get(
+                        "<?= site_url('api/auth/security_questions') ?>"
+                    );
+                    this.securityQuestions = data;
+                } catch (e) {
+                    this.error = 'خطا در بارگذاری سوال‌های امنیتی';
+                }
+            },
+
+
             async register() {
                 this.error = '';
                 this.success = '';

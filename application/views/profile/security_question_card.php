@@ -27,7 +27,7 @@
             <label class="form-label text-light small">سوال امنیتی</label>
             <select class="form-select" v-model="securityQuestionId" required>
                 <option value="">یک سوال انتخاب کنید</option>
-                <option v-for="(text, id) in securityQuestions" :key="id" :value="String(id)">{{ text }}</option>
+                <option v-for="q in securityQuestions" :key="q.id" :value="String(q.id)">{{ q.text }}</option>
             </select>
         </div>
 

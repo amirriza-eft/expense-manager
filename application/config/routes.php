@@ -70,6 +70,9 @@ $route['api/auth/logout']['POST'] =
 $route['api/auth/restore']['POST'] =
     'api/Auth_API_Controller/restore';
 
+$route['api/auth/security_questions']['GET'] =
+    'api/Auth_API_Controller/security_questions';
+
 $route['api/auth/recovery/question']['POST'] =
     'api/Auth_API_Controller/recovery_question';
 

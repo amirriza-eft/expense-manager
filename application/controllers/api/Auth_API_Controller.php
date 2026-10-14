@@ -34,6 +34,11 @@ class Auth_API_Controller extends Base_API_Controller
             );
     }
 
+    public function security_questions()
+    {
+        return $this->json($this->auth_service->security_questions());
+    }
+
     public function register()
     {
         if(!$this->validator->register()){

@@ -44,7 +44,6 @@ class Profile_service
                     ? security_question_text($question_id)
                     : ''
             ],
-            'security_questions' => security_questions_list()
         ];
     }
 
